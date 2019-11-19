@@ -1,0 +1,12 @@
+{
+  "orgName": "Adyen",
+  "country": "NL",
+  "username": "harm@adyen.bundle",
+  "adminEmail": "harm.korten@appsolutely.nl",
+  "edition": "Developer",
+  "language": "en_US",
+  "features": [
+    "Communities"
+  ],
+  "settings": {}
+}

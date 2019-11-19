@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Capture_Only_Auth</fullName>
+    <active>true</active>
+    <description>Capture is only available for &#39;AUTH&#39; transactions.</description>
+    <errorConditionFormula>AND(ccrz__TransactionType__c != &#39;AUTH&#39;, Capture_Payment__c)</errorConditionFormula>
+    <errorMessage>Capture is only available for &#39;AUTH&#39; transactions.</errorMessage>
+</ValidationRule>

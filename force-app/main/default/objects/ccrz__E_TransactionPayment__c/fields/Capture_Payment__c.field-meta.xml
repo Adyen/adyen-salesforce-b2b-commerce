@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Capture_Payment__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Used to Capture a Payment from an Auth transaction</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Used to Capture a Payment from an Auth transaction</inlineHelpText>
+    <label>Capture Payment</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
