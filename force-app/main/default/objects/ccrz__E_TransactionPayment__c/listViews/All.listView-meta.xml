@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>ccrz__Amount__c</columns>
+    <columns>ccrz__CCOrder__c</columns>
+    <columns>ccrz__CurrencyISOCode__c</columns>
+    <columns>ccrz__TransactionCode__c</columns>
+    <columns>ccrz__TransactionType__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All</label>
+</ListView>
