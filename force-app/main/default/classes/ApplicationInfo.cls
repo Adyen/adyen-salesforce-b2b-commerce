@@ -15,6 +15,7 @@
 
 public class ApplicationInfo {
     public PaymentSource adyenPaymentSource = new PaymentSource();
+    public PaymentSource merchantApplication = new PaymentSource();
     public ExternalPlatform externalPlatform = new ExternalPlatform();
 
 }
