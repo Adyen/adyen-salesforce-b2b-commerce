@@ -7,12 +7,15 @@ public with sharing class AdyenUtil {
         request.applicationInfo = new ApplicationInfo();
         request.applicationInfo.adyenPaymentSource = new PaymentSource();
         request.applicationInfo.externalPlatform = new ExternalPlatform();
-        
+        request.applicationInfo.merchantApplication = new MerchantApplication();
+
         request.applicationInfo.adyenPaymentSource.version = '1.0.0';
         request.applicationInfo.adyenPaymentSource.name = 'adyen-salesforce-b2b-commerce';
         request.applicationInfo.externalPlatform.name = 'SalesforceB2BCommerce';
         request.applicationInfo.externalPlatform.integrator = '';
         request.applicationInfo.externalPlatform.version = '';
+        request.applicationInfo.merchantApplication.version = '1.0.0';
+        request.applicationInfo.merchantApplication.name = 'adyen-salesforce-b2b-commerce';
         
         ccrz__E_Cart__c cart = (ccrz__E_Cart__c)inputData.get('cart');
         ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
@@ -42,12 +45,15 @@ public with sharing class AdyenUtil {
         request.applicationInfo = new ApplicationInfo();
         request.applicationInfo.adyenPaymentSource = new PaymentSource();
         request.applicationInfo.externalPlatform = new ExternalPlatform();
+        request.applicationInfo.merchantApplication = new MerchantApplication();
         
         request.applicationInfo.adyenPaymentSource.version = '1.0.0';
         request.applicationInfo.adyenPaymentSource.name = 'adyen-salesforce-b2b-commerce';
         request.applicationInfo.externalPlatform.name = 'SalesforceB2BCommerce';
         request.applicationInfo.externalPlatform.integrator = '';
         request.applicationInfo.externalPlatform.version = '';
+        request.applicationInfo.merchantApplication.version = '1.0.0';
+        request.applicationInfo.merchantApplication.name = 'adyen-salesforce-b2b-commerce';
         
         request.amount.currency_x = UserInfo.getDefaultCurrency();
         request.amount.value = 0;
@@ -75,12 +81,15 @@ public with sharing class AdyenUtil {
         request.applicationInfo = new ApplicationInfo();
         request.applicationInfo.adyenPaymentSource = new PaymentSource();
         request.applicationInfo.externalPlatform = new ExternalPlatform();
-        
+        request.applicationInfo.merchantApplication = new MerchantApplication();
+
         request.applicationInfo.adyenPaymentSource.version = '1.0.0';
         request.applicationInfo.adyenPaymentSource.name = 'adyen-salesforce-b2b-commerce';
         request.applicationInfo.externalPlatform.name = 'SalesforceB2BCommerce';
         request.applicationInfo.externalPlatform.integrator = '';
         request.applicationInfo.externalPlatform.version = '';
+        request.applicationInfo.merchantApplication.version = '1.0.0';
+        request.applicationInfo.merchantApplication.name = 'adyen-salesforce-b2b-commerce';
         
         ccrz__E_Cart__c cart = (ccrz__E_Cart__c)inputData.get('cart');
         ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
