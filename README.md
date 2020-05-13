@@ -15,5 +15,7 @@ Follow the installation steps provided [here](https://developer.salesforce.com/d
 Please refer to the [Adyen online docs](https://docs.is.adyen.com/plugins/salesforce-b2b-commerce) for the Adyen Salesforce B2B App integration.
 
 ## Support
+If you have a feature request, or spotted a bug or a technical problem, create a GitHub issue. For other questions, contact our [support team](https://support.adyen.com/hc/en-us/requests/new?ticket_form_id=360000705420).
 
-For questions you can reach out to [Adyen Support](mailto:support@adyen.com).
+## License
+MIT license. For more information, see the LICENSE file.
