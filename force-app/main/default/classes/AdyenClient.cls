@@ -35,6 +35,34 @@ public class AdyenClient {
         }
         return output;
     }
+
+    public static OASPaymentMethodsResponse getPaymentMethods(Merchant__mdt merchantRecord, OASPaymentMethodsRequest request){
+            OASPaymentMethodsResponse paymentMethods = new OASPaymentMethodsResponse();
+             try {
+                    Http httpClient = new Http();
+                    HttpRequest httpReq = new HttpRequest();
+                    httpReq.setEndpoint(merchantRecord.PaymentMethods_Endpoint__c);
+                    httpReq.setMethod('POST');
+                    httpReq.setHeader('X-API-KEY', merchantRecord.API_Key__c);
+                    httpReq.setHeader('Content-Type', 'application/json');
+                    String jsonString = JSON.serialize(request, true);
+                    jsonString = Util.stripX(jsonString);
+                    System.Debug('## Raw request paymentMethods '+jsonString);
+                    httpReq.setBody(jsonString);
+                    HttpResponse httpResp = httpClient.send(httpReq);
+                    System.Debug('## Raw response paymentMethods'+ httpResp.getBody());
+                    if(httpResp.getStatusCode() == 200) {
+                        paymentMethods = (OASPaymentMethodsResponse) JSON.deserialize(Util.replaceDots(httpResp.getBody()), OASPaymentMethodsResponse.class);
+                    } else {
+                        System.Debug('## Raw response invalid /paymentMethods request');
+                    }
+                }
+                catch(Exception e) {
+                    ccrz.ccLog.log(LoggingLevel.ERROR,'Err',e);
+                }
+                return paymentMethods;
+    }
+
 //    public static CaptureResponse capturePayment(Merchant__mdt merchantRecord, CaptureRequest request) {
 //        CaptureResponse output = new CaptureResponse();
 //        try {

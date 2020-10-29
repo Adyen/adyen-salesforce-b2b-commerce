@@ -145,7 +145,18 @@ public with sharing class AdyenUtil {
         
         return request;
     }
-    
+
+    public static OASPaymentMethodsRequest createPaymentMethodsRequest(ccrz__E_Cart__c cart, Merchant__mdt merchant){
+           OASPaymentMethodsRequest paymentMethodsRequest = new OASPaymentMethodsRequest();
+           OASAmount amount = new OASAmount();
+           amount.currency_x = cart.ccrz__CurrencyISOCode__c;
+           amount.value = (Long)cart.ccrz__TotalAmount__c * 100;
+           paymentMethodsRequest.amount = amount;
+           paymentMethodsRequest.merchantAccount = merchant.Name__c;
+           paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
+           paymentMethodsRequest.countryCode = 'US';
+           return paymentMethodsRequest;
+    }
 //    public static CaptureRequest captureFromTransPayment(ccrz__E_TransactionPayment__c tp, Merchant__mdt merchant)
 //    {
 //        CaptureRequest cr = new CaptureRequest();

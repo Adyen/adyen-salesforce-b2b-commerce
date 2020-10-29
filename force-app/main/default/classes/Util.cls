@@ -11,7 +11,7 @@ public inherited sharing class Util {
         return output;
     }
     public static Merchant__mdt getConfigByName(String configName) {
-        Merchant__mdt[] configs = [SELECT API_Key__c, Capture_Endpoint__c, Authorise_Endpoint__c, Disable_Endpoint__c, Payment_Endpoint__c, Name__c, QualifiedApiName FROM Merchant__mdt WHERE DeveloperName=:configName LIMIT 1];
+        Merchant__mdt[] configs = [SELECT API_Key__c, Capture_Endpoint__c, Authorise_Endpoint__c, Disable_Endpoint__c, Payment_Endpoint__c, PaymentMethods_Endpoint__c, Name__c, QualifiedApiName FROM Merchant__mdt WHERE DeveloperName=:configName LIMIT 1];
         if(configs <> null && configs.size()==1) {
             return configs[0];
         } else {

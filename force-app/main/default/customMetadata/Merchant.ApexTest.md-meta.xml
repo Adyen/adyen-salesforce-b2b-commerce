@@ -23,6 +23,10 @@
         <value xsi:type="xsd:string">https://checkout-test.adyen.com/v51/payments</value>
     </values>
     <values>
+        <field>PaymentMethods_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://checkout-test.adyen.com/v51/paymentMethods</value>
+    </values>
+    <values>
         <field>Name__c</field>
         <value xsi:type="xsd:string">ApexTest</value>
     </values>
