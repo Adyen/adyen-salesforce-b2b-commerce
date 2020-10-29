@@ -103,10 +103,7 @@ global with sharing class PmtAdyenPayController {
     global static ccrz.cc_RemoteActionResult getPaymentMethods(ccrz.cc_RemoteActionContext ctx) {
        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
        try {
-            //TODOBAS create getCart function
-            String cartId = ctx.currentCartId;
-            String query = 'SELECT '+Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c'))+', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
-            ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
+            ccrz__E_Cart__c cart = getCartById(ctx.currentCartId);
 
             Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
             Map<String, String> mapConfigs = (Map<String,String>)mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
@@ -128,6 +125,13 @@ global with sharing class PmtAdyenPayController {
         }
         return res;
     }
+
+    private static ccrz__E_Cart__c getCartById(String cartId){
+        String query = 'SELECT '+Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c'))+', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
+        ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
+        return cart;
+    }
+
     public static List<String> validateInputs(Map<String, Map<String, String>> inputData)
     {
         List<String> listString = new List<String>();
