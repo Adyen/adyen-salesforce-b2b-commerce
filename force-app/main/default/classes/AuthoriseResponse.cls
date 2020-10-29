@@ -101,8 +101,8 @@ global class AuthoriseResponse {
     global String pspReference;
     global String resultCode;
     global String merchantReference;
-    global AdditionalData additionalData;
-    global FraudResult fraudResult;
+//    global AdditionalData additionalData;
+//    global FraudResult fraudResult;
     //
     // Added by the client
     global Error errorDetail;

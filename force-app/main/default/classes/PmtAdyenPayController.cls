@@ -55,7 +55,8 @@ global with sharing class PmtAdyenPayController {
             //ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT = 'Checkout'
             Map<String,Object> processResult = paymentHook.processPayment(createParams);
             //System.Debug('#### processResult '+processResult);
-            
+
+
             Map<String,Object> placeParams = new Map<String,Object>{
                 ccrz.ccApi.API_VERSION => 9,
                     ccrz.ccApiCart.PAYMENTDATA => JSON.serialize(inputParams),

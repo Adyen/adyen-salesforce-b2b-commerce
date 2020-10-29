@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
-    <icon>Adyen/Icon.jpg</icon>
-    <label>Adyen Setup</label>
-    <motif>Custom173: TV Widescreen</motif>
-    <page>Setup</page>
-</CustomTab>
