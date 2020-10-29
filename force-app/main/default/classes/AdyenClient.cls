@@ -47,10 +47,8 @@ public class AdyenClient {
                     httpReq.setHeader('Content-Type', 'application/json');
                     String jsonString = JSON.serialize(request, true);
                     jsonString = Util.stripX(jsonString);
-                    System.Debug('## Raw request paymentMethods '+jsonString);
                     httpReq.setBody(jsonString);
                     HttpResponse httpResp = httpClient.send(httpReq);
-                    System.Debug('## Raw response paymentMethods'+ httpResp.getBody());
                     if(httpResp.getStatusCode() == 200) {
                         paymentMethods = (OASPaymentMethodsResponse) JSON.deserialize(Util.replaceDots(httpResp.getBody()), OASPaymentMethodsResponse.class);
                     } else {
