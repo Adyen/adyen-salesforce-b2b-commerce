@@ -5,26 +5,25 @@ global with sharing class PmtAdyenPayController {
     @RemoteAction
     global static ccrz.cc_RemoteActionResult pressMeCcrz( ccrz.cc_RemoteActionContext ctx, Map<String, Map<String, String>> inputData) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
-
-        try{         
+        try{
             List<String> inputValidations = validateInputs(inputData);
-            
+
             if(inputValidations.size() > 0)
             {
                 res.success = false;
                 res.data = inputData;
-                
+
                 for(String s : inputValidations)
                 {
                     ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(s);
                     res.messages.add(m);
                 }
-                
+
                 return res;
             }
-            
+
             Boolean savePayment = (Boolean.valueOf((String) inputData.get('saveAsStoredPayment').get('value')) == true);
-            
+
             ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
             String cartId = ctx.currentCartId;
             String query = 'SELECT '+Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c'))+', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
@@ -38,11 +37,11 @@ global with sharing class PmtAdyenPayController {
             inputParams.put('displayName',inputData.get('accountName').get('value'));
             inputParams.put('accountType', 'adyencc');
             inputParams.put('saveAsStoredPayment', savePayment);
-            
+
             if(inputData.containsKey('storedPaymentId')){
                 inputParams.put('storedPaymentId',inputData.get('storedPaymentId').get('value'));
             }
-             
+
             Map<String,Object> createParams = new Map<String,Object>{
                 ccrz.cc_hk_Payment.PARAM_TRANSACTION_DATA => JSON.serialize(inputParams),
                     ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX => ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT,
@@ -56,7 +55,6 @@ global with sharing class PmtAdyenPayController {
             Map<String,Object> processResult = paymentHook.processPayment(createParams);
             //System.Debug('#### processResult '+processResult);
 
-
             Map<String,Object> placeParams = new Map<String,Object>{
                 ccrz.ccApi.API_VERSION => 9,
                     ccrz.ccApiCart.PAYMENTDATA => JSON.serialize(inputParams),
@@ -67,7 +65,7 @@ global with sharing class PmtAdyenPayController {
                         if(Test.isRunningTest()){
                             placeParams.put(ccrz.ccApiCart.SKIP_VALID_CHECK, true);
                         }
-            
+
             Map<String,Object> placeResult = ccrz.ccApiCart.place(placeParams);
             //
             // Get order enc-id
@@ -91,7 +89,7 @@ global with sharing class PmtAdyenPayController {
             //System.Debug('#### exception '+e.getMessage()+e.getStackTraceString());
             res.success = false;
             res.data = inputData;
-            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage()); 
+            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage());
             res.messages.add(m);
             return res;
         }
@@ -100,7 +98,40 @@ global with sharing class PmtAdyenPayController {
         }
         return res;
     }
-    
+
+    @RemoteAction
+    global static ccrz.cc_RemoteActionResult getPaymentMethods(ccrz.cc_RemoteActionContext ctx) {
+       ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+       try {
+            ccrz__E_Cart__c cart = getCartById(ctx.currentCartId);
+
+            Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
+            Map<String, String> mapConfigs = (Map<String,String>)mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
+            Merchant__mdt merchant = Util.getConfigByName(mapConfigs.get('pmt_adyencc.config'));
+
+            OASPaymentMethodsRequest paymentMethodsRequest = AdyenUtil.createPaymentMethodsRequest(cart, merchant);
+            OASPaymentMethodsResponse paymentMethodsResponse = AdyenClient.getPaymentMethods(merchant, paymentMethodsRequest);
+
+            res.success = true;
+            res.data = paymentMethodsResponse;
+        }
+        catch(Exception e) {
+            ccrz.ccLog.log(LoggingLevel.ERROR,'Err',e);
+            System.Debug('## ERROR CATCH ' + e);
+            res.success = false;
+        }
+        finally {
+            ccrz.ccLog.close(res);
+        }
+        return res;
+    }
+
+    private static ccrz__E_Cart__c getCartById(String cartId){
+        String query = 'SELECT '+Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c'))+', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
+        ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
+        return cart;
+    }
+
     public static List<String> validateInputs(Map<String, Map<String, String>> inputData)
     {
         List<String> listString = new List<String>();

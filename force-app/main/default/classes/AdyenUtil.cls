@@ -145,7 +145,34 @@ public with sharing class AdyenUtil {
         
         return request;
     }
-    
+
+    public static OASPaymentMethodsRequest createPaymentMethodsRequest(ccrz__E_Cart__c cart, Merchant__mdt merchant){
+       OASPaymentMethodsRequest paymentMethodsRequest = new OASPaymentMethodsRequest();
+       Integer multiplier = getMultiplierMinorUnits(cart.ccrz__CurrencyISOCode__c);
+       OASAmount amount = new OASAmount();
+       amount.currency_x = cart.ccrz__CurrencyISOCode__c;
+       amount.value = (Long)cart.ccrz__TotalAmount__c * multiplier;
+       paymentMethodsRequest.amount = amount;
+       paymentMethodsRequest.merchantAccount = merchant.Name__c;
+       paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
+       paymentMethodsRequest.countryCode = 'US';
+       return paymentMethodsRequest;
+    }
+
+    public static Integer getMultiplierMinorUnits(String currencyCode){
+        switch on currencyCode {
+          when 'CVE','DJF', 'GNF','IDR','JPY','KMF','KRW', 'PYG','RWF','UGX','VND', 'VUV', 'XAF', 'XOF', 'XPF' {
+            return 1;
+          }
+          when 'BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND' {
+            return 1000;
+          }
+          when else {
+            return 100;
+          }
+        }
+    }
+
 //    public static CaptureRequest captureFromTransPayment(ccrz__E_TransactionPayment__c tp, Merchant__mdt merchant)
 //    {
 //        CaptureRequest cr = new CaptureRequest();

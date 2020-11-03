@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PaymentMethods_Endpoint__c</fullName>
+    <defaultValue>&quot;https://checkout-test.adyen.com/v49/&quot;</defaultValue>
+    <description>Endpoint to retrieve paymentMethods from Adyen</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Endpoint to retrieve paymentMethods from Adyen</inlineHelpText>
+    <label>PaymentMethods Endpoint</label>
+    <required>false</required>
+    <type>Url</type>
+</CustomField>

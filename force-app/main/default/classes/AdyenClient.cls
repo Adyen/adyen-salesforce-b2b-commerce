@@ -35,6 +35,43 @@ public class AdyenClient {
         }
         return output;
     }
+
+    public static OASPaymentMethodsResponse getPaymentMethods(Merchant__mdt merchantRecord, OASPaymentMethodsRequest request){
+        OASPaymentMethodsResponse paymentMethods = new OASPaymentMethodsResponse();
+        try {
+            Http httpClient = new Http();
+            String jsonString = JSON.serialize(request, true);
+            HttpRequest httpReq = createHttpRequest(merchantRecord.API_Key__c, merchantRecord.PaymentMethods_Endpoint__c, jsonString);
+            HttpResponse httpResp = httpClient.send(httpReq);
+
+            if(isHttpResponseOK(httpResp.getStatusCode())) {
+                paymentMethods = (OASPaymentMethodsResponse) JSON.deserialize(Util.replaceDots(httpResp.getBody()), OASPaymentMethodsResponse.class);
+            } else {
+                System.Debug('## Raw response invalid /paymentMethods request');
+            }
+        }
+        catch(Exception e) {
+            ccrz.ccLog.log(LoggingLevel.ERROR,'Err',e);
+        }
+        return paymentMethods;
+    }
+
+    public static HttpRequest createHttpRequest(String apiKey, String endpoint, String request){
+        HttpRequest httpReq = new HttpRequest();
+        httpReq.setEndpoint(endpoint);
+        httpReq.setMethod('POST');
+        httpReq.setHeader('X-API-KEY', apiKey);
+        httpReq.setHeader('Content-Type', 'application/json');
+        request = Util.stripX(request);
+        httpReq.setBody(request);
+        return httpReq;
+    }
+
+    public static Boolean isHttpResponseOK(Integer responseCode){
+        List<Integer> responseOK = new List<Integer> {200, 201, 202, 204};
+        return responseOK.contains(responseCode);
+    }
+
 //    public static CaptureResponse capturePayment(Merchant__mdt merchantRecord, CaptureRequest request) {
 //        CaptureResponse output = new CaptureResponse();
 //        try {
