@@ -12,13 +12,13 @@ public class AdyenClient {
             httpReq.setHeader('X-API-KEY', merchantRecord.API_Key__c);
             httpReq.setHeader('Content-Type', 'application/json');
             String jsonString = JSON.serialize(request, true);
-            jsonString = Util.stripX(jsonString);
+            jsonString = Util.makeAdyenCompatible(jsonString);
             System.Debug('## Raw request '+jsonString);
             httpReq.setBody(jsonString);
             HttpResponse httpResp = httpClient.send(httpReq);
             System.Debug('## Raw response '+httpResp.getBody());
             if(httpResp.getStatusCode() == 200) {
-                output = (AuthoriseResponse) JSON.deserialize(Util.replaceDots(httpResp.getBody()), AuthoriseResponse.class);
+                output = (AuthoriseResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResp.getBody()), AuthoriseResponse.class);
                 output.success = true;
             } else {
                 output.errorDetail =  (Error) JSON.deserialize(httpResp.getBody(), Error.class);
@@ -45,7 +45,7 @@ public class AdyenClient {
             HttpResponse httpResp = httpClient.send(httpReq);
 
             if(isHttpResponseOK(httpResp.getStatusCode())) {
-                paymentMethods = (OASPaymentMethodsResponse) JSON.deserialize(Util.replaceDots(httpResp.getBody()), OASPaymentMethodsResponse.class);
+                paymentMethods = (OASPaymentMethodsResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResp.getBody()), OASPaymentMethodsResponse.class);
             } else {
                 System.Debug('## Raw response invalid /paymentMethods request');
             }
@@ -62,7 +62,7 @@ public class AdyenClient {
         httpReq.setMethod('POST');
         httpReq.setHeader('X-API-KEY', apiKey);
         httpReq.setHeader('Content-Type', 'application/json');
-        request = Util.stripX(request);
+        request = Util.makeAdyenCompatible(request);
         httpReq.setBody(request);
         return httpReq;
     }
@@ -154,7 +154,7 @@ public class AdyenClient {
 //            HttpResponse httpResp = httpClient.send(httpReq);
 //            //System.Debug('## Raw response '+httpResp.getBody());
 //            if(httpResp.getStatusCode() == 200) {
-//                output = (AuthoriseResponse) JSON.deserialize(Util.replaceDots(httpResp.getBody()), AuthoriseResponse.class);
+//                output = (AuthoriseResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResp.getBody()), AuthoriseResponse.class);
 //                output.success = true;
 //            } else {
 //                output.errorDetail =  (Error) JSON.deserialize(httpResp.getBody(), Error.class);

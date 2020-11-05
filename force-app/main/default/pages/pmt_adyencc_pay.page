@@ -25,9 +25,9 @@
         '{!$RemoteAction.PmtAdyenPayController.getPaymentMethods}',
         CCRZ.pagevars.remoteContext,
         function(result, event){
-            console.log("getPaymentMethods external");
             if(result.data){
-                renderAdyenComponent(result.data);
+                const paymentMethods = convertToJsonObject(result.data);
+                renderAdyenComponent(paymentMethods);
             }
         },
         { escape: true }

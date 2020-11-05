@@ -155,6 +155,7 @@ public with sharing class AdyenUtil {
        paymentMethodsRequest.amount = amount;
        paymentMethodsRequest.merchantAccount = merchant.Name__c;
        paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
+       paymentMethodsRequest.allowedPaymentMethods = new List<String> {'card'};
        paymentMethodsRequest.countryCode = 'US';
        return paymentMethodsRequest;
     }

@@ -1,16 +1,9 @@
 //
 // Utility methods
 public inherited sharing class Util {
-    //
-    // Strip off the _x's needed to avoid protected keywords
-    public static String stripX(String input) {
-        String output = input;
-        if(output <> null) {
-            output = output.replace('_x','');
-        }
-        return output;
-    }
-    public static Merchant__mdt getConfigByName(String configName) {
+
+    public static Merchant__mdt getConfigByName(String configName)
+    {
         Merchant__mdt[] configs = [SELECT API_Key__c, Capture_Endpoint__c, Authorise_Endpoint__c, Disable_Endpoint__c, Payment_Endpoint__c, PaymentMethods_Endpoint__c, Name__c, QualifiedApiName FROM Merchant__mdt WHERE DeveloperName=:configName LIMIT 1];
         if(configs <> null && configs.size()==1) {
             return configs[0];
@@ -18,13 +11,32 @@ public inherited sharing class Util {
             return null;
         }
     }
-    public static String replaceDots(String input)
+
+    // Delete the suffix from Reserved Keywords
+    public static String makeAdyenCompatible(String input)
     {
         String output = input;
+        Map<String, String> mapKeyToReplace = new Map<String, String>();
+        mapKeyToReplace.put('currency_x', 'currency');
+        mapKeyToReplace.put('number_x', 'number');
+        mapKeyToReplace.put('group_x', 'group');
+        for(String key : mapKeyToReplace.keySet())
+        {
+            output = output.replace(key, mapKeyToReplace.get(key));
+        }
 
+        return output;
+    }
+
+    //Add suffix to avoid Reserved Keywords
+    public static String makeSalesforceCompatible(String input)
+    {
+        String output = input;
         Map<String, String> mapKeyToReplace = new Map<String, String>();
         mapKeyToReplace.put('recurring.recurringDetailReference', 'recurring_recurringDetailReference');
-
+        mapKeyToReplace.put('currency', 'currency_x');
+        mapKeyToReplace.put('number', 'number_x');
+        mapKeyToReplace.put('group', 'group_x');
         for(String key : mapKeyToReplace.keySet())
         {
             output = output.replace(key, mapKeyToReplace.get(key));
