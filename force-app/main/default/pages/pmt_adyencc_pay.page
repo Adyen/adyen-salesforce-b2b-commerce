@@ -67,32 +67,6 @@
             this.$el.html(this.templatePhone(this.model));
             return this;
         },
-        // initValidation : function() {
-        //     jQuery.validator.addMethod("ccNumber", function (value, element) {
-        //         return luhnCheck(value);
-        //     }, CCRZ.pagevars.pageLabels['PMTAdyencc_accountNumberInvalid']);
-        //     $('#payAdyenccForm').validate({
-        //         invalidHandler : function(event, validator) {
-        //             CCRZ.handleValidationErrors(event, validator, 'error_messages_section', false);
-        //         },
-        //         rules : {
-        //             accountNumber : { required : true, ccNumber : true },
-        //             expirationMonth : { required : true, range : [1, 12] },
-        //             expirationYear : { required : true },
-        //             verificationCode : { required : true, minlength : 3, maxlength : 4}
-        //         },
-        //         messages : {
-        //             accountNumber : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_accountNumberReq']},
-        //             expirationMonth : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_expirationMonthReq'], range : CCRZ.pagevars.pageLabels['PMTAdyencc_expirationMonthInvalid']},
-        //             expirationYear : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_expirationYearReq']},
-        //             verificationCode : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_verificationCodeReq'], minlength : CCRZ.pagevars.pageLabels['PMTAdyencc_verificationCodeInvalid'], maxlength : CCRZ.pagevars.pageLabels['PMTAdyencc_verificationCodeInvalid']}
-        //         },
-        //         errorPlacement : function(error, element) { }
-        //     });
-        // },
-        postRender : function() {
-            // this.initValidation();
-        },
         submitStep: function() {
             //TODOBAS add here stateData.isValid check
             if ($('#payAdyenccForm').valid()) {
