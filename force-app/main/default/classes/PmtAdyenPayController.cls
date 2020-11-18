@@ -112,8 +112,12 @@ global with sharing class PmtAdyenPayController {
             OASPaymentMethodsRequest paymentMethodsRequest = AdyenUtil.createPaymentMethodsRequest(cart, merchant);
             OASPaymentMethodsResponse paymentMethodsResponse = AdyenClient.getPaymentMethods(merchant, paymentMethodsRequest);
 
+            //Remove suffix and convert to string
+            String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
+            String stringPaymentMethodsResponse = Util.makeAdyenCompatible(jsonPaymentMethodsResponse);
+
+            res.data = stringPaymentMethodsResponse;
             res.success = true;
-            res.data = paymentMethodsResponse;
         }
         catch(Exception e) {
             ccrz.ccLog.log(LoggingLevel.ERROR,'Err',e);
