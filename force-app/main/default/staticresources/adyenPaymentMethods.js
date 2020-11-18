@@ -3,9 +3,9 @@ let checkout;
 function renderAdyenComponent(paymentMethodsResponse) {
     //TODOBAS This will be configurable in later phase. Also client key instead of originKey
     const configuration = {
-        locale: "en_US",
-        environment: "test",
-        clientKey: "test_V34KOGIDVJHLTOSMCTHATSWM5AFOQB6M",
+        locale: 'en_US',
+        environment: 'test',
+        clientKey: 'test_V34KOGIDVJHLTOSMCTHATSWM5AFOQB6M',
         paymentMethodsResponse: paymentMethodsResponse,
         onChange: handleOnChange,
     };
@@ -19,11 +19,14 @@ function renderAdyenComponent(paymentMethodsResponse) {
 }
 
 function handleOnChange(state){
-    //handleOnChange
+    if(state.isValid){
+        document.getElementById('adyenStateData').value = JSON.stringify(state.data);
+        console.log(state.data);
+    }
 }
 
 function renderPaymentMethod(paymentMethod){
-    paymentMethod.type = paymentMethod.type == "scheme" ? "card" : paymentMethod.type;
+    paymentMethod.type = paymentMethod.type == 'scheme' ? 'card' : paymentMethod.type;
     const paymentMethodsUI = document.querySelector('#paymentMethodsList');
     const container = document.createElement('div');
     const li = document.createElement('li');
@@ -42,9 +45,9 @@ function renderPaymentMethod(paymentMethod){
 
 function configureListItem(paymentMethod, li){
     const liContents = `
-                         <input name="brandCode" type="radio" value="${paymentMethod.type}" id="rb_${paymentMethod.type}">
-                         <img class="paymentMethod_img" src="https://checkoutshopper-test.adyen.com/checkoutshopper/images/logos/medium/${paymentMethod.type}.png">
-                         <label id="lb_${paymentMethod.type}" for="rb_${paymentMethod.type}">${paymentMethod.name}</label>
+                         <input name='brandCode' type='radio' value='${paymentMethod.type}' id='rb_${paymentMethod.type}'>
+                         <img class='paymentMethod_img' src='https://checkoutshopper-test.adyen.com/checkoutshopper/images/logos/medium/${paymentMethod.type}.png'>
+                         <label id='lb_${paymentMethod.type}' for='rb_${paymentMethod.type}'>${paymentMethod.name}</label>
                        `;
     li.innerHTML = liContents;
     li.classList.add('paymentMethod');

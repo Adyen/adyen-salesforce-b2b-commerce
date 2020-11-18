@@ -1,9 +1,10 @@
 global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaymentProcessor{
-    global override Map<String,Object> preProcess(Map<String,Object> inputData) {
+    global override Map<String,Object> preProcess(Map<String,Object> inputData, String stateData) {
         //System.debug('preProcess');
         //system.debug(inputData);
         ccrz.ccLog.log(System.LoggingLevel.DEBUG, 'preProcess', inputData );
         //checkout flow
+        //TODOBAS why this check?
         if(inputData.get(ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX) == ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX_CHECKOUT)
         {
             ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA);
@@ -15,6 +16,30 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
             Boolean immediateCapture = Boolean.valueOf(mapConfigs.get('pmt_adyencc.immediate_capture'));
 
             paymentParams.transactionType = immediateCapture ? 'AUTH+CAPTURE' : 'AUTH';
+
+            //TODOBAS create full paymentRequest
+            PaymentRequest paymentRequest = AdyenPaymentRequest.createPaymentRequestFromStateData(stateData);
+            //TODOBAS new ApplicationInfo() ??
+            //TODOBAS AddAmount() ??
+            paymentRequest = AdyenPaymentRequest.addAmount()
+            paymentRequest.applicationInfo = AdyenUtil.updateApplicationInfo(paymentRequest.applicationInfo);
+    //        StateData stateDataParsed = (StateData) JSON.deserialize(stateData, StateData.class);
+            System.Debug('#### paymentRequest '+ paymentRequest);
+            System.Debug('#### paymentRequest paymentMethod '+ paymentRequest.paymentMethod);
+            System.Debug('#### paymentRequest RiskData '+ paymentRequest.riskData);
+            System.Debug('#### paymentRequest BrowserInfo '+ paymentRequest.browserInfo);
+            System.Debug('#### paymentRequest BrowserInfo acceptHeader '+ paymentRequest.browserInfo.acceptHeader);
+
+            //TODOBAS check this copy from AdyenUtil
+
+             ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
+            PaymentRequest paymentRequest = createPaymentRequest(inputData, merchant);
+
+            paymentRequest.applicationInfo = updateApplicationInfo(paymentRequest.applicationInfo);
+
+            paymentRequest.paymentMethod = setPaymentDetails(paymentParams);
+            paymentRequest.storePaymentMethod = paymentParams.saveAsStoredPayment;
+
             //need to check if it's a stored payment method
             //if it is a stored pay method, get the token and call adyen
             //if not, call adyen with cc number, get the token back and update it on paymentParams to store token in pay method record (only if saveAsStoredPayment = true) and get only 4 last digits of the cc
@@ -50,7 +75,7 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
 //            {
                 //call adyen to payment
                 
-                OASPaymentRequest authRequest = AdyenUtil.authoriseFromTransactionParams(inputData, merchant);
+                PaymentRequest authRequest = AdyenPaymentRequest.authoriseFromTransactionParams(inputData, merchant);
                 AuthoriseResponse authResponse = AdyenClient.authorisePayment(merchant, authRequest);
                 
                 //System.debug(authResponse);

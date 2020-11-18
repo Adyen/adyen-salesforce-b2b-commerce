@@ -1,5 +1,5 @@
 global class AdyenInterface {
-//    global static AuthoriseResponse authorisePayment(String merchantRecord, adyen_payments.OASPaymentRequest request) {
+//    global static AuthoriseResponse authorisePayment(String merchantRecord, adyen_payments.PaymentRequest request) {
 //        Merchant__mdt merchant = Util.getConfigByName(merchantRecord);
 //        return AdyenClient.authorisePayment(merchant, request);
 //    }

@@ -1,5 +1,5 @@
 public with sharing class AdyenUtil {
-    public static OASPaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
+    public static PaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
     {
 //        AuthoriseRequest request = new AuthoriauthoriseFromTransactionParamsseRequest();
 //        request.amount = new Amount();
@@ -35,7 +35,7 @@ public with sharing class AdyenUtil {
 
 
         ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
-        OASPaymentRequest paymentRequest = createPaymentRequest(inputData, merchant);
+        PaymentRequest paymentRequest = createPaymentRequest(inputData, merchant);
 
         paymentRequest.applicationInfo = updateApplicationInfo(paymentRequest.applicationInfo);
 
@@ -46,9 +46,9 @@ public with sharing class AdyenUtil {
 
     }
 
-    public static OASPaymentRequest createPaymentRequest(Map<String, Object> inputData, Merchant__mdt merchant){
+    public static PaymentRequest createPaymentRequest(Map<String, Object> inputData, Merchant__mdt merchant){
         ccrz__E_Cart__c cart = (ccrz__E_Cart__c)inputData.get('cart');
-        OASPaymentRequest paymentRequest = new OASPaymentRequest();
+        PaymentRequest paymentRequest = new PaymentRequest();
         OASAmount amount = new OASAmount();
         amount.currency_x = cart.ccrz__CurrencyISOCode__c;
         amount.value = (Long)cart.ccrz__TotalAmount__c * 100;
@@ -61,7 +61,7 @@ public with sharing class AdyenUtil {
     }
 
     public static PaymentMethodDetails setPaymentDetails(ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams){
-        OASCardDetails card = new OASCardDetails();
+        CardDetails card = new CardDetails();
         card.number_x = paymentParams.accountNumber;
         card.expiryMonth = String.valueOf(paymentParams.expirationMonth);
         card.expiryYear = String.valueOf(paymentParams.expirationYear);
@@ -173,6 +173,86 @@ public with sharing class AdyenUtil {
           }
         }
     }
+
+   public static PaymentRequest paymentRequestBuilder(String stateData){
+        PaymentRequest paymentRequest = new PaymentRequest();
+        Map<String, Object> stateDataObjects = (Map<String, Object>) JSON.deserializeUntyped(stateData);
+        if(stateDataObjects.containsKey('riskData')){
+            Map<String, Object> riskData = (Map<String, Object>) stateDataObjects.get('riskData');
+            String serializedRiskData = JSON.serialize(riskData, true);
+            paymentRequest.riskData = (RiskData)JSON.deserialize(serializedRiskData, RiskData.class);
+        }
+
+        if(stateDataObjects.containsKey('browserInfo')){
+            Map<String, Object> browserInfo = (Map<String, Object>) stateDataObjects.get('browserInfo');
+            String serializedBrowserInfo = JSON.serialize(browserInfo, true);
+            paymentRequest.browserInfo = (BrowserInfo)JSON.deserialize(serializedBrowserInfo, BrowserInfo.class);
+        }
+
+        if(stateDataObjects.containsKey('paymentMethod')){
+        //        Map<String, Object> paymentMethod = (Map<String, Object>) stateDataObjects.get('paymentMethod');
+        //        System.Debug('#### paymentMethod ' + paymentMethod);
+            Map<String, Object> paymentMethod = (Map<String, Object>) stateDataObjects.get('paymentMethod');
+            //paymentRequest.paymentMethod.encryptedCardNumber = paymentMethod.get('encryptedCardNumber');
+            paymentRequest.paymentMethod = getPaymentMethodDetails(paymentMethod);
+//            String serializedPaymentMethod = JSON.serialize(paymentMethod, true);
+//            System.Debug('#### serializedPaymentMethod ' + serializedPaymentMethod);
+//            System.Debug('#### paymentMethod Parsed' + (PaymentMethodDetails)JSON.deserialize(serializedPaymentMethod, PaymentMethodDetails.class));
+//            paymentRequest.paymentMethod = (PaymentMethodDetails)JSON.deserialize(serializedPaymentMethod, PaymentMethodDetails.class);
+//
+
+        }
+
+        return paymentRequest;
+   }
+
+   public static PaymentMethodDetails getPaymentMethodDetails(Map<String, Object> paymentMethod){
+        String paymentType = (String)paymentMethod.get('type');
+        System.Debug('#### paymentType = ' + paymentType);
+        if(paymentType == 'scheme'){
+            CardDetails cardDetails = new CardDetails();
+            cardDetails.holderName = (String)paymentMethod.get('holderName');
+            cardDetails.encryptedCardNumber = (String)paymentMethod.get('encryptedCardNumber');
+            cardDetails.encryptedExpiryMonth = (String)paymentMethod.get('encryptedExpiryMonth');
+            cardDetails.encryptedExpiryYear = (String)paymentMethod.get('encryptedExpiryYear');
+            cardDetails.encryptedSecurityCode = (String)paymentMethod.get('encryptedSecurityCode');
+            return cardDetails;
+        }
+        else { //TODOBAS create payment method check  (switch statement)
+            return new CardDetails();
+        }
+
+   }
+
+   public static PaymentRequest parseStateData(String stateData){
+        System.Debug('#### parseStateData ' + stateData);
+        JSONParser parser = JSON.createParser(stateData);
+        PaymentRequest paymentRequest = new PaymentRequest();
+        System.Debug('#### parser ' + parser);
+        while (parser.nextToken() != System.JSONToken.END_OBJECT) {
+            if (parser.getCurrentToken() == System.JSONToken.FIELD_NAME) {
+                String text = parser.getText();
+                if (parser.nextToken() != System.JSONToken.VALUE_NULL) {
+                    if (text == 'riskData') {
+                    //TODOBAS readValueAs(RiskData)
+                          //paymentRequest.riskData = readValueAs(RiskData); //(RiskData) JSON.deserialize(parser, RiskData.class);
+                        paymentRequest.riskData = (RiskData)parser.readValueAs(RiskData.class);
+                    } else if (text == 'paymentMethod') {
+//                        paymentRequest.paymentMethod = new PaymentMethod(parser);
+                    } else if (text == 'browserInfo') {
+                        System.Debug('#### browserInfo parsed ' + (BrowserInfo)parser.readValueAs(BrowserInfo.class));
+                        paymentRequest.browserInfo = (BrowserInfo)parser.readValueAs(BrowserInfo.class); //(BrowserInfo) JSON.deserialize(parser, BrowserInfo.class);
+//                    } else if (text == 'clientStateDataIndicator') {
+//                        clientStateDataIndicator = parser.getBooleanValue();
+                    } else {
+                        System.debug(LoggingLevel.WARN, 'JSON2Apex consuming unrecognized property: '+text);
+//                        consumeObject(parser);
+                    }
+                }
+            }
+        }
+        return paymentRequest;
+   }
 
 //    public static CaptureRequest captureFromTransPayment(ccrz__E_TransactionPayment__c tp, Merchant__mdt merchant)
 //    {
