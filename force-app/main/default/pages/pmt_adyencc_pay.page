@@ -68,31 +68,26 @@
             return this;
         },
         submitStep: function() {
-            //TODOBAS add here stateData.isValid check
-            if ($('#payAdyenccForm').valid()) {
-                event.preventDefault();
-                let self = this;
-                loadingToggle();
-                Visualforce.remoting.Manager.invokeAction(
-                    '{!$RemoteAction.PmtAdyenPayController.pressMeCcrz}',
-                    CCRZ.pagevars.remoteContext,
-                    this.model.form,
-                    function(result, event){
-                        if (event.status && result.success) {
-                            self.model.errors = null;
-                            window.location.href = CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation?o='+result.data.orderInfo.ordId;
-                        } else if (event.type === 'exception') {
-                            self.model.errors = result.messages;
-                            loadingToggle();
-                        } else {
-                            self.model.errors = result.messages;
-                            loadingToggle();
-                        }
-                        self.render();
-                    },
-                    {escape: true}
-                );
-            }
+          //TODOBAS add here stateData.isValid check
+          Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.PmtAdyenPayController.pressMeCcrz}',
+                CCRZ.pagevars.remoteContext,
+                document.getElementById("adyenStateData").value,
+                function(result, event){
+                    if (event.status && result.success) {
+                        self.model.errors = null;
+                        window.location.href = CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation?o='+result.data.orderInfo.ordId;
+                    } else if (event.type === 'exception') {
+                        self.model.errors = result.messages;
+                        loadingToggle();
+                    } else {
+                        self.model.errors = result.messages;
+                        loadingToggle();
+                    }
+                    self.render();
+                },
+                { escape: true }
+            );
         },
     });
 
