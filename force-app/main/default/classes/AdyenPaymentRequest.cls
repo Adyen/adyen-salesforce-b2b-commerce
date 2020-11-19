@@ -24,7 +24,6 @@ public with sharing class AdyenPaymentRequest {
 
        public static PaymentMethodDetails getPaymentMethodDetails(Map<String, Object> paymentMethod){
             String paymentType = (String)paymentMethod.get('type');
-            System.Debug('#### paymentType = ' + paymentType);
             if(paymentType == 'scheme'){
                 CardDetails cardDetails = new CardDetails();
                 cardDetails.holderName = (String)paymentMethod.get('holderName');

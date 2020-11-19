@@ -76,7 +76,9 @@
                 function(result, event){
                     if (event.status && result.success) {
                         self.model.errors = null;
-                        window.location.href = CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation?o='+result.data.orderInfo.ordId;
+                        var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
+                        orderSuccessUrl.searchParams.append('o', result.data.orderInfo.ordId);
+                        window.location.href = orderSuccessUrl;
                     } else if (event.type === 'exception') {
                         self.model.errors = result.messages;
                         loadingToggle();
