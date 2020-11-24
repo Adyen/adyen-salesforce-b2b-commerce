@@ -1,4 +1,14 @@
 public with sharing class AdyenPaymentRequest {
+     public static PaymentRequest createPaymentRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant){
+        PaymentRequest paymentRequest = createPaymentRequestFromStateData(stateData);
+        paymentRequest.merchantAccount = merchant.Name__c;
+        paymentRequest.amount = AdyenUtil.getAdyenAmount(cart);
+        paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
+        paymentRequest.reference = cart.Id;
+        paymentRequest.shopperReference = cart.ccrz__Account__c;
+        return paymentRequest;
+     }
+
      public static PaymentRequest createPaymentRequestFromStateData(String stateData){
             PaymentRequest paymentRequest = new PaymentRequest();
             Map<String, Object> stateDataObjects = (Map<String, Object>) JSON.deserializeUntyped(stateData);
@@ -22,7 +32,7 @@ public with sharing class AdyenPaymentRequest {
             return paymentRequest;
        }
 
-       public static PaymentMethodDetails getPaymentMethodDetails(Map<String, Object> paymentMethod){
+     public static PaymentMethodDetails getPaymentMethodDetails(Map<String, Object> paymentMethod){
             String paymentType = (String)paymentMethod.get('type');
             if(paymentType == 'scheme'){
                 CardDetails cardDetails = new CardDetails();

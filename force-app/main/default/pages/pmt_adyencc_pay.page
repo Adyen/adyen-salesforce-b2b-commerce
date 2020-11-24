@@ -74,17 +74,14 @@
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
+                    console.log(result.data);
                     if (event.status && result.success) {
-                        self.model.errors = null;
                         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
-                        orderSuccessUrl.searchParams.append('o', result.data.orderInfo.ordId);
+                        orderSuccessUrl.searchParams.append('o', result.data.ordId);
                         window.location.href = orderSuccessUrl;
-                    } else if (event.type === 'exception') {
-                        self.model.errors = result.messages;
-                        loadingToggle();
                     } else {
-                        self.model.errors = result.messages;
-                        loadingToggle();
+                        console.log('Payment failed');
+                        console.log(result);
                     }
                     self.render();
                 },

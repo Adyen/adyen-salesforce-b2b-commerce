@@ -1,75 +1,44 @@
 public with sharing class AdyenUtil {
-    public static PaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
-    {
-//        AuthoriseRequest request = new AuthoriauthoriseFromTransactionParamsseRequest();
-//        request.amount = new Amount();
-//        request.paymentMethod = new PaymentMethod();
-//        request.applicationInfo = new ApplicationInfo();
-//        request.applicationInfo.adyenPaymentSource = new PaymentSource();
-//        request.applicationInfo.externalPlatform = new ExternalPlatform();
-//
-//        request.applicationInfo.adyenPaymentSource.version = '1.0.0';
-//        request.applicationInfo.adyenPaymentSource.name = 'adyen-salesforce-b2b-commerce';
-//        request.applicationInfo.externalPlatform.name = 'SalesforceB2BCommerce';
-//        request.applicationInfo.externalPlatform.integrator = '';
-//        request.applicationInfo.externalPlatform.version = '';
-//
-//        ccrz__E_Cart__c cart = (ccrz__E_Cart__c)inputData.get('cart');
-//        ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
-//
-//        request.amount.currency_x = cart.ccrz__CurrencyISOCode__c;
-//        request.amount.value = (Long)cart.ccrz__TotalAmount__c * 100;
-//
-//        request.paymentMethod.number_x = paymentParams.accountNumber;
-//        request.paymentMethod.expiryMonth = String.valueOf(paymentParams.expirationMonth);
-//        request.paymentMethod.expiryYear = String.valueOf(paymentParams.expirationYear);
-//        request.paymentMethod.cvc = paymentParams.verificationCode;
-//        request.paymentMethod.type = 'scheme';
-//
-//        request.reference = cart.Id;
-//        request.merchantAccount = merchant.Name__c;
-//        request.storePaymentMethod = paymentParams.saveAsStoredPayment;
-//        request.shopperReference = cart.ccrz__Account__c;
-//
-//        return request;
+//    public static PaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
+//    {
+//          //TODOBAS
+////        ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
+////        paymentRequest.storePaymentMethod = paymentParams.saveAsStoredPayment;
+////
+////        return paymentRequest;
+//    }
 
 
-        ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
-        PaymentRequest paymentRequest = createPaymentRequest(inputData, merchant);
-
-        paymentRequest.applicationInfo = updateApplicationInfo(paymentRequest.applicationInfo);
-
-        paymentRequest.paymentMethod = setPaymentDetails(paymentParams);
-        paymentRequest.storePaymentMethod = paymentParams.saveAsStoredPayment;
-
-        return paymentRequest;
-
+    public static Merchant__mdt getConfiguredMerchantAccount(ccrz__E_Cart__c cart){
+        Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
+        Map<String, String> mapConfigs = (Map<String,String>)mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
+        Merchant__mdt merchant = Util.getConfigByName(mapConfigs.get('pmt_adyencc.config'));
+        return merchant;
     }
 
-    public static PaymentRequest createPaymentRequest(Map<String, Object> inputData, Merchant__mdt merchant){
-        ccrz__E_Cart__c cart = (ccrz__E_Cart__c)inputData.get('cart');
-        PaymentRequest paymentRequest = new PaymentRequest();
+    public static String getConfiguredCaptureDelay(ccrz__E_Cart__c cart){
+        Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
+        Map<String, String> mapConfigs = (Map<String,String>)mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
+        Boolean immediateCapture = Boolean.valueOf(mapConfigs.get('pmt_adyencc.immediate_capture'));
+        return immediateCapture ? 'AUTH+CAPTURE' : 'AUTH';
+    }
+
+    public static ccrz__E_Cart__c getCartFromDatabase(String cartId){
+        String query = 'SELECT ' + Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c')) +', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
+        ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
+        return cart;
+    }
+
+    public static OASAmount getAdyenAmount(ccrz__E_Cart__c cart){
+        Integer multiplier = getMultiplierMinorUnits(cart.ccrz__CurrencyISOCode__c);
         OASAmount amount = new OASAmount();
         amount.currency_x = cart.ccrz__CurrencyISOCode__c;
-        amount.value = (Long)cart.ccrz__TotalAmount__c * 100;
-        paymentRequest.amount = amount;
-
-        paymentRequest.reference = cart.Id;
-        paymentRequest.merchantAccount = merchant.Name__c;
-        paymentRequest.shopperReference = cart.ccrz__Account__c;
-        return paymentRequest;
+        amount.value = (Long)cart.ccrz__TotalAmount__c * multiplier;
+        return amount;
     }
 
-    public static PaymentMethodDetails setPaymentDetails(ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams){
-        OASCardDetails card = new OASCardDetails();
-        card.number_x = paymentParams.accountNumber;
-        card.expiryMonth = String.valueOf(paymentParams.expirationMonth);
-        card.expiryYear = String.valueOf(paymentParams.expirationYear);
-        card.cvc = paymentParams.verificationCode;
-        return card;
-    }
-
-    public static OASApplicationInfo updateApplicationInfo(OASApplicationInfo applicationInfo){
+    public static OASApplicationInfo getApplicationInfo(){
+        OASApplicationInfo applicationInfo = new OASApplicationInfo();
         OASCommonField adyenPaymentSource = new OASCommonField();
         adyenPaymentSource.name = 'adyen-salesforce-b2b-commerce';
         adyenPaymentSource.version = '2.0.0';
@@ -80,6 +49,11 @@ public with sharing class AdyenUtil {
         externalPlatform.version = '';
         applicationInfo.externalPlatform = externalPlatform;
         return applicationInfo;
+    }
+
+    public static Boolean isHttpResponseOK(Integer responseCode){
+        List<Integer> responseOK = new List<Integer> {200, 201, 202, 204};
+        return responseOK.contains(responseCode);
     }
     
     public static AuthoriseRequest authoriseFromNewPage(Map<String, Object> inputData, Merchant__mdt merchant)
@@ -144,20 +118,6 @@ public with sharing class AdyenUtil {
 //        request.shopperReference = cart.ccrz__Account__c;
         
         return request;
-    }
-
-    public static OASPaymentMethodsRequest createPaymentMethodsRequest(ccrz__E_Cart__c cart, Merchant__mdt merchant){
-       OASPaymentMethodsRequest paymentMethodsRequest = new OASPaymentMethodsRequest();
-       Integer multiplier = getMultiplierMinorUnits(cart.ccrz__CurrencyISOCode__c);
-       OASAmount amount = new OASAmount();
-       amount.currency_x = cart.ccrz__CurrencyISOCode__c;
-       amount.value = (Long)cart.ccrz__TotalAmount__c * multiplier;
-       paymentMethodsRequest.amount = amount;
-       paymentMethodsRequest.merchantAccount = merchant.Name__c;
-       paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
-       paymentMethodsRequest.allowedPaymentMethods = new List<String> {'card'};
-       paymentMethodsRequest.countryCode = 'US';
-       return paymentMethodsRequest;
     }
 
     public static Integer getMultiplierMinorUnits(String currencyCode){
