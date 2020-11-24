@@ -19,7 +19,9 @@ function renderAdyenComponent(paymentMethodsResponse) {
 }
 
 function handleOnChange(state){
-    //handleOnChange
+   if(state.isValid){
+        document.getElementById('adyenStateData').value = JSON.stringify(state.data);
+    }
 }
 
 function renderPaymentMethod(paymentMethod){

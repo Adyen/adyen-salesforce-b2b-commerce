@@ -1,5 +1,5 @@
 public with sharing class AdyenUtil {
-    public static OASPaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
+    public static PaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
     {
 //        AuthoriseRequest request = new AuthoriauthoriseFromTransactionParamsseRequest();
 //        request.amount = new Amount();
@@ -35,7 +35,7 @@ public with sharing class AdyenUtil {
 
 
         ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
-        OASPaymentRequest paymentRequest = createPaymentRequest(inputData, merchant);
+        PaymentRequest paymentRequest = createPaymentRequest(inputData, merchant);
 
         paymentRequest.applicationInfo = updateApplicationInfo(paymentRequest.applicationInfo);
 
@@ -46,9 +46,9 @@ public with sharing class AdyenUtil {
 
     }
 
-    public static OASPaymentRequest createPaymentRequest(Map<String, Object> inputData, Merchant__mdt merchant){
+    public static PaymentRequest createPaymentRequest(Map<String, Object> inputData, Merchant__mdt merchant){
         ccrz__E_Cart__c cart = (ccrz__E_Cart__c)inputData.get('cart');
-        OASPaymentRequest paymentRequest = new OASPaymentRequest();
+        PaymentRequest paymentRequest = new PaymentRequest();
         OASAmount amount = new OASAmount();
         amount.currency_x = cart.ccrz__CurrencyISOCode__c;
         amount.value = (Long)cart.ccrz__TotalAmount__c * 100;

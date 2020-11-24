@@ -1,7 +1,7 @@
 //
 // Contains the callouts to the Adyen API
 public class AdyenClient {
-    public static AuthoriseResponse authorisePayment(Merchant__mdt merchantRecord, OASPaymentRequest request) {
+    public static AuthoriseResponse authorisePayment(Merchant__mdt merchantRecord, PaymentRequest request) {
         ccrz.ccLog.log(LoggingLevel.DEBUG,'DebugBas', request);
         AuthoriseResponse output = new AuthoriseResponse();
         try {

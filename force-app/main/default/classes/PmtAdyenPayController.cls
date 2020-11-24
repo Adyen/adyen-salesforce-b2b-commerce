@@ -3,25 +3,13 @@ global with sharing class PmtAdyenPayController {
     public Boolean isGuest { get{ return UserInfo.getUserType() == 'Guest';} }
     
     @RemoteAction
-    global static ccrz.cc_RemoteActionResult pressMeCcrz( ccrz.cc_RemoteActionContext ctx, Map<String, Map<String, String>> inputData) {
+    global static ccrz.cc_RemoteActionResult pressMeCcrz( ccrz.cc_RemoteActionContext ctx, String stateData) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+        PaymentRequest paymentRequest = AdyenPaymentRequest.createPaymentRequestFromStateData(stateData);
+
         try{
-            List<String> inputValidations = validateInputs(inputData);
 
-            if(inputValidations.size() > 0)
-            {
-                res.success = false;
-                res.data = inputData;
-
-                for(String s : inputValidations)
-                {
-                    ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(s);
-                    res.messages.add(m);
-                }
-
-                return res;
-            }
-
+            //TODOBAS remove raw card data code
             Boolean savePayment = (Boolean.valueOf((String) inputData.get('saveAsStoredPayment').get('value')) == true);
 
             ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
@@ -52,7 +40,7 @@ global with sharing class PmtAdyenPayController {
             //
             // SOQL Cart and Serialize
             //ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT = 'Checkout'
-            Map<String,Object> processResult = paymentHook.processPayment(createParams);
+            Map<String,Object> processResult = paymentHook.processPayment(createParams, stateData);
             //System.Debug('#### processResult '+processResult);
 
             Map<String,Object> placeParams = new Map<String,Object>{

@@ -1,5 +1,5 @@
 global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaymentProcessor{
-    global override Map<String,Object> preProcess(Map<String,Object> inputData) {
+    global override Map<String,Object> preProcess(Map<String,Object> inputData, String stateData) {
         //System.debug('preProcess');
         //system.debug(inputData);
         ccrz.ccLog.log(System.LoggingLevel.DEBUG, 'preProcess', inputData );
@@ -49,9 +49,9 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
 //            else
 //            {
                 //call adyen to payment
-                
-                OASPaymentRequest authRequest = AdyenUtil.authoriseFromTransactionParams(inputData, merchant);
-                AuthoriseResponse authResponse = AdyenClient.authorisePayment(merchant, authRequest);
+                PaymentRequest paymentRequest = AdyenPaymentRequest.createPaymentRequestFromStateData(stateData);
+                //PaymentRequest authRequest = AdyenUtil.authoriseFromTransactionParams(inputData, merchant);
+                AuthoriseResponse authResponse = AdyenClient.authorisePayment(merchant, paymentRequest);
                 
                 //System.debug(authResponse);
 
