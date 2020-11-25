@@ -1,3 +1,4 @@
+//
 // Contains the callouts to the Adyen API
 public class AdyenClient {
     public static PaymentResponse authorisePayment(Merchant__mdt merchantRecord, PaymentRequest request) {
