@@ -74,16 +74,13 @@
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
-                    console.log(result.data);
                     if (event.status && result.success) {
                         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
                         orderSuccessUrl.searchParams.append('o', result.data.ordId);
                         window.location.href = orderSuccessUrl;
                     } else {
-                        console.log('Payment failed');
-                        console.log(result);
+                        //handle payment action
                     }
-                    self.render();
                 },
                 { escape: true }
             );

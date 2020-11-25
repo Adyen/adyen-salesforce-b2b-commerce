@@ -71,7 +71,6 @@ global with sharing class PmtAdyenPayController {
             //Exception handling here
             System.Debug('#### exception '+e.getMessage()+e.getStackTraceString());
             res.success = false;
-            res.data = 'testData'; // inputData;
             ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage());
             res.messages.add(m);
             return res;
