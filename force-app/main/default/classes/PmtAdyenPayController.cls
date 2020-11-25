@@ -6,7 +6,7 @@ global with sharing class PmtAdyenPayController {
     global static ccrz.cc_RemoteActionResult getPaymentMethods(ccrz.cc_RemoteActionContext ctx) {
        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
        try {
-            ccrz__E_Cart__c cart = getCartById(ctx.currentCartId);
+            ccrz__E_Cart__c cart = AdyenUtil.getCartFromDatabase(ctx.currentCartId);
             Merchant__mdt merchant = AdyenUtil.getConfiguredMerchantAccount(cart);
 
             PaymentMethodsRequest paymentMethodsRequest = AdyenPaymentMethodsRequest.createPaymentMethodsRequest(cart, merchant);
@@ -31,29 +31,15 @@ global with sharing class PmtAdyenPayController {
     }
 
     @RemoteAction
-    global static ccrz.cc_RemoteActionResult pressMeCcrz(ccrz.cc_RemoteActionContext ctx, String stateData) {
+    global static ccrz.cc_RemoteActionResult placeOrderAdyen(ccrz.cc_RemoteActionContext ctx, String stateData) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
-
-            //TODOBAS remove raw card data code
-//            Boolean savePayment = (Boolean.valueOf((String) inputData.get('saveAsStoredPayment').get('value')) == true);
-
             ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
             ccrz__E_Cart__c cart = AdyenUtil.getCartFromDatabase(ctx.currentCartId);
 
             Map<String, Object> inputParams = new Map<String, Object>();
-//            inputParams.put('accountNumber',inputData.get('accountNumber').get('value'));
-//            inputParams.put('expirationMonth',inputData.get('expirationMonth').get('value'));
-//            inputParams.put('expirationYear',inputData.get('expirationYear').get('value'));
-//            inputParams.put('verificationCode',inputData.get('verificationCode').get('value'));
-//            inputParams.put('displayName',inputData.get('accountName').get('value'));
             inputParams.put('accountType', 'adyencc');
             inputParams.put('token', stateData);
-//            inputParams.put('saveAsStoredPayment', savePayment);
-//
-//            if(inputData.containsKey('storedPaymentId')){
-//                inputParams.put('storedPaymentId',inputData.get('storedPaymentId').get('value'));
-//            }
 
             Map<String,Object> paymentProcessorInput = new Map<String,Object> {
                 ccrz.cc_hk_Payment.PARAM_TRANSACTION_DATA => JSON.serialize(inputParams), //stateData,
@@ -61,17 +47,13 @@ global with sharing class PmtAdyenPayController {
                 ccrz.cc_hk_Payment.PARAM_CART => cart,
                 ccrz.cc_hk_Payment.PARAM_ACCOUNT_TYPE => 'adyencc'
             };
-            System.Debug('#### create paymentProcessorData '+ paymentProcessorInput);
-            //
-            // SOQL Cart and Serialize
-            //ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT = 'Checkout'
-            Map<String,Object> processResult = paymentHook.processPayment(paymentProcessorInput);
-            System.Debug('#### processResult ' + processResult);
 
-//TODOBAS Here starts the Place Order
+            Map<String,Object> processResult = paymentHook.processPayment(paymentProcessorInput);
+            //TODOBAS return paymentResponse if not isFinal
+
+            //Here starts the Place Order
             Map<String,Object> placeParams = new Map<String,Object>{
                 ccrz.ccApi.API_VERSION => 9,
-//                ccrz.ccApiCart.PAYMENTDATA => 'stateDataAdyenTest', // JSON.serialize(inputParams),
                 ccrz.ccApiCart.TRANSPAYMENTDATA => processResult.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA),
                 ccrz.ccApiCart.PAYMENTRESULT => processResult,
                 ccrz.ccApiCart.CART_ENCID => cart.Id
@@ -83,22 +65,6 @@ global with sharing class PmtAdyenPayController {
             Map<String,Object> placeResult = ccrz.ccApiCart.place(placeParams);
             res = validatePlaceResult(placeResult, res);
 
-            //
-            // Get order enc-id
-            //TODOBAS set right inputData for place order
-//            Map<String, Map<String, String>> inputData2 = inputData.clone();
-//            String orderId = (String)placeResult.get('orderId');
-//            ccrz__E_Order__c[] ords = [SELECT Id, ccrz__EncryptedId__c FROM ccrz__E_Order__c WHERE Id=:orderId LIMIT 1];
-//            if(ords<>null && ords.size()==1) {
-//                Map<String, String> temp = new Map<String, String>();
-//                temp.put('ordId',ords[0].ccrz__EncryptedId__c);
-//                inputData2.put('orderInfo',temp);
-//            }
-//            res.success = true;
-//            res.data = inputData2; // TRY WITH CLONE TO PREVENT COLLECTION IS READONLY ERROR
-            //
-            // FIGURE OUT::
-            // Confirmation Mail not sent currently
         }
         catch(Exception e){
             ccrz.ccLog.log(LoggingLevel.ERROR,'Err',e);
@@ -129,11 +95,5 @@ global with sharing class PmtAdyenPayController {
         res.success = true;
         res.data = orderResult;
         return res;
-    }
-
-    private static ccrz__E_Cart__c getCartById(String cartId){
-        String query = 'SELECT '+Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c'))+', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
-        ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
-        return cart;
     }
 }

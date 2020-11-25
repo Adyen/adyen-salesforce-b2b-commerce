@@ -1,4 +1,3 @@
-//
 // Contains the callouts to the Adyen API
 public class AdyenClient {
     public static PaymentResponse authorisePayment(Merchant__mdt merchantRecord, PaymentRequest request) {
@@ -7,25 +6,17 @@ public class AdyenClient {
             Http httpClient = new Http();
             String jsonString = JSON.serialize(request, true);
             HttpRequest httpReq = createHttpRequest(merchantRecord.API_Key__c, merchantRecord.Payment_Endpoint__c, jsonString);
-            System.Debug('## Raw request '+ httpReq);
             HttpResponse httpResp = httpClient.send(httpReq);
-            System.Debug('## Raw response '+ httpResp.getBody());
 
             if(AdyenUtil.isHttpResponseOK(httpResp.getStatusCode())) {
                 paymentResponse = (PaymentResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResp.getBody()), PaymentResponse.class);
-//                output.success = true;
             } else {
-//                output.errorDetail =  (Error) JSON.deserialize(httpResp.getBody(), Error.class);
-//                if(output.errorDetail.status==null) {
-//                    output.errorDetail.status = httpResp.getStatusCode();
-//                }
-//                output.success = false;
+                System.Debug('## Response code ' + httpResp.getStatusCode() + 'from /payments call');
+                System.Debug('## /payments raw response: ' + httpResp.getBody());
             }
         }
         catch(Exception e) {
-//            output.errorDetail = new Error();
-//            output.errorDetail.message = 'Adyen callout failed: '+e.getMessage();
-//            output.success = false;
+            ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
         }
         return paymentResponse;
     }
@@ -45,7 +36,7 @@ public class AdyenClient {
             }
         }
         catch(Exception e) {
-            ccrz.ccLog.log(LoggingLevel.ERROR,'Err',e);
+            ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
         }
         return paymentMethods;
     }

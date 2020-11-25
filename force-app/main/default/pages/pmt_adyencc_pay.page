@@ -70,7 +70,7 @@
         submitStep: function() {
           //TODOBAS add here stateData.isValid check
           Visualforce.remoting.Manager.invokeAction(
-                '{!$RemoteAction.PmtAdyenPayController.pressMeCcrz}',
+                '{!$RemoteAction.PmtAdyenPayController.placeOrderAdyen}',
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
