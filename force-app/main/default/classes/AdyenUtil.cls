@@ -1,19 +1,8 @@
 public with sharing class AdyenUtil {
-//    public static PaymentRequest authoriseFromTransactionParams(Map<String, Object> inputData, Merchant__mdt merchant)
-//    {
-//          //TODOBAS
-////        ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams)inputData.get('processedPaymentData');
-////        paymentRequest.storePaymentMethod = paymentParams.saveAsStoredPayment;
-////
-////        return paymentRequest;
-//    }
-
-
     public static Merchant__mdt getConfiguredMerchantAccount(ccrz__E_Cart__c cart){
         Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
         Map<String, String> mapConfigs = (Map<String,String>)mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
-        Merchant__mdt merchant = Util.getConfigByName(mapConfigs.get('pmt_adyencc.config'));
-        return merchant;
+        return Util.getConfigByName(mapConfigs.get('pmt_adyencc.config'));
     }
 
     public static String getConfiguredCaptureDelay(ccrz__E_Cart__c cart){
@@ -25,8 +14,7 @@ public with sharing class AdyenUtil {
 
     public static ccrz__E_Cart__c getCartFromDatabase(String cartId){
         String query = 'SELECT ' + Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c')) +', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
-        ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
-        return cart;
+        return (ccrz__E_Cart__c) Database.query(query);
     }
 
     public static OASAmount getAdyenAmount(ccrz__E_Cart__c cart){
