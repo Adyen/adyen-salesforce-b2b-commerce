@@ -20,7 +20,7 @@ public with sharing class AdyenUtil {
         Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
         Map<String, String> mapConfigs = (Map<String,String>)mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
         Boolean immediateCapture = Boolean.valueOf(mapConfigs.get('pmt_adyencc.immediate_capture'));
-        return immediateCapture ? 'AUTH+CAPTURE' : 'AUTH';
+        return immediateCapture ? AdyenConstants.IMMEDIATE_CAPTURE : AdyenConstants.MANUAL_CAPTURE;
     }
 
     public static ccrz__E_Cart__c getCartFromDatabase(String cartId){
@@ -40,12 +40,12 @@ public with sharing class AdyenUtil {
     public static OASApplicationInfo getApplicationInfo(){
         OASApplicationInfo applicationInfo = new OASApplicationInfo();
         OASCommonField adyenPaymentSource = new OASCommonField();
-        adyenPaymentSource.name = 'adyen-salesforce-b2b-commerce';
-        adyenPaymentSource.version = '2.0.0';
+        adyenPaymentSource.name = AdyenConstants.PACKAGE_NAME;
+        adyenPaymentSource.version = AdyenConstants.PACKAGE_VERSION;
         applicationInfo.adyenPaymentSource = adyenPaymentSource;
 
         OASExternalPlatform externalPlatform = new OASExternalPlatform();
-        externalPlatform.name = 'SalesforceB2BCommerce';
+        externalPlatform.name = AdyenConstants.PLATFORM_NAME;
         externalPlatform.version = '';
         applicationInfo.externalPlatform = externalPlatform;
         return applicationInfo;
