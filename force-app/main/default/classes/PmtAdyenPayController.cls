@@ -10,7 +10,7 @@ global with sharing class PmtAdyenPayController {
             Merchant__mdt merchant = AdyenUtil.getConfiguredMerchantAccount(cart);
 
             PaymentMethodsRequest paymentMethodsRequest = AdyenPaymentMethodsRequest.createPaymentMethodsRequest(cart, merchant);
-            PaymentMethodsResponse paymentMethodsResponse = AdyenClient.getPaymentMethods(merchant, paymentMethodsRequest);
+            PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethodsRequest.getPaymentMethods(merchant, paymentMethodsRequest);
 
             //Remove suffix and convert to string
             String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
@@ -39,6 +39,7 @@ global with sharing class PmtAdyenPayController {
 
             Map<String, Object> inputParams = new Map<String, Object>();
             inputParams.put('accountType', 'adyencc');
+            //Use token for stateData
             inputParams.put('token', stateData);
 
             Map<String,Object> paymentProcessorInput = new Map<String,Object> {
