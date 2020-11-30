@@ -2,7 +2,7 @@ public with sharing class AdyenPaymentRequest {
      public static PaymentRequest createPaymentRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant){
         PaymentRequest paymentRequest = createPaymentRequestFromStateData(stateData);
         paymentRequest.merchantAccount = merchant.Name__c;
-        paymentRequest.amount = AdyenUtil.getAdyenAmount(cart);
+        paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
         paymentRequest.reference = cart.Id;
         paymentRequest.shopperReference = cart.ccrz__Account__c;

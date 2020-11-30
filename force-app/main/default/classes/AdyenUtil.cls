@@ -17,12 +17,26 @@ public with sharing class AdyenUtil {
         return (ccrz__E_Cart__c) Database.query(query);
     }
 
-    public static OASAmount getAdyenAmount(ccrz__E_Cart__c cart){
-        Integer multiplier = getMultiplierMinorUnits(cart.ccrz__CurrencyISOCode__c);
-        OASAmount amount = new OASAmount();
-        amount.currency_x = cart.ccrz__CurrencyISOCode__c;
-        amount.value = (Long)cart.ccrz__TotalAmount__c * multiplier;
-        return amount;
+    public static Amount getAdyenAmount(String currencyCode, Decimal amount){
+        Integer multiplier = getMultiplierMinorUnits(currencyCode);
+        Amount adyenAmount = new Amount();
+        adyenAmount.currency_x = currencyCode;
+        adyenAmount.value = (Long)amount * multiplier;
+        return adyenAmount;
+    }
+
+    public static Integer getMultiplierMinorUnits(String currencyCode){
+        switch on currencyCode {
+          when 'CVE','DJF', 'GNF','IDR','JPY','KMF','KRW', 'PYG','RWF','UGX','VND', 'VUV', 'XAF', 'XOF', 'XPF' {
+            return 1;
+          }
+          when 'BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND' {
+            return 1000;
+          }
+          when else {
+            return 100;
+          }
+        }
     }
 
     public static OASApplicationInfo getApplicationInfo(){
@@ -108,36 +122,6 @@ public with sharing class AdyenUtil {
         return request;
     }
 
-    public static Integer getMultiplierMinorUnits(String currencyCode){
-        switch on currencyCode {
-          when 'CVE','DJF', 'GNF','IDR','JPY','KMF','KRW', 'PYG','RWF','UGX','VND', 'VUV', 'XAF', 'XOF', 'XPF' {
-            return 1;
-          }
-          when 'BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND' {
-            return 1000;
-          }
-          when else {
-            return 100;
-          }
-        }
-    }
-
-//    public static CaptureRequest captureFromTransPayment(ccrz__E_TransactionPayment__c tp, Merchant__mdt merchant)
-//    {
-//        CaptureRequest cr = new CaptureRequest();
-//        cr.modificationAmount = new Amount();
-//        cr.originalReference = tp.ccrz__TransactionCode__c;
-//        //
-//        // Amount
-//        cr.modificationAmount.currency_x = tp.ccrz__CurrencyISOCode__c;
-//        cr.modificationAmount.value = (Long)tp.ccrz__Amount__c * 100;
-//        //
-//        // root props
-//        cr.merchantAccount = merchant.Name__c;
-//        cr.reference = tp.Id;
-//
-//        return cr;
-//    }
 //
 //    public static DisableRequest disableStoredPayment(ccrz__E_StoredPayment__c storedPayment,  Merchant__mdt merchant)
 //    {
