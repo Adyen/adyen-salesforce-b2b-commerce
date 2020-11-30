@@ -1,4 +1,6 @@
-global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
+global
+
+class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
 
 //    global override Map<String,Object> removeStoredPayment(Map<String,Object> inputData) {
 //        Map<String,Object> returnData = new Map<String,Object>();
