@@ -1,6 +1,4 @@
-public with sharing
-
-class AdyenCaptureRequest {
+public with sharing class AdyenCaptureRequest {
     public static CaptureRequest createCaptureRequest(ccrz__E_TransactionPayment__c tp, Merchant__mdt merchant) {
         CaptureRequest captureRequest = new CaptureRequest();
         captureRequest.merchantAccount = merchant.Name__c;

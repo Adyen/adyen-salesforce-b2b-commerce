@@ -1,6 +1,4 @@
-public with sharing
-
-class AdyenPaymentMethodsRequest {
+public with sharing class AdyenPaymentMethodsRequest {
     public static PaymentMethodsRequest createPaymentMethodsRequest(ccrz__E_Cart__c cart, Merchant__mdt merchant) {
         PaymentMethodsRequest paymentMethodsRequest = new PaymentMethodsRequest();
         paymentMethodsRequest.merchantAccount = merchant.Name__c;

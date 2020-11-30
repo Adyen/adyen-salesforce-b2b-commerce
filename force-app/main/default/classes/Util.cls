@@ -1,8 +1,6 @@
 //
 // Utility methods
-public inherited sharing
-
-class Util {
+public inherited sharing class Util {
 
     public static Merchant__mdt getConfigByName(String configName) {
         Merchant__mdt[] configs = [

@@ -1,9 +1,5 @@
-global inherited sharing
-
-class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaymentProcessor {
-    global override
-
-    Map<String, Object> preProcess(Map<String, Object> paymentProcessorInput) {
+global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaymentProcessor {
+    global override Map<String, Object> preProcess(Map<String, Object> paymentProcessorInput) {
         //checkout flow
         if (paymentProcessorInput.get(ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX) == ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX_CHECKOUT) {
             ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams) paymentProcessorInput.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA);

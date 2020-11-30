@@ -1,6 +1,4 @@
-global with sharing
-
-class BatchCapturePayment implements Database.Batchable<sObject>, Database.Stateful, Database.AllowsCallouts {
+global with sharing class BatchCapturePayment implements Database.Batchable<sObject>, Database.Stateful, Database.AllowsCallouts {
 
     private String query;
     private Map<String, Merchant__mdt> mapStoreNameMerchant;
@@ -18,9 +16,7 @@ class BatchCapturePayment implements Database.Batchable<sObject>, Database.State
         return Database.getQueryLocator(query);
     }
 
-    global
-
-    void execute(Database.BatchableContext BC, List<ccrz__E_TransactionPayment__c> scope) {
+    global void execute(Database.BatchableContext BC, List<ccrz__E_TransactionPayment__c> scope) {
         List<ccrz__E_TransactionPayment__c> listToUpsert = new List<ccrz__E_TransactionPayment__c>();
         //check for limits
         //# callouts
@@ -72,9 +68,7 @@ class BatchCapturePayment implements Database.Batchable<sObject>, Database.State
         }
     }
 
-    global
-
-    void finish(Database.BatchableContext BC) {
+    global void finish(Database.BatchableContext BC) {
         if (remainingSetIds.size() > 0) {
             Database.executeBatch(new BatchCapturePayment(remainingSetIds), 100);
         }
