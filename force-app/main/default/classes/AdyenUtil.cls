@@ -27,14 +27,13 @@ public with sharing class AdyenUtil {
 
     public static Integer getMultiplierMinorUnits(String currencyCode) {
         switch on currencyCode {
-            when 'CVE', 'DJF', 'GNF', 'IDR', 'JPY', 'KMF', 'KRW', 'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF'
-            {
+            when 'CVE', 'DJF', 'GNF', 'IDR', 'JPY', 'KMF', 'KRW', 'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF' {
                 return 1;
             }
             when 'BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND' {
                 return 1000;
             }
-            when else{
+            when else {
                 return 100;
             }
         }
@@ -55,8 +54,8 @@ public with sharing class AdyenUtil {
     }
 
     public static Boolean isHttpResponseOK(Integer responseCode) {
-        List<Integer> responseOK = new List<Integer> {
-            200, 201, 202, 204
+        List<Integer> responseOK = new List<Integer>{
+                200, 201, 202, 204
         } ;
         return responseOK.contains(responseCode);
     }
