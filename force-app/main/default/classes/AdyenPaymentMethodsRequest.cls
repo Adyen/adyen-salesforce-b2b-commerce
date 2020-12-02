@@ -4,9 +4,7 @@ public with sharing class AdyenPaymentMethodsRequest {
         paymentMethodsRequest.merchantAccount = merchant.Name__c;
         paymentMethodsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
-        paymentMethodsRequest.allowedPaymentMethods = new List<String> {
-            'card', 'ideal'
-        } ;
+
         //TODOBAS countryCode from address
         paymentMethodsRequest.countryCode = 'US';
         return paymentMethodsRequest;

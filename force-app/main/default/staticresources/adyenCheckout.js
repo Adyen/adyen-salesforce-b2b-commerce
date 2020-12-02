@@ -1,4 +1,6 @@
 let checkout;
+let selectedMethod;
+const componentsObj = {};
 
 function renderAdyenComponent(paymentMethodsResponse) {
     //TODOBAS This will be configurable in later phase. Also client key instead of originKey
@@ -7,6 +9,7 @@ function renderAdyenComponent(paymentMethodsResponse) {
         environment: "test",
         clientKey: "test_V34KOGIDVJHLTOSMCTHATSWM5AFOQB6M",
         paymentMethodsResponse: paymentMethodsResponse,
+        paymentMethodsConfiguration: getPaymentMethodsConfig(),
         onChange: handleOnChange,
     };
     checkout = new AdyenCheckout(configuration);
@@ -18,10 +21,29 @@ function renderAdyenComponent(paymentMethodsResponse) {
     selectFirstPaymentMethod();
 }
 
+function getPaymentMethodsConfig(){
+    const paymentMethodsConfiguration = {};
+    paymentMethodsConfiguration.card = {
+       enableStoreDetails: !isGuest,
+           onChange(state) {
+                const type = 'card';
+                if (!componentsObj[type]) {
+                    componentsObj[type] = {};
+                }
+                componentsObj[type].isValid = state.isValid;
+                componentsObj[type].stateData = state.data;
+           },
+       };
+    return paymentMethodsConfiguration;
+}
+
 function handleOnChange(state){
-   if(state.isValid){
-        document.getElementById('adyenStateData').value = JSON.stringify(state.data);
-    }
+   const { type } = state.data.paymentMethod;
+   if (!componentsObj[type]) {
+       componentsObj[type] = {};
+   }
+   componentsObj[type].isValid = state.isValid;
+   componentsObj[type].stateData = state.data;
 }
 
 function renderPaymentMethod(paymentMethod){
@@ -35,10 +57,24 @@ function renderPaymentMethod(paymentMethod){
     paymentMethodsUI.append(li);
     handleInput(paymentMethod.type);
 
-    try {
-        const node = checkout.create(paymentMethod.type).mount(container);
+    const node = createNode(paymentMethod.type)
+    if(node){
+        node.mount(container);
+    }
+}
+
+function createNode(paymentMethod){
+   if(!componentsObj[paymentMethod]){
+        componentsObj[paymentMethod] = {};
+   }
+   try {
+        const node = checkout.create(paymentMethod)
+        componentsObj[paymentMethod].node = node;
+        return node;
     } catch (e) {
         /* No component for payment method */
+        componentsObj[paymentMethod].isValid = true;
+        return null;
     }
 }
 
@@ -74,10 +110,32 @@ function selectFirstPaymentMethod(){
 }
 
 function displaySelectedMethod(type){
+    selectedMethod = type;
     $('.additionalFields').hide();
     document
         .querySelector(`#component_${type}`)
         .setAttribute('style', 'display:block');
+}
+
+function validateComponent(){
+    if(!componentsObj[selectedMethod].isValid){
+        componentsObj[selectedMethod].node.showValidation();
+        return false;
+    }
+    assignStateData();
+    return true;
+}
+
+function assignStateData(){
+    let stateData;
+    if (componentsObj[selectedMethod] && componentsObj[selectedMethod].stateData) {
+    stateData = componentsObj[selectedMethod].stateData;
+    } else {
+    stateData = { paymentMethod: { type: selectedMethod } };
+    }
+    document.querySelector('#adyenStateData').value = JSON.stringify(
+      stateData,
+    );
 }
 
 function convertToJsonObject(jsonString){

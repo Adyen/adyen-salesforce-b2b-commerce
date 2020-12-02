@@ -1,4 +1,5 @@
-<apex:page controller="PmtAdyenPayController" docType="html-5.0" applyHtmlTag="false" showHeader="false" sidebar="false" standardStylesheets="false">
+<apex:page controller="PmtAdyenPayController" docType="html-5.0" applyHtmlTag="false" showHeader="false" sidebar="false"
+           standardStylesheets="false">
     <apex:includeScript value="{! $Resource.validations }"/>
     <apex:includeScript value="{! $Resource.adyenComponent }"/>
     <apex:includeScript value="{! $Resource.adyenCheckout }"/>
@@ -12,15 +13,21 @@
             <div id="component-container"></div>
             <div id="paymentMethodsList"></div>
             <div class="panel-body cc_body">
-                 <form id="payAdyenccForm" class="form-horizontal newAdyenForm cc_form-horizontal cc_new_adyen_form payAdyenccForm">
-                     <input type="hidden" id="adyenStateData" />
-                         <input type="button" class="btn btn-default btn-sm button makeAdyenPayment cc_make_adyen_payment submitStep" style="padding: 9px 17px 7px; font-size: 11px;" value="{{pageLabelMap 'Payment_MakePayment'}}"></input>
-                 </form>
+                <form id="payAdyenccForm"
+                      class="form-horizontal newAdyenForm cc_form-horizontal cc_new_adyen_form payAdyenccForm">
+                    <input type="hidden" id="adyenStateData"/>
+                    <input type="button"
+                           class="btn btn-default btn-sm button makeAdyenPayment cc_make_adyen_payment submitStep"
+                           style="padding: 9px 17px 7px; font-size: 11px;"
+                           value="{{pageLabelMap 'Payment_MakePayment'}}"></input>
+                </form>
             </div>
         </div>
     </script>
 
     <script type="text/javascript">
+
+    let isGuest = {!JSENCODE(IF(isGuest, "true", "false"))};
     Visualforce.remoting.Manager.invokeAction(
         '{!$RemoteAction.PmtAdyenPayController.getPaymentMethods}',
         CCRZ.pagevars.remoteContext,
@@ -32,12 +39,6 @@
         },
         { escape: true }
     );
-
-    let isGuest = {!JSENCODE(IF(isGuest, "true", "false"))};
-
-    CCRZ.models.PaymentsAdyenCCModel = CCRZ.CloudCrazeModel.extend({
-        //Add stateData here
-    });
 
     CCRZ.views.AdyenCCPaymentView = CCRZ.CloudCrazeView.extend({
         viewName : "AdyenCCPaymentView",
@@ -68,8 +69,8 @@
             return this;
         },
         submitStep: function() {
-          //TODOBAS add here stateData.isValid check
-          Visualforce.remoting.Manager.invokeAction(
+          if(validateComponent()){
+            Visualforce.remoting.Manager.invokeAction(
                 '{!$RemoteAction.PmtAdyenPayController.placeOrderAdyen}',
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
@@ -84,6 +85,7 @@
                 },
                 { escape: true }
             );
+          }
         },
     });
 
