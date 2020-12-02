@@ -40,6 +40,9 @@
         { escape: true }
     );
 
+     CCRZ.models.PaymentsAdyenCCModel = CCRZ.CloudCrazeModel.extend({
+    });
+
     CCRZ.views.AdyenCCPaymentView = CCRZ.CloudCrazeView.extend({
         viewName : "AdyenCCPaymentView",
         className : "PmtAdyenPayController",

@@ -1,5 +1,4 @@
-let checkout;
-let selectedMethod;
+const checkout = {};
 const componentsObj = {};
 
 function renderAdyenComponent(paymentMethodsResponse) {
@@ -12,7 +11,7 @@ function renderAdyenComponent(paymentMethodsResponse) {
         paymentMethodsConfiguration: getPaymentMethodsConfig(),
         onChange: handleOnChange,
     };
-    checkout = new AdyenCheckout(configuration);
+    checkout.adyenCheckout = new AdyenCheckout(configuration);
 
     paymentMethodsResponse.paymentMethods.forEach((pm) =>
         renderPaymentMethod(pm)
@@ -68,7 +67,7 @@ function createNode(paymentMethod){
         componentsObj[paymentMethod] = {};
    }
    try {
-        const node = checkout.create(paymentMethod)
+        const node = checkout.adyenCheckout.create(paymentMethod)
         componentsObj[paymentMethod].node = node;
         return node;
     } catch (e) {
@@ -110,7 +109,7 @@ function selectFirstPaymentMethod(){
 }
 
 function displaySelectedMethod(type){
-    selectedMethod = type;
+    checkout.selectedMethod = type;
     $('.additionalFields').hide();
     document
         .querySelector(`#component_${type}`)
@@ -118,8 +117,9 @@ function displaySelectedMethod(type){
 }
 
 function validateComponent(){
-    if(!componentsObj[selectedMethod].isValid){
-        componentsObj[selectedMethod].node.showValidation();
+    const type = checkout.selectedMethod;
+    if(!componentsObj[type].isValid){
+        componentsObj[type].node.showValidation();
         return false;
     }
     assignStateData();
@@ -128,10 +128,11 @@ function validateComponent(){
 
 function assignStateData(){
     let stateData;
-    if (componentsObj[selectedMethod] && componentsObj[selectedMethod].stateData) {
-    stateData = componentsObj[selectedMethod].stateData;
+    const type = checkout.selectedMethod;
+    if (componentsObj[type] && componentsObj[type].stateData) {
+    stateData = componentsObj[type].stateData;
     } else {
-    stateData = { paymentMethod: { type: selectedMethod } };
+    stateData = { paymentMethod: { type: type } };
     }
     document.querySelector('#adyenStateData').value = JSON.stringify(
       stateData,
