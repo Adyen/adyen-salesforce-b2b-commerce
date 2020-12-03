@@ -20,32 +20,32 @@ function renderAdyenComponent(paymentMethodsResponse) {
     selectFirstPaymentMethod();
 }
 
-function getPaymentMethodsConfig(){
+function getPaymentMethodsConfig() {
     return {
-    card: {
-         enableStoreDetails: !isGuest,
-             onChange(state) {
-                  const type = 'card';
-                  if (!componentsObj[type]) {
-                      componentsObj[type] = {};
-                  }
-                  componentsObj[type].isValid = state.isValid;
-                  componentsObj[type].stateData = state.data;
-             },
-         }
-       }
+        card: {
+            enableStoreDetails: !isGuest,
+            onChange(state) {
+                const type = 'card';
+                if (!componentsObj[type]) {
+                    componentsObj[type] = {};
+                }
+                componentsObj[type].isValid = state.isValid;
+                componentsObj[type].stateData = state.data;
+            },
+        }
+    }
 }
 
-function handleOnChange(state){
-   const { type } = state.data.paymentMethod;
-   if (!componentsObj[type]) {
-       componentsObj[type] = {};
-   }
-   componentsObj[type].isValid = state.isValid;
-   componentsObj[type].stateData = state.data;
+function handleOnChange(state) {
+    const {type} = state.data.paymentMethod;
+    if (!componentsObj[type]) {
+        componentsObj[type] = {};
+    }
+    componentsObj[type].isValid = state.isValid;
+    componentsObj[type].stateData = state.data;
 }
 
-function renderPaymentMethod(paymentMethod){
+function renderPaymentMethod(paymentMethod) {
     paymentMethod.type = paymentMethod.type == "scheme" ? "card" : paymentMethod.type;
     const paymentMethodsUI = document.querySelector('#paymentMethodsList');
     const container = document.createElement('div');
@@ -57,27 +57,27 @@ function renderPaymentMethod(paymentMethod){
     handleInput(paymentMethod.type);
 
     const node = createNode(paymentMethod.type)
-    if(node){
+    if (node) {
         node.mount(container);
     }
 }
 
-function createNode(paymentMethod){
-   if(!componentsObj[paymentMethod]){
+function createNode(paymentMethod) {
+    if (!componentsObj[paymentMethod]) {
         componentsObj[paymentMethod] = {};
-   }
-   try {
+    }
+    try {
         const node = checkout.adyenCheckout.create(paymentMethod)
         componentsObj[paymentMethod].node = node;
         return node;
     } catch (e) {
         /* No component for payment method */
         componentsObj[paymentMethod].isValid = true;
-        return null;
+        return;
     }
 }
 
-function configureListItem(paymentMethod, li){
+function configureListItem(paymentMethod, li) {
     const liContents = `
                          <input name="brandCode" type="radio" value="${paymentMethod.type}" id="rb_${paymentMethod.type}">
                          <img class="paymentMethod_img" src="https://checkoutshopper-test.adyen.com/checkoutshopper/images/logos/medium/${paymentMethod.type}.png">
@@ -100,15 +100,15 @@ function handleInput(paymentMethodType) {
     };
 }
 
-function selectFirstPaymentMethod(){
+function selectFirstPaymentMethod() {
     const firstPaymentMethod = document.querySelector(
-    'input[type=radio][name=brandCode]',
+        'input[type=radio][name=brandCode]',
     );
     firstPaymentMethod.checked = true;
     displaySelectedMethod(firstPaymentMethod.value);
 }
 
-function displaySelectedMethod(type){
+function displaySelectedMethod(type) {
     checkout.selectedMethod = type;
     $('.additionalFields').hide();
     document
@@ -116,27 +116,26 @@ function displaySelectedMethod(type){
         .setAttribute('style', 'display:block');
 }
 
-function validateComponent(){
+function validateComponent() {
     const type = checkout.selectedMethod;
-    if(componentsObj[type].isValid){
+    if (componentsObj[type].isValid) {
         assignStateData();
         return true;
     }
     componentsObj[type].node.showValidation();
-    return false;
-
+    return;
 }
 
-function assignStateData(){
+function assignStateData() {
     const type = checkout.selectedMethod;
     const hasStateData = componentsObj[type] && componentsObj[type].stateData;
-    const stateData = hasStateData ? componentsObj[type].stateData : { paymentMethod: { type: selectedMethod } }
+    const stateData = hasStateData ? componentsObj[type].stateData : {paymentMethod: {type: selectedMethod}}
     document.querySelector('#adyenStateData').value = JSON.stringify(
-      stateData,
+        stateData,
     );
 }
 
-function convertToJsonObject(jsonString){
+function convertToJsonObject(jsonString) {
     jsonString = jsonString.replace(/&quot;/g, '\"');
     return JSON.parse(jsonString);
 }
