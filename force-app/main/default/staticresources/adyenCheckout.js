@@ -1,7 +1,7 @@
 const checkout = {};
 const componentsObj = {};
 
-function renderAdyenComponent(paymentMethodsResponse) {
+renderAdyenComponent = paymentMethodsResponse => {
     //TODOBAS This will be configurable in later phase. Also client key instead of originKey
     const configuration = {
         locale: "en_US",
@@ -20,24 +20,16 @@ function renderAdyenComponent(paymentMethodsResponse) {
     selectFirstPaymentMethod();
 }
 
-function getPaymentMethodsConfig() {
+getPaymentMethodsConfig = () => {
     return {
         card: {
             enableStoreDetails: !isGuest,
-            onChange(state) {
-                const type = 'card';
-                if (!componentsObj[type]) {
-                    componentsObj[type] = {};
-                }
-                componentsObj[type].isValid = state.isValid;
-                componentsObj[type].stateData = state.data;
-            },
         }
     }
 }
 
-function handleOnChange(state) {
-    const {type} = state.data.paymentMethod;
+handleOnChange = state => {
+    const type = state.data.paymentMethod.type == "scheme" ? "card" : state.data.paymentMethod.type;
     if (!componentsObj[type]) {
         componentsObj[type] = {};
     }
@@ -45,7 +37,7 @@ function handleOnChange(state) {
     componentsObj[type].stateData = state.data;
 }
 
-function renderPaymentMethod(paymentMethod) {
+renderPaymentMethod = paymentMethod => {
     paymentMethod.type = paymentMethod.type == "scheme" ? "card" : paymentMethod.type;
     const paymentMethodsUI = document.querySelector('#paymentMethodsList');
     const container = document.createElement('div');
@@ -62,7 +54,7 @@ function renderPaymentMethod(paymentMethod) {
     }
 }
 
-function createNode(paymentMethod) {
+createNode = paymentMethod => {
     if (!componentsObj[paymentMethod]) {
         componentsObj[paymentMethod] = {};
     }
@@ -77,7 +69,7 @@ function createNode(paymentMethod) {
     }
 }
 
-function configureListItem(paymentMethod, li) {
+configureListItem = (paymentMethod, li) => {
     const liContents = `
                          <input name="brandCode" type="radio" value="${paymentMethod.type}" id="rb_${paymentMethod.type}">
                          <img class="paymentMethod_img" src="https://checkoutshopper-test.adyen.com/checkoutshopper/images/logos/medium/${paymentMethod.type}.png">
@@ -87,20 +79,20 @@ function configureListItem(paymentMethod, li) {
     li.classList.add('paymentMethod');
 }
 
-function configureContainer(paymentMethodType, container) {
+configureContainer = (paymentMethodType, container) => {
     container.classList.add('additionalFields');
     container.setAttribute('id', `component_${paymentMethodType}`);
     container.setAttribute('style', 'display:none');
 }
 
-function handleInput(paymentMethodType) {
+handleInput = paymentMethodType => {
     const input = document.querySelector(`#rb_${paymentMethodType}`);
     input.onchange = (event) => {
         displaySelectedMethod(event.target.value);
     };
 }
 
-function selectFirstPaymentMethod() {
+selectFirstPaymentMethod = () => {
     const firstPaymentMethod = document.querySelector(
         'input[type=radio][name=brandCode]',
     );
@@ -108,7 +100,7 @@ function selectFirstPaymentMethod() {
     displaySelectedMethod(firstPaymentMethod.value);
 }
 
-function displaySelectedMethod(type) {
+displaySelectedMethod = type => {
     checkout.selectedMethod = type;
     $('.additionalFields').hide();
     document
@@ -116,7 +108,7 @@ function displaySelectedMethod(type) {
         .setAttribute('style', 'display:block');
 }
 
-function validateComponent() {
+validateComponent = () => {
     const type = checkout.selectedMethod;
     if (componentsObj[type].isValid) {
         assignStateData();
@@ -126,7 +118,7 @@ function validateComponent() {
     return;
 }
 
-function assignStateData() {
+assignStateData = () => {
     const type = checkout.selectedMethod;
     const hasStateData = componentsObj[type] && componentsObj[type].stateData;
     const stateData = hasStateData ? componentsObj[type].stateData : {paymentMethod: {type: selectedMethod}}
@@ -135,7 +127,7 @@ function assignStateData() {
     );
 }
 
-function convertToJsonObject(jsonString) {
+convertToJsonObject = jsonString => {
     jsonString = jsonString.replace(/&quot;/g, '\"');
     return JSON.parse(jsonString);
 }
