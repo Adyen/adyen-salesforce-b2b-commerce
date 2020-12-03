@@ -118,22 +118,19 @@ function displaySelectedMethod(type){
 
 function validateComponent(){
     const type = checkout.selectedMethod;
-    if(!componentsObj[type].isValid){
-        componentsObj[type].node.showValidation();
-        return false;
+    if(componentsObj[type].isValid){
+        assignStateData();
+        return true;
     }
-    assignStateData();
-    return true;
+    componentsObj[type].node.showValidation();
+    return false;
+
 }
 
 function assignStateData(){
-    let stateData;
     const type = checkout.selectedMethod;
-    if (componentsObj[type] && componentsObj[type].stateData) {
-    stateData = componentsObj[type].stateData;
-    } else {
-    stateData = { paymentMethod: { type: type } };
-    }
+    const hasStateData = componentsObj[type] && componentsObj[type].stateData;
+    const stateData = hasStateData ? componentsObj[type].stateData : { paymentMethod: { type: selectedMethod } }
     document.querySelector('#adyenStateData').value = JSON.stringify(
       stateData,
     );
