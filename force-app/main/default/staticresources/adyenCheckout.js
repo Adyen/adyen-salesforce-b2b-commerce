@@ -21,19 +21,19 @@ function renderAdyenComponent(paymentMethodsResponse) {
 }
 
 function getPaymentMethodsConfig(){
-    const paymentMethodsConfiguration = {};
-    paymentMethodsConfiguration.card = {
-       enableStoreDetails: !isGuest,
-           onChange(state) {
-                const type = 'card';
-                if (!componentsObj[type]) {
-                    componentsObj[type] = {};
-                }
-                componentsObj[type].isValid = state.isValid;
-                componentsObj[type].stateData = state.data;
-           },
-       };
-    return paymentMethodsConfiguration;
+    return {
+    card: {
+         enableStoreDetails: !isGuest,
+             onChange(state) {
+                  const type = 'card';
+                  if (!componentsObj[type]) {
+                      componentsObj[type] = {};
+                  }
+                  componentsObj[type].isValid = state.isValid;
+                  componentsObj[type].stateData = state.data;
+             },
+         }
+       }
 }
 
 function handleOnChange(state){
