@@ -10,7 +10,7 @@
             <div class="panel-heading cc_heading">
                 <h3 class="panel-title cc_title">{{labels.title}}</h3>
             </div>
-            <div id="component-container"></div>
+            <div id="action-container"></div>
             <div id="paymentMethodsList"></div>
             <div class="panel-body cc_body">
                 <form id="payAdyenccForm"
@@ -78,12 +78,13 @@
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
-                    if (event.status && result.success) {
+                    if (event.status && paymentResult.isFinal) {
                         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
                         orderSuccessUrl.searchParams.append('o', result.data.ordId);
                         window.location.href = orderSuccessUrl;
                     } else {
                         //handle payment action
+                        handleAction(result.data.action);
                     }
                 },
                 { escape: true }

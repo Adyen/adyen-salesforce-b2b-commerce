@@ -49,25 +49,36 @@ global with sharing class PmtAdyenPayController {
                     ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX => ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT,
                     ccrz.cc_hk_Payment.PARAM_CART => cart,
                     ccrz.cc_hk_Payment.PARAM_ACCOUNT_TYPE => 'adyencc'
-            } ;
+            };
 
             Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
-            //TODOBAS return paymentResponse if not isFinal
-
-            //Here starts the Place Order
-            Map<String, Object> placeParams = new Map<String, Object>{
-                    ccrz.ccApi.API_VERSION => 9,
-                    ccrz.ccApiCart.TRANSPAYMENTDATA =>
-                            processResult.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA),
-                    ccrz.ccApiCart.PAYMENTRESULT => processResult,
-                    ccrz.ccApiCart.CART_ENCID => cart.Id
-            } ;
-            if (Test.isRunningTest()) {
-                placeParams.put(ccrz.ccApiCart.SKIP_VALID_CHECK, true);
+            Object paymentResult = processResult.get('paymentResult');
+            if (!paymentResult.get(isFinal)) {
+                res.data = paymentResult;
+                return res;
             }
 
-            Map<String, Object> placeResult = ccrz.ccApiCart.place(placeParams);
-            res = validatePlaceResult(placeResult, res);
+            if (paymentResult.get(resultCode) == 'AUTHORISED') {
+                //Here starts the Place Order
+                Map<String, Object> placeParams = new Map<String, Object>{
+                        ccrz.ccApi.API_VERSION => 9,
+                        ccrz.ccApiCart.TRANSPAYMENTDATA =>
+                                processResult.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA),
+                        ccrz.ccApiCart.PAYMENTRESULT => processResult,
+                        ccrz.ccApiCart.CART_ENCID => cart.Id
+                } ;
+                if (Test.isRunningTest()) {
+                    placeParams.put(ccrz.ccApiCart.SKIP_VALID_CHECK, true);
+                }
+
+                Map<String, Object> placeResult = ccrz.ccApiCart.place(placeParams);
+                res = validatePlaceResult(placeResult, res);
+                res.success = true;
+            }
+
+            res.success = false;
+            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message('Payment failed, result is ' + paymentResult);
+            res.messages.add(m);
 
         } catch (Exception e) {
             ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
@@ -76,7 +87,6 @@ global with sharing class PmtAdyenPayController {
             res.success = false;
             ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage());
             res.messages.add(m);
-            return res;
         } finally {
             ccrz.ccLog.close(res);
         }
