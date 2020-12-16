@@ -23,6 +23,7 @@ public with sharing class AdyenResponseHandler {
                 };
             }
             when else {
+                System.Debug('## Unknown resultCode: ' + resultCode);
                 return new Map<String, Object>{
                         'isFinal' => true,
                         'resultCode' => resultCode

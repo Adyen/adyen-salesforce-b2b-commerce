@@ -52,13 +52,12 @@ global with sharing class PmtAdyenPayController {
             };
 
             Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
-            Object paymentResult = processResult.get('paymentResult');
-            if (!paymentResult.get(isFinal)) {
+            Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
+            if (!(Boolean)paymentResult.get('isFinal')) {
                 res.data = paymentResult;
                 return res;
             }
-
-            if (paymentResult.get(resultCode) == 'AUTHORISED') {
+            if (paymentResult.get('resultCode') == PaymentResponse.ResultCodeEnum.AUTHORISED) {
                 //Here starts the Place Order
                 Map<String, Object> placeParams = new Map<String, Object>{
                         ccrz.ccApi.API_VERSION => 9,
