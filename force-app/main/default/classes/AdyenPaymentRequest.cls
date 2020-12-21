@@ -5,6 +5,7 @@ public with sharing class AdyenPaymentRequest {
         paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
         paymentRequest.reference = cart.Id;
+        paymentRequest.returnUrl = 'https://b2b-scoping-0920-developer-edition.na139.force.com/services/apexrest/AdyenReturnUrl/*';
         paymentRequest.shopperReference = cart.ccrz__Account__c;
         return paymentRequest;
     }
@@ -53,6 +54,11 @@ public with sharing class AdyenPaymentRequest {
             sepaDirectDebitDetails.ibanNumber = (String) paymentMethod.get('sepa.ibanNumber');
             sepaDirectDebitDetails.ownerName = (String) paymentMethod.get('sepa.ownerName');
             return sepaDirectDebitDetails;
+        } else if (!String.isBlank((String) paymentMethod.get('issuer'))) {
+            IssuerDetails issuerDetails = new IssuerDetails();
+            issuerDetails.setType(paymentType);
+            issuerDetails.issuer = (String) paymentMethod.get('issuer');
+            return issuerDetails;
         } else {
             DefaultPaymentMethodDetails defaultPaymentMethodDetails = new DefaultPaymentMethodDetails();
             defaultPaymentMethodDetails.setType(paymentType);
@@ -67,7 +73,6 @@ public with sharing class AdyenPaymentRequest {
         String jsonString = JSON.serialize(request, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);
-
         if (AdyenUtil.isHttpResponseOK(httpResponse.getStatusCode())) {
             paymentResponse = (PaymentResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResponse.getBody()), PaymentResponse.class);
         } else {

@@ -131,3 +131,7 @@ convertToJsonObject = jsonString => {
     jsonString = jsonString.replace(/&quot;/g, '\"');
     return JSON.parse(jsonString);
 }
+
+handleAction = action => {
+    checkout.adyenCheckout.createFromAction(action).mount('#action-container');
+}

@@ -10,9 +10,17 @@
             <div class="panel-heading cc_heading">
                 <h3 class="panel-title cc_title">{{labels.title}}</h3>
             </div>
-            <div id="component-container"></div>
+            <div id="action-container"></div>
             <div id="paymentMethodsList"></div>
             <div class="panel-body cc_body">
+                {{#if errors}}
+                <div class="poPayment-messagingSection-Error">
+                    {{#each errors}}
+                    <div class="alert alert-danger">{{this.message}}</div>
+                    {{/each}}
+                </div>
+                {{/if}}
+                <div class="error_messages_section" style="display:none;"></div>
                 <form id="payAdyenccForm"
                       class="form-horizontal newAdyenForm cc_form-horizontal cc_new_adyen_form payAdyenccForm">
                     <input type="hidden" id="adyenStateData"/>
@@ -41,6 +49,7 @@
     );
 
     CCRZ.models.PaymentsAdyenCCModel = CCRZ.CloudCrazeModel.extend({
+        errors: null
     });
 
     CCRZ.views.AdyenCCPaymentView = CCRZ.CloudCrazeView.extend({
@@ -73,17 +82,22 @@
         },
         submitStep: function() {
           if(validateComponent()){
+              let self = this;
             Visualforce.remoting.Manager.invokeAction(
                 '{!$RemoteAction.PmtAdyenPayController.placeOrderAdyen}',
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
-                    if (event.status && result.success) {
+                    if (!result.data.isFinal && result.data.action) {
+                         //handle payment action
+                        handleAction(result.data.action);
+                    } else if(result.data.ordId) {
                         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
                         orderSuccessUrl.searchParams.append('o', result.data.ordId);
                         window.location.href = orderSuccessUrl;
                     } else {
-                        //handle payment action
+                        self.model.errors = result.messages;
+                        return false;
                     }
                 },
                 { escape: true }

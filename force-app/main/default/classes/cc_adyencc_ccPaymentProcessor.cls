@@ -11,11 +11,13 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
             PaymentRequest paymentRequest = AdyenPaymentRequest.createPaymentRequest(stateData, cart, merchant);
             PaymentResponse paymentResponse = AdyenPaymentRequest.authorisePayment(merchant, paymentRequest);
 
+            Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentResponse);
+            paymentProcessorInput.put('paymentResult', paymentResult);
+
             paymentParams.transactionCode = paymentResponse.pspReference;
             //Remove the stateData from payment
             paymentParams.token = '';
 
-            //TODOBAS handle Payment Response
             paymentProcessorInput.put(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA, paymentParams);
         }
 
