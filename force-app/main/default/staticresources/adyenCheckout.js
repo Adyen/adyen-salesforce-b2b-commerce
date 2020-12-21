@@ -23,9 +23,16 @@ renderAdyenComponent = paymentMethodsResponse => {
 getPaymentMethodsConfig = () => {
     return {
         card: {
+            brands: ['mc','visa','amex'],
             enableStoreDetails: !isGuest,
+            hasHolderName: true,
+            holderNameRequired: true,
+            onBrand: handleOnBrand,
         }
     }
+}
+handleOnBrand = brand => {
+    console.log(brand);
 }
 
 handleOnChange = state => {
@@ -132,6 +139,13 @@ convertToJsonObject = jsonString => {
     return JSON.parse(jsonString);
 }
 
+decodeJsonObject = jsonObject => {
+    var elem = document.createElement('textarea');
+    elem.innerHTML = JSON.stringify(jsonObject);;
+    return JSON.parse(elem.value);
+}
+
 handleAction = action => {
-    checkout.adyenCheckout.createFromAction(action).mount('#action-container');
+    const decodedAction = decodeJsonObject(action);
+    checkout.adyenCheckout.createFromAction(decodedAction).mount('#action-container');
 }
