@@ -1,0 +1,5 @@
+<apex:page controller="AdyenReturnUrl" action="{!pageReferenceMethod}">
+    <div>
+        Test
+    </div>
+</apex:page>
