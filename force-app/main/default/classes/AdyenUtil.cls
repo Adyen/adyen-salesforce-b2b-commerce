@@ -2,6 +2,8 @@ public with sharing class AdyenUtil {
     public static Merchant__mdt getConfiguredMerchantAccount(ccrz__E_Cart__c cart) {
         Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
         Map<String, String> mapConfigs = (Map<String, String>) mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
+        System.debug('### mapConfigs = ' + mapConfigs);
+        System.debug('### pmt_adyencc = ' + mapConfigs.get('pmt_adyencc.config'));
         return Util.getConfigByName(mapConfigs.get('pmt_adyencc.config'));
     }
 

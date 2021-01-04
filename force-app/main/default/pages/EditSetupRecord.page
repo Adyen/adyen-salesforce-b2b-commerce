@@ -30,12 +30,16 @@
                         <apex:inputText required="true" value="{!editingRow.Name__c}" />
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Payment_Endpoint__c.label}"/>
-                        <apex:inputText required="true" value="{!editingRow.Payment_Endpoint__c}" style="width:95%" />
+                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Payments_Endpoint__c.label}"/>
+                        <apex:inputText required="true" value="{!editingRow.Payments_Endpoint__c}" style="width:95%" />
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
                         <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.PaymentMethods_Endpoint__c.label}"/>
                         <apex:inputText required="true" value="{!editingRow.PaymentMethods_Endpoint__c}" style="width:95%" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem>
+                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Payments_Details_Endpoint__c.label}"/>
+                        <apex:inputText required="true" value="{!editingRow.Payments_Details_Endpoint__c}" style="width:95%" />
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
                         <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Capture_Endpoint__c.label}"/>

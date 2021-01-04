@@ -1,6 +1,6 @@
 public with sharing class AdyenResponseHandler {
-    public static Map<String, Object> handleResponse(PaymentResponse paymentResponse) {
-        PaymentResponse.ResultCodeEnum resultCode = paymentResponse.resultCode;
+    public static Map<String, Object> handleResponse(PaymentsResponse paymentsResponse) {
+        PaymentsResponse.ResultCodeEnum resultCode = paymentsResponse.resultCode;
         switch on resultCode {
             when AUTHORISED, REFUSED, ERROR, CANCELLED {
                 return new Map<String, Object>{
@@ -12,14 +12,14 @@ public with sharing class AdyenResponseHandler {
                 return new Map<String, Object>{
                         'isFinal' => false,
                         'resultCode' => resultCode,
-                        'action' => paymentResponse.action
+                        'action' => paymentsResponse.action
                 };
             }
             when RECEIVED {
                 return new Map<String, Object>{
                         'isFinal' => false,
                         'resultCode' => resultCode,
-                        'additionalData' => paymentResponse.additionalData
+                        'additionalData' => paymentsResponse.additionalData
                 };
             }
             when else {

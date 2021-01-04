@@ -33,6 +33,18 @@ global with sharing class PmtAdyenPayController {
     }
 
     @RemoteAction
+    global static ccrz.cc_RemoteActionResult adyenPaymentsDetails(ccrz.cc_RemoteActionContext ctx, String stateData) {
+        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+        System.debug('### res = ' + res);
+        System.debug('### ctx = ' + ctx);
+        PaymentsDetailsRequest paymentsDetailsRequest = AdyenPaymentsDetailsRequest.createPaymentsDetailsRequest(stateData);
+        System.debug('### paymentsDetailsRequest = ' + paymentsDetailsRequest);
+        PaymentsResponse paymentsResponse = AdyenPaymentsDetailsRequest.callPaymentsDetails(paymentsDetailsRequest);
+        System.debug('### paymentsResponse = ' + paymentsResponse);
+        return res;
+    }
+
+    @RemoteAction
     global static ccrz.cc_RemoteActionResult placeOrderAdyen(ccrz.cc_RemoteActionContext ctx, String stateData) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
@@ -57,7 +69,7 @@ global with sharing class PmtAdyenPayController {
                 res.data = paymentResult;
                 return res;
             }
-            if (paymentResult.get('resultCode') == PaymentResponse.ResultCodeEnum.AUTHORISED) {
+            if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 //Here starts the Place Order
                 Map<String, Object> placeParams = new Map<String, Object>{
                         ccrz.ccApi.API_VERSION => 9,
@@ -82,7 +94,7 @@ global with sharing class PmtAdyenPayController {
         } catch (Exception e) {
             ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
             //Exception handling here
-            System.Debug('#### exception ' + e.getMessage() + e.getStackTraceString());
+            System.Debug('#### exception ' + e.getMessage() + e.getStackTraceString() + 'lineNumber: ' + e.getLineNumber());
             res.success = false;
             ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage());
             res.messages.add(m);

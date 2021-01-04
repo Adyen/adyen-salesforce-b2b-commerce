@@ -1,4 +1,4 @@
-<apex:page controller="AdyenReturnUrl" action="{!pageReferenceMethod}">
+<apex:page controller="AdyenReturnUrl">
     <div>
         Test
     </div>

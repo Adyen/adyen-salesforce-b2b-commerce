@@ -19,7 +19,7 @@
         <value xsi:type="xsd:string">https://pal-test.adyen.com/pal/servlet/Recurring/V49/disable</value>
     </values>
     <values>
-        <field>Payment_Endpoint__c</field>
+        <field>Payments_Endpoint__c</field>
         <value xsi:type="xsd:string">https://checkout-test.adyen.com/v64/payments</value>
     </values>
     <values>

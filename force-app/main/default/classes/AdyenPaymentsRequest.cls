@@ -1,36 +1,39 @@
-public with sharing class AdyenPaymentRequest {
-    public static PaymentRequest createPaymentRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
-        PaymentRequest paymentRequest = createPaymentRequestFromStateData(stateData);
-        paymentRequest.merchantAccount = merchant.Name__c;
-        paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
-        paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
-        paymentRequest.reference = cart.Id;
-        paymentRequest.returnUrl = 'https://b2b-scoping-0920-developer-edition.na139.force.com/services/apexrest/AdyenReturnUrl/*';
-        paymentRequest.shopperReference = cart.ccrz__Account__c;
-        return paymentRequest;
+public with sharing class AdyenPaymentsRequest {
+    public static PaymentsRequest createPaymentsRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
+        PaymentsRequest paymentsRequest = createPaymentsRequestFromStateData(stateData);
+        paymentsRequest.merchantAccount = merchant.Name__c;
+        paymentsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
+        paymentsRequest.applicationInfo = AdyenUtil.getApplicationInfo();
+        paymentsRequest.reference = cart.Id;
+        paymentsRequest.returnUrl = 'https://b2b-scoping-0920-developer-edition.na139.force.com/services/apexrest/AdyenReturnUrl/*';
+        paymentsRequest.shopperReference = cart.ccrz__Account__c;
+        paymentsRequest.additionalData = getAdditionalData();
+        paymentsRequest.channel = 'web';
+        paymentsRequest.origin = 'https://b2b-scoping-0920-developer-edition.na139.force.com';
+        return paymentsRequest;
     }
 
-    private static PaymentRequest createPaymentRequestFromStateData(String stateData) {
-        PaymentRequest paymentRequest = new PaymentRequest();
+    private static PaymentsRequest createPaymentsRequestFromStateData(String stateData) {
+        PaymentsRequest paymentsRequest = new PaymentsRequest();
         Map<String, Object> stateDataObjects = (Map<String, Object>) JSON.deserializeUntyped(stateData);
         if (stateDataObjects.containsKey('riskData')) {
             Map<String, Object> riskData = (Map<String, Object>) stateDataObjects.get('riskData');
             String serializedRiskData = JSON.serialize(riskData, true);
-            paymentRequest.riskData = (RiskData) JSON.deserialize(serializedRiskData, RiskData.class);
+            paymentsRequest.riskData = (RiskData) JSON.deserialize(serializedRiskData, RiskData.class);
         }
 
         if (stateDataObjects.containsKey('browserInfo')) {
             Map<String, Object> browserInfo = (Map<String, Object>) stateDataObjects.get('browserInfo');
             String serializedBrowserInfo = JSON.serialize(browserInfo, true);
-            paymentRequest.browserInfo = (BrowserInfo) JSON.deserialize(serializedBrowserInfo, BrowserInfo.class);
+            paymentsRequest.browserInfo = (BrowserInfo) JSON.deserialize(serializedBrowserInfo, BrowserInfo.class);
         }
 
         if (stateDataObjects.containsKey('paymentMethod')) {
             Map<String, Object> paymentMethod = (Map<String, Object>) stateDataObjects.get('paymentMethod');
-            paymentRequest.paymentMethod = getPaymentMethodDetails(paymentMethod);
+            paymentsRequest.paymentMethod = getPaymentMethodDetails(paymentMethod);
         }
 
-        return paymentRequest;
+        return paymentsRequest;
     }
 
     private static PaymentMethodDetails getPaymentMethodDetails(Map<String, Object> paymentMethod) {
@@ -67,19 +70,25 @@ public with sharing class AdyenPaymentRequest {
 
     }
 
-    public static PaymentResponse authorisePayment(Merchant__mdt merchant, PaymentRequest request) {
-        PaymentResponse paymentResponse = new PaymentResponse();
-        AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payment_Endpoint__c);
+    private static Map<String,String> getAdditionalData(){
+        return new Map<String, String> {
+                'allow3DS2' => 'true'
+        };
+    }
+
+    public static PaymentsResponse authorisePayment(Merchant__mdt merchant, PaymentsRequest request) {
+        PaymentsResponse paymentsResponse = new PaymentsResponse();
+        AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payments_Endpoint__c);
         String jsonString = JSON.serialize(request, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);
         if (AdyenUtil.isHttpResponseOK(httpResponse.getStatusCode())) {
-            paymentResponse = (PaymentResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResponse.getBody()), PaymentResponse.class);
+            paymentsResponse = (PaymentsResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResponse.getBody()), PaymentsResponse.class);
         } else {
             System.Debug('## Response code ' + httpResponse.getStatusCode() + 'from /payments call');
             System.Debug('## /payments raw response: ' + httpResponse.getBody());
         }
 
-        return paymentResponse;
+        return paymentsResponse;
     }
 }

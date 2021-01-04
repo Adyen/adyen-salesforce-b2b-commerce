@@ -3,6 +3,8 @@
     <apex:includeScript value="{! $Resource.validations }"/>
     <apex:includeScript value="{! $Resource.adyenComponent }"/>
     <apex:includeScript value="{! $Resource.adyenCheckout }"/>
+    <script src="/soap/ajax/50.0/connection.js" type="text/javascript"></script>
+    <script src="/soap/ajax/50.0/apex.js" type="text/javascript"></script>
     <link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/3.16.1/adyen.css"/>
     <script id="AdyenCCPayment" type="text/template">
         <div id="overlayCustom" class="modal-backdrop fade in" style="display: none"></div>

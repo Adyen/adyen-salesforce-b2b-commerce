@@ -10,6 +10,7 @@ renderAdyenComponent = paymentMethodsResponse => {
         paymentMethodsResponse: paymentMethodsResponse,
         paymentMethodsConfiguration: getPaymentMethodsConfig(),
         onChange: handleOnChange,
+        onAdditionalDetails: handleOnAdditionalDetails,
     };
     checkout.adyenCheckout = new AdyenCheckout(configuration);
 
@@ -42,6 +43,35 @@ handleOnChange = state => {
     }
     componentsObj[type].isValid = state.isValid;
     componentsObj[type].stateData = state.data;
+}
+
+handleOnAdditionalDetails = state => {
+    document.querySelector('#adyenStateData').value = JSON.stringify(
+        state.data,
+    );
+    console.log(state);
+    var paymentsDetailsResult = sforce.apex.execute("AdyenWebService", "adyenPaymentsDetails", state);
+    console.log(paymentsDetailsResult);
+    // Visualforce.remoting.Manager.invokeAction(
+    //     '{!$RemoteAction.PmtAdyenPayController.adyenPaymentsDetails}',
+    //     CCRZ.pagevars.remoteContext,
+    //     document.getElementById("adyenStateData").value,
+    //     //create general function
+    //     function(result, event){
+    //         if (!result.data.isFinal && result.data.action) {
+    //              //handle payment action
+    //             handleAction(result.data.action);
+    //         } else if(result.data.ordId) {
+    //             var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
+    //             orderSuccessUrl.searchParams.append('o', result.data.ordId);
+    //             window.location.href = orderSuccessUrl;
+    //         } else {
+    //             self.model.errors = result.messages;
+    //             return false;
+    //         }
+    //     },
+    //     { escape: true }
+    // );
 }
 
 renderPaymentMethod = paymentMethod => {
