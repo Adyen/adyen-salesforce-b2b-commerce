@@ -27,12 +27,8 @@ getPaymentMethodsConfig = () => {
             enableStoreDetails: !isGuest,
             hasHolderName: true,
             holderNameRequired: true,
-            onBrand: handleOnBrand,
         }
     }
-}
-handleOnBrand = brand => {
-    console.log(brand);
 }
 
 handleOnChange = state => {
