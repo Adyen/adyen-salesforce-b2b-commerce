@@ -55,7 +55,7 @@ renderPaymentMethod = paymentMethod => {
     paymentMethodsUI.append(li);
     handleInput(paymentMethod.type);
 
-    const node = createNode(paymentMethod.type)
+    const node = createNode(paymentMethod.type);
     if (node) {
         node.mount(container);
     }
@@ -129,6 +129,7 @@ assignStateData = () => {
     const type = checkout.selectedMethod;
     const hasStateData = componentsObj[type] && componentsObj[type].stateData;
     const stateData = hasStateData ? componentsObj[type].stateData : {paymentMethod: {type: selectedMethod}}
+    stateData.origin = window.location.origin;
     document.querySelector('#adyenStateData').value = JSON.stringify(
         stateData,
     );

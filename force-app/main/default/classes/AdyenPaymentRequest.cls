@@ -7,6 +7,8 @@ public with sharing class AdyenPaymentRequest {
         paymentRequest.reference = cart.Id;
         paymentRequest.returnUrl = 'https://b2b-scoping-0920-developer-edition.na139.force.com/services/apexrest/AdyenReturnUrl/*';
         paymentRequest.shopperReference = cart.ccrz__Account__c;
+        paymentRequest.additionalData = getAdditionalData();
+        paymentRequest.channel = 'web';
         return paymentRequest;
     }
 
@@ -23,6 +25,10 @@ public with sharing class AdyenPaymentRequest {
             Map<String, Object> browserInfo = (Map<String, Object>) stateDataObjects.get('browserInfo');
             String serializedBrowserInfo = JSON.serialize(browserInfo, true);
             paymentRequest.browserInfo = (BrowserInfo) JSON.deserialize(serializedBrowserInfo, BrowserInfo.class);
+        }
+
+        if (stateDataObjects.containsKey('origin')) {
+            paymentRequest.origin = (String)stateDataObjects.get('origin');
         }
 
         if (stateDataObjects.containsKey('paymentMethod')) {
@@ -64,7 +70,12 @@ public with sharing class AdyenPaymentRequest {
             defaultPaymentMethodDetails.setType(paymentType);
             return defaultPaymentMethodDetails;
         }
+    }
 
+    private static Map<String,String> getAdditionalData(){
+        return new Map<String, String> {
+                'allow3DS2' => 'true'
+        };
     }
 
     public static PaymentResponse authorisePayment(Merchant__mdt merchant, PaymentRequest request) {
