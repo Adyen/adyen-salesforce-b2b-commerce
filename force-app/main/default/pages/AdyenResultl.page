@@ -1,5 +1,0 @@
-<apex:page controller="AdyenShowConfirmation" action="{!renderPage}">
-    <div>
-        Test
-    </div>
-</apex:page>

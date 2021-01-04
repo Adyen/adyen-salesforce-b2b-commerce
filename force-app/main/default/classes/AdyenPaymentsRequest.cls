@@ -9,7 +9,6 @@ public with sharing class AdyenPaymentsRequest {
         paymentsRequest.shopperReference = cart.ccrz__Account__c;
         paymentsRequest.additionalData = getAdditionalData();
         paymentsRequest.channel = 'web';
-        paymentsRequest.origin = 'https://b2b-scoping-0920-developer-edition.na139.force.com';
         return paymentsRequest;
     }
 
@@ -26,6 +25,10 @@ public with sharing class AdyenPaymentsRequest {
             Map<String, Object> browserInfo = (Map<String, Object>) stateDataObjects.get('browserInfo');
             String serializedBrowserInfo = JSON.serialize(browserInfo, true);
             paymentsRequest.browserInfo = (BrowserInfo) JSON.deserialize(serializedBrowserInfo, BrowserInfo.class);
+        }
+
+        if (stateDataObjects.containsKey('origin')) {
+            paymentsRequest.origin = (String)stateDataObjects.get('origin');
         }
 
         if (stateDataObjects.containsKey('paymentMethod')) {
