@@ -53,26 +53,25 @@ global with sharing class PmtAdyenPayController {
 
             Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
             Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
+
+            //create order (status is Open)
+            Map<String, Object> orderResult = AdyenOrder.createOrder(processResult, cart);
+            System.Debug('#### order created ' + orderResult);
+
             if (!(Boolean)paymentResult.get('isFinal')) {
+                //TODOBAS add orderId into paymentResult
                 res.data = paymentResult;
                 return res;
             }
-            if (paymentResult.get('resultCode') == PaymentResponse.ResultCodeEnum.AUTHORISED) {
-                //Here starts the Place Order
-                Map<String, Object> placeParams = new Map<String, Object>{
-                        ccrz.ccApi.API_VERSION => 9,
-                        ccrz.ccApiCart.TRANSPAYMENTDATA =>
-                                processResult.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA),
-                        ccrz.ccApiCart.PAYMENTRESULT => processResult,
-                        ccrz.ccApiCart.CART_ENCID => cart.Id
-                } ;
-                if (Test.isRunningTest()) {
-                    placeParams.put(ccrz.ccApiCart.SKIP_VALID_CHECK, true);
-                }
 
-                Map<String, Object> placeResult = ccrz.ccApiCart.place(placeParams);
-                res = validatePlaceResult(placeResult, res);
+            if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
+                //TODOBAS update order status to Submitted
+                //Return orderId for confirmation page
+                Map<String, String> orderId = AdyenUtil.validateOrderResult(orderResult);
+                System.Debug('#### order orderId ' + orderId);
+                res.data = orderId;
                 res.success = true;
+                return res;
             }
 
             res.success = false;
@@ -92,24 +91,4 @@ global with sharing class PmtAdyenPayController {
         return res;
     }
 
-    private static ccrz.cc_RemoteActionResult validatePlaceResult(Map<String, Object> placeResult, ccrz.cc_RemoteActionResult res) {
-//        if(!placeResult.SUCCESS){
-//           //TODOBAS Fail the order
-//        }
-        String orderId = (String) placeResult.get('orderId');
-        ccrz__E_Order__c[] placedOrder = [
-                SELECT Id, ccrz__EncryptedId__c
-                FROM ccrz__E_Order__c
-                WHERE Id = :orderId
-                LIMIT
-                        1
-        ];
-        Map<String, String> orderResult = new Map<String, String>();
-        if (placedOrder <> null && placedOrder.size() == 1) {
-            orderResult.put('ordId', placedOrder[0].ccrz__EncryptedId__c);
-        }
-        res.success = true;
-        res.data = orderResult;
-        return res;
-    }
 }

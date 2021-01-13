@@ -2,6 +2,7 @@ public with sharing class AdyenUtil {
     public static Merchant__mdt getConfiguredMerchantAccount(ccrz__E_Cart__c cart) {
         Map<String, Object> mapAdyenParams = Util.getCCConfig('pmt_adyencc', cart.ccrz__Storefront__c, true, true);
         Map<String, String> mapConfigs = (Map<String, String>) mapAdyenParams.get(ccrz.ccAPIConfig.CONFIGURATIONS);
+        System.debug('### mapConfigs adyencc' + mapConfigs.get('pmt_adyencc.config'));
         return Util.getConfigByName(mapConfigs.get('pmt_adyencc.config'));
     }
 
@@ -58,6 +59,26 @@ public with sharing class AdyenUtil {
                 200, 201, 202, 204
         } ;
         return responseOK.contains(responseCode);
+    }
+
+     public static Map<String, String> validateOrderResult(Map<String, Object> placeResult) {
+//        if(!placeResult.SUCCESS){
+//           //TODOBAS Fail the order
+//        }
+        String orderId = (String) placeResult.get('orderId');
+        ccrz__E_Order__c[] placedOrder = [
+                SELECT Id, ccrz__EncryptedId__c
+                FROM ccrz__E_Order__c
+                WHERE Id = :orderId
+                LIMIT
+                        1
+        ];
+        Map<String, String> orderResult = new Map<String, String>();
+        if (placedOrder <> null && placedOrder.size() == 1) {
+            orderResult.put('ordId', placedOrder[0].ccrz__EncryptedId__c);
+        }
+
+        return orderResult;
     }
 
 //

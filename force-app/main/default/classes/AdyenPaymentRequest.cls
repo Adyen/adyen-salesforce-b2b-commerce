@@ -78,19 +78,19 @@ public with sharing class AdyenPaymentRequest {
         };
     }
 
-    public static PaymentResponse authorisePayment(Merchant__mdt merchant, PaymentRequest request) {
-        PaymentResponse paymentResponse = new PaymentResponse();
+    public static PaymentsResponse authorisePayment(Merchant__mdt merchant, PaymentRequest request) {
+        PaymentsResponse paymentsResponse = new PaymentsResponse();
         AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payment_Endpoint__c);
         String jsonString = JSON.serialize(request, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);
         if (AdyenUtil.isHttpResponseOK(httpResponse.getStatusCode())) {
-            paymentResponse = (PaymentResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResponse.getBody()), PaymentResponse.class);
+            paymentsResponse = (PaymentsResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResponse.getBody()), PaymentsResponse.class);
         } else {
             System.Debug('## Response code ' + httpResponse.getStatusCode() + 'from /payments call');
             System.Debug('## /payments raw response: ' + httpResponse.getBody());
         }
 
-        return paymentResponse;
+        return paymentsResponse;
     }
 }

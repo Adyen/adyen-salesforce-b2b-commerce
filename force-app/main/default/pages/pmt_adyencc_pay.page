@@ -88,6 +88,8 @@
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
+                    console.log('templateResult');
+                    console.log(result);
                     if (!result.data.isFinal && result.data.action) {
                          //handle payment action
                         handleAction(result.data.action);
