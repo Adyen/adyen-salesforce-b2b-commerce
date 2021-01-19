@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <label>ApexTest</label>
+    <label>AdyenMerchantConfig</label>
     <protected>true</protected>
     <values>
         <field>API_Key__c</field>
@@ -27,11 +27,11 @@
         <value xsi:type="xsd:string">https://checkout-test.adyen.com/v64/paymentMethods</value>
     </values>
     <values>
-        <field>Name__c</field>
-        <value xsi:type="xsd:string">ApexTest</value>
+        <field>Payments_Details_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://checkout-test.adyen.com/v64/payments/details</value>
     </values>
     <values>
-        <field>Reference__c</field>
-        <value xsi:type="xsd:string">apex</value>
+        <field>Merchant_Account__c</field>
+        <value xsi:type="xsd:string">MerchantAccount</value>
     </values>
 </CustomMetadata>

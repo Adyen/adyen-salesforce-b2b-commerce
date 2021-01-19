@@ -42,47 +42,34 @@ handleOnChange = state => {
 }
 
 handleOnAdditionalDetails = (state, component) => {
-    console.log('onAdditionalDetails');
-    console.log(component);
-    console.log(state);
     const details = {
         ...state.data,
-        cartId: CCRZ.pagevars.currentCartID
+        cartId: window.cartId
     };
-    console.log(details);
     $.ajax({
         type: 'POST',
         data: JSON.stringify(details),
         dataType: 'text',
-        // contentType: "application/json",
         contentType: "application/json; charset=utf-8",
         cache: false,
-        url: 'https://b2b-scoping-0920-developer-edition.na139.force.com/services/apexrest/AdyenService/',
+        url: '/services/apexrest/AdyenService/',
         success: function(data)
         {
             const result = JSON.parse(JSON.parse(data));
-            console.log('resultBas');
-            console.log(result);
             //TODOBAS extract this method
             if (!result.isFinal && result.action) {
                 //handle payment action
                 handleAction(result.action);
             }
-            else if(result.ordId) {
+            else if(result.orderIdEnc) {
                 var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
-                orderSuccessUrl.searchParams.append('o', result.ordId);
+                orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
                 window.location.href = orderSuccessUrl;
             }
             else {
-                console.log('no data');
                 //self.model.errors = result.messages;
                 return false;
             }
-        },
-        error: function(x,t,r)
-        {
-            console.log(x.status);
-            console.log(t);
         }
     });
 }
@@ -191,6 +178,5 @@ decodeJsonObject = jsonObject => {
 
 handleAction = action => {
     const decodedAction = decodeJsonObject(action);
-    console.log(decodedAction);
     checkout.adyenCheckout.createFromAction(decodedAction).mount('#action-container');
 }

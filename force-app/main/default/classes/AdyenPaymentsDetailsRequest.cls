@@ -1,10 +1,7 @@
 public with sharing class AdyenPaymentsDetailsRequest {
    public static PaymentsResponse adyenPaymentsDetails(String stateData){
-        System.debug('### paymentsDetailsRequest stateData = ' + stateData);
         PaymentsDetailsRequest paymentsDetailsRequest = createPaymentsDetailsRequest(stateData);
-        System.debug('### paymentsDetailsRequest = ' + paymentsDetailsRequest);
         PaymentsResponse paymentsResponse = callPaymentsDetails(paymentsDetailsRequest);
-        System.debug('### paymentsResponse = ' + paymentsResponse);
         return paymentsResponse;
     }
 
@@ -13,10 +10,8 @@ public with sharing class AdyenPaymentsDetailsRequest {
     }
 
     public static PaymentsResponse callPaymentsDetails(PaymentsDetailsRequest request){
-        System.debug('### request = ' + request);
         PaymentsResponse paymentsDetailsResponse = new PaymentsResponse();
-        //TODOBAS retrieve merchant dynamically
-        Merchant__mdt merchant = Util.getConfigByName('SalesforceB2BBas');
+        Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
 
         AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payments_Details_Endpoint__c);
         String jsonString = JSON.serialize(request, true);

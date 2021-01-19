@@ -55,21 +55,20 @@ global with sharing class PmtAdyenPayController {
             Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
 
             //create order (status is Open)
-            Map<String, Object> orderResult = AdyenOrder.createOrder(processResult, cart);
-            System.Debug('#### order created ' + orderResult);
+            Map<String, Object> orderResult = AdyenOrder.createOpenOrder(processResult, cart);
+            Map<String, String> orderIds = AdyenOrder.validateOrderResult(orderResult);
 
             if (!(Boolean)paymentResult.get('isFinal')) {
-                //TODOBAS add orderId into paymentResult
+                paymentResult.put('cartId', orderIds.get('cartId'));
                 res.data = paymentResult;
                 return res;
             }
 
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 //TODOBAS update order status to Submitted
+
                 //Return orderId for confirmation page
-                Map<String, String> orderId = AdyenUtil.validateOrderResult(orderResult);
-                System.Debug('#### order orderId ' + orderId);
-                res.data = orderId;
+                res.data = orderIds.get('orderIdEnc');
                 res.success = true;
                 return res;
             }

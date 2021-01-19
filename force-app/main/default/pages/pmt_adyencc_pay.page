@@ -88,14 +88,13 @@
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
-                    console.log('templateResult');
-                    console.log(result);
                     if (!result.data.isFinal && result.data.action) {
+                        window.cartId = result.data.cartId;
                          //handle payment action
                         handleAction(result.data.action);
-                    } else if(result.data.ordId) {
+                    } else if(result.data.orderIdEnc) {
                         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
-                        orderSuccessUrl.searchParams.append('o', result.data.ordId);
+                        orderSuccessUrl.searchParams.append('o', result.data.orderIdEnc);
                         window.location.href = orderSuccessUrl;
                     } else {
                         self.model.errors = result.messages;

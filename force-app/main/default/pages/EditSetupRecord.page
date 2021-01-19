@@ -26,8 +26,8 @@
                         <apex:inputText required="true" value="{!editingRow.MasterLabel}" />
                     </apex:pageBlockSectionItem>-->
                     <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Name__c.label}"/>
-                        <apex:inputText required="true" value="{!editingRow.Name__c}" />
+                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Merchant_Account__c.label}"/>
+                        <apex:inputText required="true" value="{!editingRow.Merchant_Account__c}" />
                     </apex:pageBlockSectionItem>
                     <apex:pageBlockSectionItem>
                         <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Payment_Endpoint__c.label}"/>
