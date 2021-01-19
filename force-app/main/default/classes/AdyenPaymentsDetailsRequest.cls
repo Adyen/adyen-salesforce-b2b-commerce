@@ -20,8 +20,8 @@ public with sharing class AdyenPaymentsDetailsRequest {
         if (AdyenUtil.isHttpResponseOK(httpResponse.getStatusCode())) {
             paymentsDetailsResponse = (PaymentsResponse) JSON.deserialize(Util.makeSalesforceCompatible(httpResponse.getBody()), PaymentsResponse.class);
         } else {
-            System.Debug('## Response code ' + httpResponse.getStatusCode() + 'from /payments call');
-            System.Debug('## /payments raw response: ' + httpResponse.getBody());
+            System.Debug('## Response code ' + httpResponse.getStatusCode() + 'from /payments/details call');
+            System.Debug('## /payments/details raw response: ' + httpResponse.getBody());
         }
 
         return paymentsDetailsResponse;

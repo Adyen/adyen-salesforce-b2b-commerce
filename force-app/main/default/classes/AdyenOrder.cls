@@ -37,7 +37,7 @@ global with sharing class AdyenOrder {
             return authOrder[0].ccrz__EncryptedId__c;
         }
 
-        return 'testOrderUpdate';
+        return 'OrderInvalid';
     }
 
     public static ccrz__E_Order__c[] getOrderById(String orderId){
