@@ -24,7 +24,6 @@ renderAdyenComponent = paymentMethodsResponse => {
 getPaymentMethodsConfig = () => {
     return {
         card: {
-            brands: ['mc','visa','amex'],
             enableStoreDetails: !isGuest,
             hasHolderName: true,
             holderNameRequired: true,
