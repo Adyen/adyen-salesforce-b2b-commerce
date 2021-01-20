@@ -1,7 +1,7 @@
 public with sharing class AdyenCaptureRequest {
     public static CaptureRequest createCaptureRequest(ccrz__E_TransactionPayment__c tp, Merchant__mdt merchant) {
         CaptureRequest captureRequest = new CaptureRequest();
-        captureRequest.merchantAccount = merchant.Name__c;
+        captureRequest.merchantAccount = merchant.Merchant_Account__c;
         captureRequest.originalReference = tp.ccrz__TransactionCode__c;
         captureRequest.modificationAmount = AdyenUtil.getAdyenAmount(tp.ccrz__CurrencyISOCode__c, tp.ccrz__Amount__c);
         captureRequest.reference = tp.Id;

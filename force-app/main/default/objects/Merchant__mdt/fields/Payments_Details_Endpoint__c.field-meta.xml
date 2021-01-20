@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Payment_Endpoint__c</fullName>
+    <fullName>Payments_Details_Endpoint__c</fullName>
     <defaultValue>&quot;https://checkout-test.adyen.com/v66/&quot;</defaultValue>
-    <description>Endpoint to which the Adyen Payment service is mounted</description>
+    <description>Payments Details endpoint</description>
     <externalId>false</externalId>
     <fieldManageability>SubscriberControlled</fieldManageability>
     <inlineHelpText>Endpoint to which the Adyen Payment service is mounted</inlineHelpText>
-    <label>Payment Endpoint</label>
+    <label>Payments Details Endpoint</label>
     <required>false</required>
     <type>Url</type>
 </CustomField>

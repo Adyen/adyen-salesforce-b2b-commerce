@@ -20,7 +20,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Name__c</field>
+                <field>Merchant_Account__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
@@ -77,7 +77,7 @@
         <fields>API_Key__c</fields>
         <fields>Authorise_Endpoint__c</fields>
         <fields>Capture_Endpoint__c</fields>
-        <fields>Name__c</fields>
+        <fields>Merchant_Account__c</fields>
         <fields>Disable_Endpoint__c</fields>
     </miniLayout>
     <showEmailCheckbox>false</showEmailCheckbox>

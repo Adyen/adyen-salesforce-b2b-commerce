@@ -10,6 +10,7 @@ renderAdyenComponent = paymentMethodsResponse => {
         paymentMethodsResponse: paymentMethodsResponse,
         paymentMethodsConfiguration: getPaymentMethodsConfig(),
         onChange: handleOnChange,
+        onAdditionalDetails: handleOnAdditionalDetails,
     };
     checkout.adyenCheckout = new AdyenCheckout(configuration);
 
@@ -24,6 +25,8 @@ getPaymentMethodsConfig = () => {
     return {
         card: {
             enableStoreDetails: !isGuest,
+            hasHolderName: true,
+            holderNameRequired: true,
         }
     }
 }
@@ -37,6 +40,39 @@ handleOnChange = state => {
     componentsObj[type].stateData = state.data;
 }
 
+handleOnAdditionalDetails = (state, component) => {
+    const details = {
+        ...state.data,
+        cartId: window.cartId
+    };
+    $.ajax({
+        type: 'POST',
+        data: JSON.stringify(details),
+        dataType: 'text',
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        url: '/services/apexrest/AdyenService/',
+        success: function(data)
+        {
+            const result = JSON.parse(JSON.parse(data));
+            //TODOBAS extract this method
+            if (!result.isFinal && result.action) {
+                //handle payment action
+                handleAction(result.action);
+            }
+            else if(result.orderIdEnc) {
+                var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
+                orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
+                window.location.href = orderSuccessUrl;
+            }
+            else {
+                //self.model.errors = result.messages;
+                return false;
+            }
+        }
+    });
+}
+
 renderPaymentMethod = paymentMethod => {
     paymentMethod.type = paymentMethod.type == "scheme" ? "card" : paymentMethod.type;
     const paymentMethodsUI = document.querySelector('#paymentMethodsList');
@@ -48,7 +84,7 @@ renderPaymentMethod = paymentMethod => {
     paymentMethodsUI.append(li);
     handleInput(paymentMethod.type);
 
-    const node = createNode(paymentMethod.type)
+    const node = createNode(paymentMethod.type);
     if (node) {
         node.mount(container);
     }
@@ -122,6 +158,7 @@ assignStateData = () => {
     const type = checkout.selectedMethod;
     const hasStateData = componentsObj[type] && componentsObj[type].stateData;
     const stateData = hasStateData ? componentsObj[type].stateData : {paymentMethod: {type: selectedMethod}}
+    stateData.origin = window.location.origin;
     document.querySelector('#adyenStateData').value = JSON.stringify(
         stateData,
     );
@@ -132,6 +169,13 @@ convertToJsonObject = jsonString => {
     return JSON.parse(jsonString);
 }
 
+decodeJsonObject = jsonObject => {
+    var elem = document.createElement('textarea');
+    elem.innerHTML = JSON.stringify(jsonObject);;
+    return JSON.parse(elem.value);
+}
+
 handleAction = action => {
-    checkout.adyenCheckout.createFromAction(action).mount('#action-container');
+    const decodedAction = decodeJsonObject(action);
+    checkout.adyenCheckout.createFromAction(decodedAction).mount('#action-container');
 }
