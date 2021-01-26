@@ -1,11 +1,12 @@
 public with sharing class AdyenPaymentsDetailsRequest {
+    //TODOBAS check where this is called and optimise /payments/details call
    public static PaymentsResponse adyenPaymentsDetails(String stateData){
-        PaymentsDetailsRequest paymentsDetailsRequest = createPaymentsDetailsRequest(stateData);
-        PaymentsResponse paymentsResponse = callPaymentsDetails(paymentsDetailsRequest);
-        return paymentsResponse;
+        PaymentsDetailsRequest paymentsDetailsRequest = createPaymentsDetailsRequestFromStateData(stateData);
+        PaymentsResponse paymentsDetailsResponse = callPaymentsDetails(paymentsDetailsRequest);
+        return paymentsDetailsResponse;
     }
 
-    public static PaymentsDetailsRequest createPaymentsDetailsRequest(String stateData) {
+    public static PaymentsDetailsRequest createPaymentsDetailsRequestFromStateData(String stateData) {
         return (PaymentsDetailsRequest) JSON.deserialize(stateData, PaymentsDetailsRequest.class);
     }
 

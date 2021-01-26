@@ -1,12 +1,11 @@
 global with sharing class AdyenOrder {
-    public static Map<String, Object> createOpenOrder(Map<String, Object> processResult, ccrz__E_Cart__c cart) {
+    public static Map<String, Object> placeOrder(Map<String, Object> processResult, String cartId) {
             Map<String, Object> createOrderParams = new Map<String, Object>{
                     ccrz.ccApi.API_VERSION => 9,
                     ccrz.ccApiCart.TRANSPAYMENTDATA =>
                             processResult.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA),
                     ccrz.ccApiCart.PAYMENTRESULT => processResult,
-                    ccrz.ccApiCart.CART_ENCID => cart.Id,
-                    ccrz.ccApiOrder.PARAM_ORDER_STATUS => 'Open'
+                    ccrz.ccApiCart.CART_ENCID => cartId
             };
             if (Test.isRunningTest()) {
                 createOrderParams.put(ccrz.ccApiCart.SKIP_VALID_CHECK, true);
@@ -31,7 +30,12 @@ global with sharing class AdyenOrder {
     }
 
      public static String updateOrderStatus(String cartId){
+     System.debug('### cartId = ' + cartId);
         ccrz__E_Order__c[] authOrder = AdyenOrder.getOrderByCartId(cartId);
+        System.debug('### UserInfo getProfileId = ' + UserInfo.getProfileId());
+        System.debug('### UserInfo getUserName = ' + UserInfo.getUserName());
+        System.debug('### UserInfo getUserRoleId()= ' + UserInfo.getUserRoleId());
+        System.debug('### authOrder = ' + authOrder);
         if(authOrder <> null && authOrder.size() == 1) {
             //TODOBAS update Order Status authOrder[0]
             return authOrder[0].ccrz__EncryptedId__c;

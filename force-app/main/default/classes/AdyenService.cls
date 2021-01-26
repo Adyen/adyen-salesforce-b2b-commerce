@@ -5,16 +5,18 @@ global with sharing class AdyenService {
         String requestBody = RestContext.request.requestBody.toString();
         Map<String, Object> requestData = (Map<String, Object>)JSON.deserializeUntyped(requestBody);
 
-        PaymentsDetailsRequest paymentsDetailsRequest = (PaymentsDetailsRequest) JSON.deserialize(requestBody, PaymentsDetailsRequest.class);
-        PaymentsResponse paymentsResponse = AdyenPaymentsDetailsRequest.callPaymentsDetails(paymentsDetailsRequest);
-        Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsResponse);
+        //Since cartId will not exist in PaymentsDetailsRequest, it will not be added in request
+//        PaymentsDetailsRequest paymentsDetailsRequest = (PaymentsDetailsRequest) JSON.deserialize(requestBody, PaymentsDetailsRequest.class);
+//        PaymentsResponse paymentsResponse = AdyenPaymentsDetailsRequest.callPaymentsDetails(paymentsDetailsRequest);
+        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetailsRequest.adyenPaymentsDetails(requestBody);
+        Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
 
         if(!(Boolean)paymentResult.get('isFinal')){
             return JSON.serialize(paymentResult, true);
         }
 
         String cartId = (String)requestData.get('cartId');
-        if(!(paymentsResponse.merchantReference == cartId)){
+        if(!(paymentsDetailsResponse.merchantReference == cartId)){
             //TODOBAS restore cart
             return 'Invalid order';
         }

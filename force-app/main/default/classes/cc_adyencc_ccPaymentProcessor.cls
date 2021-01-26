@@ -23,4 +23,11 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
 
         return paymentProcessorInput;
     }
+
+    global override Map<String, Object> process(Map<String, Object> paymentProcessorInput) {
+        System.debug('### process = ' + paymentProcessorInput);
+        return paymentProcessorInput;
+    }
+
+
 }
