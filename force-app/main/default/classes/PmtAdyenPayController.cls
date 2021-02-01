@@ -38,7 +38,7 @@ global with sharing class PmtAdyenPayController {
 
             Map<String, Object> inputParams = new Map<String, Object>();
             inputParams.put('accountType', 'adyencc');
-            //Use token for stateData ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA
+            //Use token for stateData
             inputParams.put('token', stateData);
 
             Map<String, Object> paymentProcessorInput = new Map<String, Object>{
