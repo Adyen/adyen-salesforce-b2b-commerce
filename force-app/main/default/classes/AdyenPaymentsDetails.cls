@@ -1,13 +1,16 @@
-public with sharing class AdyenPaymentsDetailsRequest {
-    //TODOBAS check where this is called and optimise /payments/details call
-   public static PaymentsResponse adyenPaymentsDetails(String stateData){
-        PaymentsDetailsRequest paymentsDetailsRequest = createPaymentsDetailsRequestFromStateData(stateData);
-        PaymentsResponse paymentsDetailsResponse = callPaymentsDetails(paymentsDetailsRequest);
-        return paymentsDetailsResponse;
+public with sharing class AdyenPaymentsDetails {
+    public static PaymentsResponse requestFromStateData(string stateData){
+        PaymentsDetailsRequest paymentsDetailsRequest = (PaymentsDetailsRequest) JSON.deserialize(stateData, PaymentsDetailsRequest.class);
+        return callPaymentsDetails(paymentsDetailsRequest);
     }
 
-    public static PaymentsDetailsRequest createPaymentsDetailsRequestFromStateData(String stateData) {
-        return (PaymentsDetailsRequest) JSON.deserialize(stateData, PaymentsDetailsRequest.class);
+    public static PaymentsResponse requestAfterRedirect(Map<String, String> details, String cartEncryptedId){
+        ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartEncryptedId);
+        PaymentsDetailsRequest paymentsDetailsRequest = new PaymentsDetailsRequest();
+        paymentsDetailsRequest.details = details;
+        //Get saved payment data from cart
+        paymentsDetailsRequest.paymentData = cart.AdyenPaymentData__c;
+        return callPaymentsDetails(paymentsDetailsRequest);
     }
 
     public static PaymentsResponse callPaymentsDetails(PaymentsDetailsRequest request){

@@ -11,10 +11,7 @@ global with sharing class PmtAdyenPayController {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
-            Merchant__mdt merchant = AdyenUtil.getConfiguredMerchantAccount(cart);
-
-            PaymentMethodsRequest paymentMethodsRequest = AdyenPaymentMethodsRequest.createPaymentMethodsRequest(cart, merchant);
-            PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethodsRequest.getPaymentMethods(merchant, paymentMethodsRequest);
+            PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(cart);
 
             //Remove suffix and convert to string
             String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
@@ -55,19 +52,14 @@ global with sharing class PmtAdyenPayController {
             Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
 
             if (!(Boolean)paymentResult.get('isFinal')) {
-
-//                if(paymentResult.get('paymentData') !== null){
-                    //TODOBAS save PaymentData to cart
-                    cart.AdyenPaymentData__c = (String)paymentResult.get('paymentData');
-                    update cart;
-//                }
+                cart.AdyenPaymentData__c = (String)paymentResult.get('paymentData');
+                update cart;
                 paymentResult.put('cartId', cart.Id);
                 res.data = paymentResult;
                 return res;
             }
 
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
-                //TODOBAS update order status to Submitted
                 //create order
                 Map<String, Object> orderResult = AdyenOrder.placeOrder(processResult, cart.Id);
                 Map<String, String> orderIds = AdyenOrder.validateOrderResult(orderResult);

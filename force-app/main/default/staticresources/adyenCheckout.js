@@ -173,13 +173,13 @@ handlePaymentResult = result => {
         //handle payment action
         handleAction(result.action);
     }
-    else if(result.orderIdEnc) {
+    else if(result.isFinal && result.orderSuccess) {
         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
         orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
         window.location.href = orderSuccessUrl;
     }
     else {
-        //self.model.errors = result.messages;
+        document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
         return false;
     }
 }
