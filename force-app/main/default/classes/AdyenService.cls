@@ -13,6 +13,7 @@ global with sharing class AdyenService {
             return JSON.serialize(paymentResult, true);
         }
 
+        Boolean orderSuccess = false;
         String cartId = (String)requestData.get('cartId');
         if(!(paymentsResponse.merchantReference == cartId)){
             //TODOBAS restore cart
