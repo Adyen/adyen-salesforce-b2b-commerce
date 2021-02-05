@@ -13,8 +13,8 @@ public with sharing class AdyenReturn {
         if((String)paymentResult.get('merchantReference') == merchantReference){
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED){
                 //Place order
-                Map<String, Object> orderResult = AdyenOrder.placeOrder(paymentResult, merchantReference);
-                Map<String, String> orderIds = AdyenOrder.validateOrderResult(orderResult);
+                Map<String, Object> orderResult = AdyenController.placeOrder(paymentResult, merchantReference);
+                Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 String orderId = orderIds.get('orderIdEnc');
                 //TODOBAS retrieve community URL
                 PageReference pageRef = new PageReference('https://b2b-scoping-0920-developer-edition.na139.force.com/ccrz__OrderConfirmation?o=' + orderId);

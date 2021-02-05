@@ -1,18 +1,24 @@
 public with sharing class AdyenPaymentMethods {
-    private static PaymentMethodsRequest createPaymentMethodsRequest(ccrz__E_Cart__c cart, Merchant__mdt merchant) {
+    private static PaymentMethodsRequest createPaymentMethodsRequest(ccrz__E_Cart__c cart, Merchant__mdt merchant, Boolean isStoredPaymentMethod) {
         PaymentMethodsRequest paymentMethodsRequest = new PaymentMethodsRequest();
         paymentMethodsRequest.merchantAccount = merchant.Merchant_Account__c;
         paymentMethodsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
 
+        if(isStoredPaymentMethod){
+            //Only credit card for My Wallet
+            paymentMethodsRequest.allowedPaymentMethods = new List<String>{'card'};
+        }
         //TODOBAS countryCode from address
         paymentMethodsRequest.countryCode = 'US';
         return paymentMethodsRequest;
     }
 
-    public static PaymentMethodsResponse getPaymentMethods(ccrz__E_Cart__c cart) {
+    public static PaymentMethodsResponse getPaymentMethods(ccrz__E_Cart__c cart, Boolean isStoredPaymentMethod) {
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
-        PaymentMethodsRequest paymentMethodsRequest = createPaymentMethodsRequest(cart, merchant);
+        System.Debug('## /paymentMethods raw merchant: ' + merchant);
+        PaymentMethodsRequest paymentMethodsRequest = createPaymentMethodsRequest(cart, merchant, isStoredPaymentMethod);
+        System.Debug('## /paymentMethods raw paymentMethodsRequest: ' + paymentMethodsRequest);
         AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.PaymentMethods_Endpoint__c);
         String jsonString = JSON.serialize(paymentMethodsRequest, true);
         jsonString = Util.makeAdyenCompatible(jsonString);

@@ -14,8 +14,8 @@ global with sharing class AdyenService {
         if((Boolean)paymentResult.get('isFinal') && paymentsDetailsResponse.merchantReference == cartId){
             if (String.valueOf(paymentResult.get('resultCode')) == 'AUTHORISED') {
                 //TODOBAS place order success=false
-                Map<String, Object> orderResult = AdyenOrder.placeOrder(paymentResult, cartId);
-                Map<String, String> orderIds = AdyenOrder.validateOrderResult(orderResult);
+                Map<String, Object> orderResult = AdyenController.placeOrder(paymentResult, cartId);
+                Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
                 paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));
                 orderSuccess = true;
