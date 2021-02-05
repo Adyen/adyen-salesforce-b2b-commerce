@@ -165,8 +165,6 @@ public with sharing class SetupController {
     public class CustomMetadataCallback implements Metadata.DeployCallback {
         public void handleResult(Metadata.DeployResult result,
                 Metadata.DeployCallbackContext context) {
-            //System.debug('## Deployment result '+result);
-            //System.debug('## Deployment context '+context);
 
         }
     }
