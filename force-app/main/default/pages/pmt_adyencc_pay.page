@@ -42,7 +42,6 @@
         '{!$RemoteAction.PmtAdyenPayController.getPaymentMethods}',
         CCRZ.pagevars.remoteContext,
         function(result, event){
-            console.log(result);
             if(result.data){
                 const paymentMethods = convertToJsonObject(result.data);
                 renderAdyenComponent(paymentMethods);

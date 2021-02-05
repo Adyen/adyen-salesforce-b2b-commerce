@@ -23,7 +23,6 @@
             '{!$RemoteAction.PmtAdyenNewController.getPaymentMethods}',
             CCRZ.pagevars.remoteContext,
             function(result, event){
-                console.log(result);
                 if(result.data){
                     const paymentMethods = convertToJsonObject(result.data);
                     renderAdyenComponent(paymentMethods);
@@ -36,7 +35,6 @@
         CCRZ.models.StoredPaymentsAdyenccModel = CCRZ.CloudCrazeModel.extend({
             className : "PmtAdyenNewController",
             saveAdyenccNumber: function(poData, callback) {
-                //console.log(poData);
             },
         });
         
