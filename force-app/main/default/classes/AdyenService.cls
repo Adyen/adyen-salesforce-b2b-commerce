@@ -23,7 +23,7 @@ global with sharing class AdyenService {
             return AdyenOrder.updateOrderStatus(cartId);
         }
 
+        paymentResult.put('orderSuccess', orderSuccess);
         return JSON.serialize(paymentResult, true);
-
     }
 }

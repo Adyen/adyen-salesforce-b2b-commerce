@@ -1,4 +1,4 @@
-public with sharing class AdyenPaymentRequest {
+public with sharing class AdyenPayments {
     public static PaymentRequest createPaymentRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
         PaymentRequest paymentRequest = createPaymentRequestFromStateData(stateData);
         paymentRequest.merchantAccount = merchant.Merchant_Account__c;

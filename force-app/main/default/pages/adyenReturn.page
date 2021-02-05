@@ -1,0 +1,2 @@
+<apex:page controller="AdyenReturn" action="{!handleRedirectResponse}">
+</apex:page>
