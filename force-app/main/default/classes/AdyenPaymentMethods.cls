@@ -16,9 +16,7 @@ public with sharing class AdyenPaymentMethods {
 
     public static PaymentMethodsResponse getPaymentMethods(ccrz__E_Cart__c cart, Boolean isStoredPaymentMethod) {
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
-        System.Debug('## /paymentMethods raw merchant: ' + merchant);
         PaymentMethodsRequest paymentMethodsRequest = createPaymentMethodsRequest(cart, merchant, isStoredPaymentMethod);
-        System.Debug('## /paymentMethods raw paymentMethodsRequest: ' + paymentMethodsRequest);
         AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.PaymentMethods_Endpoint__c);
         String jsonString = JSON.serialize(paymentMethodsRequest, true);
         jsonString = Util.makeAdyenCompatible(jsonString);

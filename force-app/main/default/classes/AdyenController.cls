@@ -1,12 +1,9 @@
 global with sharing class AdyenController {
     public static ccrz.cc_RemoteActionResult obtainPaymentMethods(ccrz.cc_RemoteActionContext ctx, Boolean isStoredPaymentMethod){
             ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
-            System.debug('### getPaymentMethods initiated ctx= ' + ctx);
             try {
                 ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
-                System.debug('### getPaymentMethods initiated cart= ' + cart);
                 PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(cart, isStoredPaymentMethod);
-                System.debug('### paymentMethodsResponse = ' + paymentMethodsResponse);
 
                 //Remove suffix and convert to string
                 String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
