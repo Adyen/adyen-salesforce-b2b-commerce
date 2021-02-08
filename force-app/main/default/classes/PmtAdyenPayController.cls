@@ -10,11 +10,8 @@ global with sharing class PmtAdyenPayController {
     global static ccrz.cc_RemoteActionResult getPaymentMethods(ccrz.cc_RemoteActionContext ctx) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
-            ccrz__E_Cart__c cart = AdyenUtil.getCartFromDatabase(ctx.currentCartId);
-            Merchant__mdt merchant = AdyenUtil.getConfiguredMerchantAccount(cart);
-
-            PaymentMethodsRequest paymentMethodsRequest = AdyenPaymentMethodsRequest.createPaymentMethodsRequest(cart, merchant);
-            PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethodsRequest.getPaymentMethods(merchant, paymentMethodsRequest);
+            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
+            PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(cart);
 
             //Remove suffix and convert to string
             String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
@@ -37,7 +34,7 @@ global with sharing class PmtAdyenPayController {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
             ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
-            ccrz__E_Cart__c cart = AdyenUtil.getCartFromDatabase(ctx.currentCartId);
+            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
 
             Map<String, Object> inputParams = new Map<String, Object>();
             inputParams.put('accountType', 'adyencc');
@@ -54,19 +51,18 @@ global with sharing class PmtAdyenPayController {
             Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
             Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
 
-            //create order (status is Open)
-            Map<String, Object> orderResult = AdyenOrder.createOpenOrder(processResult, cart);
-            Map<String, String> orderIds = AdyenOrder.validateOrderResult(orderResult);
-
             if (!(Boolean)paymentResult.get('isFinal')) {
-                paymentResult.put('cartId', orderIds.get('cartId'));
+                cart.AdyenPaymentData__c = (String)paymentResult.get('paymentData');
+                update cart;
+                paymentResult.put('cartId', cart.Id);
                 res.data = paymentResult;
                 return res;
             }
 
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
-                //TODOBAS update order status to Submitted
-
+                //create order
+                Map<String, Object> orderResult = AdyenOrder.placeOrder(processResult, cart.Id);
+                Map<String, String> orderIds = AdyenOrder.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
                 res.data = orderIds.get('orderIdEnc');
                 res.success = true;

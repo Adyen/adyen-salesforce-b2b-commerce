@@ -1,12 +1,16 @@
-public with sharing class AdyenPaymentsDetailsRequest {
-   public static PaymentsResponse adyenPaymentsDetails(String stateData){
-        PaymentsDetailsRequest paymentsDetailsRequest = createPaymentsDetailsRequest(stateData);
-        PaymentsResponse paymentsResponse = callPaymentsDetails(paymentsDetailsRequest);
-        return paymentsResponse;
+public with sharing class AdyenPaymentsDetails {
+    public static PaymentsResponse requestFromStateData(string stateData){
+        PaymentsDetailsRequest paymentsDetailsRequest = (PaymentsDetailsRequest) JSON.deserialize(stateData, PaymentsDetailsRequest.class);
+        return callPaymentsDetails(paymentsDetailsRequest);
     }
 
-    public static PaymentsDetailsRequest createPaymentsDetailsRequest(String stateData) {
-        return (PaymentsDetailsRequest) JSON.deserialize(stateData, PaymentsDetailsRequest.class);
+    public static PaymentsResponse requestAfterRedirect(Map<String, String> details, String cartEncryptedId){
+        ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartEncryptedId);
+        PaymentsDetailsRequest paymentsDetailsRequest = new PaymentsDetailsRequest();
+        paymentsDetailsRequest.details = details;
+        //Get saved payment data from cart
+        paymentsDetailsRequest.paymentData = cart.AdyenPaymentData__c;
+        return callPaymentsDetails(paymentsDetailsRequest);
     }
 
     public static PaymentsResponse callPaymentsDetails(PaymentsDetailsRequest request){

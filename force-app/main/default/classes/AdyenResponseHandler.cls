@@ -5,14 +5,16 @@ public with sharing class AdyenResponseHandler {
             when AUTHORISED, REFUSED, ERROR, CANCELLED {
                 return new Map<String, Object>{
                         'isFinal' => true,
-                        'resultCode' => resultCode
+                        'resultCode' => resultCode,
+                        'merchantReference' => paymentsResponse.merchantReference
                 };
             }
             when REDIRECTSHOPPER, IDENTIFYSHOPPER, CHALLENGESHOPPER, PRESENTTOSHOPPER, PENDING {
                 return new Map<String, Object>{
                         'isFinal' => false,
                         'resultCode' => resultCode,
-                        'action' => paymentsResponse.action
+                        'action' => paymentsResponse.action,
+                        'paymentData' => paymentsResponse.paymentData
                 };
             }
             when RECEIVED {
