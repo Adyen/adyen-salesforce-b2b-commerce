@@ -13,7 +13,6 @@
             <div class="panel-heading cc_heading">
                 <h3 class="panel-title cc_title">{{labels.title}}</h3>
             </div>
-            <div id="action-container"></div>
             <div id="paymentMethodsList"></div>
             <div class="panel-body cc_body">
                 {{#if errors}}
@@ -33,18 +32,24 @@
                 </form>
             </div>
         </div>
+        <div class="modal fade" id="action-modal" role="dialog">
+            <div class="modal-dialog">
+                <div id="action-container"></div>
+            </div>
+        </div>
     </script>
 
     <script type="text/javascript">
-
     let isGuest = {!JSENCODE(IF(isGuest, "true", "false"))};
     Visualforce.remoting.Manager.invokeAction(
         '{!$RemoteAction.PmtAdyenPayController.getPaymentMethods}',
         CCRZ.pagevars.remoteContext,
         function(result, event){
+            loadingToggle();
             if(result.data){
                 const paymentMethods = convertToJsonObject(result.data);
                 renderAdyenComponent(paymentMethods);
+                loadingToggle();
             }
         },
         { escape: true }
@@ -85,6 +90,7 @@
         submitStep: function() {
           if(validateComponent()){
               let self = this;
+              loadingToggle();
             Visualforce.remoting.Manager.invokeAction(
                 '{!$RemoteAction.PmtAdyenPayController.placeOrderAdyen}',
                 CCRZ.pagevars.remoteContext,
