@@ -5,6 +5,9 @@
     <apex:includeScript value="{! $Resource.adyenCheckout }"/>
     <link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/3.16.1/adyen.css"/>
     <script id="AdyenCCPayment" type="text/template">
+        <div class="error_messages_section alert alert-danger" style="display:none;">
+            <div>Payment failed, please try again</div>
+        </div>
         <div id="overlayCustom" class="modal-backdrop fade in" style="display: none"></div>
         <div class="panel panel-default cc_panel cc_payment_adyen">
             <div class="panel-heading cc_heading">
@@ -20,7 +23,6 @@
                     {{/each}}
                 </div>
                 {{/if}}
-                <div class="error_messages_section" style="display:none;"></div>
                 <form id="payAdyenccForm"
                       class="form-horizontal newAdyenForm cc_form-horizontal cc_new_adyen_form payAdyenccForm">
                     <input type="hidden" id="adyenStateData"/>
@@ -88,18 +90,10 @@
                 CCRZ.pagevars.remoteContext,
                 document.getElementById("adyenStateData").value,
                 function(result, event){
-                    if (!result.data.isFinal && result.data.action) {
+                    if(result.data.cartId){
                         window.cartId = result.data.cartId;
-                         //handle payment action
-                        handleAction(result.data.action);
-                    } else if(result.data.orderIdEnc) {
-                        var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
-                        orderSuccessUrl.searchParams.append('o', result.data.orderIdEnc);
-                        window.location.href = orderSuccessUrl;
-                    } else {
-                        self.model.errors = result.messages;
-                        return false;
                     }
+                    handlePaymentResult(result.data);
                 },
                 { escape: true }
             );

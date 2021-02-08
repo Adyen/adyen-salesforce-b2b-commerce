@@ -24,6 +24,7 @@ renderAdyenComponent = paymentMethodsResponse => {
 getPaymentMethodsConfig = () => {
     return {
         card: {
+            brands: ['mc', 'visa'],
             enableStoreDetails: !isGuest,
             hasHolderName: true,
             holderNameRequired: true,
@@ -55,20 +56,7 @@ handleOnAdditionalDetails = (state, component) => {
         success: function(data)
         {
             const result = JSON.parse(JSON.parse(data));
-            //TODOBAS extract this method
-            if (!result.isFinal && result.action) {
-                //handle payment action
-                handleAction(result.action);
-            }
-            else if(result.orderIdEnc) {
-                var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
-                orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
-                window.location.href = orderSuccessUrl;
-            }
-            else {
-                //self.model.errors = result.messages;
-                return false;
-            }
+            return handlePaymentResult(result);
         }
     });
 }
@@ -178,4 +166,20 @@ decodeJsonObject = jsonObject => {
 handleAction = action => {
     const decodedAction = decodeJsonObject(action);
     checkout.adyenCheckout.createFromAction(decodedAction).mount('#action-container');
+}
+
+handlePaymentResult = result => {
+    if (!result.isFinal && result.action) {
+        //handle payment action
+        handleAction(result.action);
+    }
+    else if(result.isFinal && result.orderSuccess) {
+        var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
+        orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
+        window.location.href = orderSuccessUrl;
+    }
+    else {
+        document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
+        return false;
+    }
 }
