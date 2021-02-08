@@ -1,5 +1,2 @@
 <apex:page controller="AdyenReturn" action="{!handleRedirectResponse}">
-    <script type="text/javascript">
-        console.log("AdyenReturnPage loaded");
-    </script>
 </apex:page>

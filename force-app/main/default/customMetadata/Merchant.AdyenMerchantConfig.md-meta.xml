@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AdyenMerchantConfig</label>
+    <protected>true</protected>
+    <values>
+        <field>API_Key__c</field>
+        <value xsi:type="xsd:string">abcd1234</value>
+    </values>
+    <values>
+        <field>Authorise_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://pal-test.adyen.com/pal/servlet/Payment/v66/authorise</value>
+    </values>
+    <values>
+        <field>Capture_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://checkout-test.adyen.com/v66/capture</value>
+    </values>
+    <values>
+        <field>Disable_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://pal-test.adyen.com/pal/servlet/Recurring/V49/disable</value>
+    </values>
+    <values>
+        <field>Payment_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://checkout-test.adyen.com/v66/payments</value>
+    </values>
+    <values>
+        <field>PaymentMethods_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://checkout-test.adyen.com/v66/paymentMethods</value>
+    </values>
+    <values>
+        <field>Payments_Details_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://checkout-test.adyen.com/v66/payments/details</value>
+    </values>
+    <values>
+        <field>Merchant_Account__c</field>
+        <value xsi:type="xsd:string">MerchantAccount</value>
+    </values>
+    <values>
+        <field>Name__c</field>
+        <value xsi:type="xsd:string">Name</value>
+    </values>
+</CustomMetadata>
