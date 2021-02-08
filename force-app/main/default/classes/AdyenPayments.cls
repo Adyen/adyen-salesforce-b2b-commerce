@@ -1,11 +1,12 @@
-public with sharing class AdyenPaymentRequest {
+public with sharing class AdyenPayments {
     public static PaymentRequest createPaymentRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
         PaymentRequest paymentRequest = createPaymentRequestFromStateData(stateData);
         paymentRequest.merchantAccount = merchant.Merchant_Account__c;
         paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
         paymentRequest.reference = cart.Id;
-        paymentRequest.returnUrl = 'https://b2b-scoping-0920-developer-edition.na139.force.com/services/apexrest/AdyenReturnUrl/*';
+        //TODOBAS dynamic get host
+        paymentRequest.returnUrl = 'https://b2b-scoping-0920-dev-ed--c.visualforce.com/apex/AdyenReturn?merchantReference=' + cart.Id;
         paymentRequest.shopperReference = cart.ccrz__Account__c;
         paymentRequest.additionalData = getAdditionalData();
         paymentRequest.channel = 'web';

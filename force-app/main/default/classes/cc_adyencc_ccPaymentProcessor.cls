@@ -8,8 +8,8 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
             paymentParams.transactionType = AdyenUtil.getConfiguredCaptureDelay(cart);
             String stateData = String.valueOf(paymentParams.token);
 
-            PaymentRequest paymentRequest = AdyenPaymentRequest.createPaymentRequest(stateData, cart, merchant);
-            PaymentsResponse paymentsResponse = AdyenPaymentRequest.authorisePayment(merchant, paymentRequest);
+            PaymentRequest paymentRequest = AdyenPayments.createPaymentRequest(stateData, cart, merchant);
+            PaymentsResponse paymentsResponse = AdyenPayments.authorisePayment(merchant, paymentRequest);
 
             Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsResponse);
             paymentProcessorInput.put('paymentResult', paymentResult);
