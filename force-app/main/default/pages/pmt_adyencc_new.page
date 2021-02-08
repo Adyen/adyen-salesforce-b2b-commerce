@@ -1,0 +1,91 @@
+<apex:page controller="PmtAdyenNewController" docType="html-5.0" applyHtmlTag="false" showHeader="false" sidebar="false" standardStylesheets="false">
+<apex:includeScript value="{! $Resource.validations }"/>
+<apex:includeScript value="{! $Resource.adyenComponent }"/>
+<apex:includeScript value="{! $Resource.adyenCheckout }"/>
+    <script id="MyAccount-MyWalletPO-Desktop" type="text/template">
+        <div class="error_messages_section alert alert-danger" style="display:none;">
+            <div>Payment failed, please try again</div>
+        </div>
+        <div id="overlayCustom" class="modal-backdrop fade in" style="display: none"></div>
+        <div class="panel panel-default cc_panel cc_myaccount_mywallet">
+            <div class="panel-heading cc_heading">
+                <h3 class="panel-title cc_title">{{pageLabelMap 'MyWallet_AddPymtMtd'}}</h3>
+            </div>
+            <div class="cc_myaccount_content panel-body cc_body">
+                <div id="action-container"></div>
+                <div id="paymentMethodsList"></div>
+            </div>
+        </div>
+    </script>
+    <script type="text/javascript">
+        let isGuest = false;
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.PmtAdyenNewController.getPaymentMethods}',
+            CCRZ.pagevars.remoteContext,
+            function(result, event){
+                if(result.data){
+                    const paymentMethods = convertToJsonObject(result.data);
+                    renderAdyenComponent(paymentMethods);
+                }
+            },
+            { escape: true }
+        );
+
+    jQuery(function($) {
+        CCRZ.models.StoredPaymentsAdyenccModel = CCRZ.CloudCrazeModel.extend({
+            className : "PmtAdyenNewController",
+            saveAdyenccNumber: function(poData, callback) {
+            },
+        });
+        
+        CCRZ.views.StoredPaymentsAdyenccView = CCRZ.CloudCrazeView.extend({
+            viewName : "StoredPaymentsAdyenccView",
+            templateDesktop : CCRZ.util.template(CCRZ.uiProperties.StoredPaymentsPOView.desktop.tmpl),
+            templatePhone : CCRZ.util.template(CCRZ.uiProperties.StoredPaymentsPOView.phone.tmpl),
+            init : function(){
+                this.render();
+            },
+            events: {
+                "click #saveAdyencc" : "saveNewAdyenccNumber",
+                "click #cancelAdyencc" : "cancelNewAdyenccNumber"
+            },
+            renderDesktop : function(){
+                $(CCRZ.uiProperties.StoredPaymentsPOView.phone.selector).empty();
+                this.setElement($(CCRZ.uiProperties.StoredPaymentsPOView.desktop.selector));
+                this.$el.html(this.templateDesktop(this.data));
+            },
+            renderPhone : function(){
+                $(CCRZ.uiProperties.StoredPaymentsPOView.desktop.selector).empty();
+                this.setElement($(CCRZ.uiProperties.StoredPaymentsPOView.phone.selector));
+                this.$el.html(this.templatePhone(this.data));
+            },
+            cancelNewAdyenccNumber : function(){
+                myWallet();
+            },
+            saveNewAdyenccNumber : function() {
+                if(validateComponent()){
+                    let self = this;
+                    loadingToggle();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.PmtAdyenNewController.addAdyenccStoredPayment}',
+                        CCRZ.pagevars.remoteContext,
+                        document.getElementById("adyenStateData").value,
+                        function(result, event){
+                            if(result.data.cartId){
+                                window.cartId = result.data.cartId;
+                            }
+                            handlePaymentResult(result.data);
+                        },
+                        { escape: true }
+                    );
+                }
+            }
+        });
+        
+        CCRZ.paymentViews = CCRZ.paymentViews || {};
+        CCRZ.paymentViews.po = new CCRZ.views.StoredPaymentsAdyenccView({
+            model : new CCRZ.models.StoredPaymentsAdyenccModel
+        });
+    });
+    </script>
+</apex:page>
