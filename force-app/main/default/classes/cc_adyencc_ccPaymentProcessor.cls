@@ -8,8 +8,8 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
             paymentParams.transactionType = AdyenUtil.getConfiguredCaptureDelay(cart);
             String stateData = String.valueOf(paymentParams.token);
 
-            PaymentRequest paymentRequest = AdyenPaymentRequest.createPaymentRequest(stateData, cart, merchant);
-            PaymentsResponse paymentsResponse = AdyenPaymentRequest.authorisePayment(merchant, paymentRequest);
+            PaymentsRequest paymentRequest = AdyenPayments.createPaymentsRequest(stateData, cart, merchant);
+            PaymentsResponse paymentsResponse = AdyenPayments.authorisePayment(merchant, paymentRequest);
 
             Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsResponse);
             paymentProcessorInput.put('paymentResult', paymentResult);
@@ -23,11 +23,4 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
 
         return paymentProcessorInput;
     }
-
-    global override Map<String, Object> process(Map<String, Object> paymentProcessorInput) {
-        System.debug('### process = ' + paymentProcessorInput);
-        return paymentProcessorInput;
-    }
-
-
 }
