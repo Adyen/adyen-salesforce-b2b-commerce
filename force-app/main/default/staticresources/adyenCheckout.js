@@ -166,6 +166,7 @@ decodeJsonObject = jsonObject => {
 handleAction = action => {
     const decodedAction = decodeJsonObject(action);
     checkout.adyenCheckout.createFromAction(decodedAction).mount('#action-container');
+    $("#action-modal").modal({ backdrop: 'static', keyboard: false });
 }
 
 handlePaymentResult = result => {
@@ -179,6 +180,8 @@ handlePaymentResult = result => {
         window.location.href = orderSuccessUrl;
     }
     else {
+        loadingToggle();
+        $("#action-modal").modal('hide');
         document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
         return false;
     }
