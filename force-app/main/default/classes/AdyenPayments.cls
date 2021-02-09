@@ -1,16 +1,27 @@
 public with sharing class AdyenPayments {
-    public static PaymentsRequest createPaymentsRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
-        PaymentsRequest paymentRequest = createPaymentsRequestFromStateData(stateData);
-        paymentRequest.merchantAccount = merchant.Merchant_Account__c;
-        paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
-        paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
-        paymentRequest.reference = cart.Id;
+    public static PaymentsRequest createPaymentsRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant, Boolean isZeroAuth) {
+        PaymentsRequest paymentsRequest = createPaymentsRequestFromStateData(stateData);
+        paymentsRequest.merchantAccount = merchant.Merchant_Account__c;
+        paymentsRequest.applicationInfo = AdyenUtil.getApplicationInfo();
+        paymentsRequest.shopperReference = cart.ccrz__Account__c;
+        paymentsRequest.additionalData = getAdditionalData();
+        paymentsRequest.channel = 'web';
+
+        Amount amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
+        String returnPage = '/apex/AdyenReturn?merchantReference=';
+        String merchantReference = cart.Id;
+        if(isZeroAuth){
+            amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, 0.00);
+            merchantReference = 'addStoredMethod-' + cart.Id;
+            returnPage = '/ccrz__MyAccount?viewState=viewAccount&cartId=';
+        }
+
+        paymentsRequest.amount = amount;
+        paymentsRequest.reference = merchantReference;
         //TODOBAS dynamic get host
-        paymentRequest.returnUrl = 'https://b2b-scoping-0920-dev-ed--c.visualforce.com/apex/AdyenReturn?merchantReference=' + cart.Id;
-        paymentRequest.shopperReference = cart.ccrz__Account__c;
-        paymentRequest.additionalData = getAdditionalData();
-        paymentRequest.channel = 'web';
-        return paymentRequest;
+        paymentsRequest.returnUrl = 'https://componentsdev0221-developer-edition.na150.force.com' + returnPage + cart.Id;
+
+        return paymentsRequest;
     }
 
     private static PaymentsRequest createPaymentsRequestFromStateData(String stateData) {

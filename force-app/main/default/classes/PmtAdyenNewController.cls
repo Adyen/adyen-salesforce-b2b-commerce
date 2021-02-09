@@ -7,6 +7,11 @@ global with sharing class PmtAdyenNewController {
     @RemoteAction
     global static ccrz.cc_RemoteActionResult addAdyenccStoredPayment(ccrz.cc_RemoteActionContext ctx, String stateData)
     {
-        return AdyenController.processPayment(ctx, stateData);
+        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+        ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
+        //Handle the Zero Auth request
+        Map<String, Object> paymentResult = AdyenController.handlePaymentsCall(cart, stateData, true);
+        //TODOBAS handle payments response
+        return res;
     }
 }
