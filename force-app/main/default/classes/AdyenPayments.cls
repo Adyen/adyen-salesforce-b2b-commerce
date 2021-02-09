@@ -1,6 +1,6 @@
 public with sharing class AdyenPayments {
-    public static PaymentRequest createPaymentRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
-        PaymentRequest paymentRequest = createPaymentRequestFromStateData(stateData);
+    public static PaymentsRequest createPaymentsRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
+        PaymentsRequest paymentRequest = createPaymentsRequestFromStateData(stateData);
         paymentRequest.merchantAccount = merchant.Merchant_Account__c;
         paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
@@ -13,8 +13,8 @@ public with sharing class AdyenPayments {
         return paymentRequest;
     }
 
-    private static PaymentRequest createPaymentRequestFromStateData(String stateData) {
-        PaymentRequest paymentRequest = new PaymentRequest();
+    private static PaymentsRequest createPaymentsRequestFromStateData(String stateData) {
+        PaymentsRequest paymentRequest = new PaymentsRequest();
         Map<String, Object> stateDataObjects = (Map<String, Object>) JSON.deserializeUntyped(stateData);
         if (stateDataObjects.containsKey('riskData')) {
             Map<String, Object> riskData = (Map<String, Object>) stateDataObjects.get('riskData');
@@ -79,7 +79,7 @@ public with sharing class AdyenPayments {
         };
     }
 
-    public static PaymentsResponse authorisePayment(Merchant__mdt merchant, PaymentRequest request) {
+    public static PaymentsResponse authorisePayment(Merchant__mdt merchant, PaymentsRequest request) {
         PaymentsResponse paymentsResponse = new PaymentsResponse();
         AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payment_Endpoint__c);
         String jsonString = JSON.serialize(request, true);
