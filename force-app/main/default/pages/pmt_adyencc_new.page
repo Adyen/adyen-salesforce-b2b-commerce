@@ -78,10 +78,21 @@
                         CCRZ.pagevars.remoteContext,
                         document.getElementById("adyenStateData").value,
                         function(result, event){
-                            if(result.data.cartId){
-                                window.cartId = result.data.cartId;
+                            if (!result.data.isFinal && result.data.action) {
+                                //handle payment action
+                                handleAction(result.data.action);
                             }
-                            handlePaymentResult(result.data);
+                            else if(result.success){
+                                loadingToggle();
+                                $("#action-modal").modal('hide');
+                                myWallet();
+                            }
+                            else {
+                                loadingToggle();
+                                $("#action-modal").modal('hide');
+                                document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
+                                return false;
+                            }
                         },
                         { escape: true }
                     );

@@ -8,10 +8,32 @@ global with sharing class PmtAdyenNewController {
     global static ccrz.cc_RemoteActionResult addAdyenccStoredPayment(ccrz.cc_RemoteActionContext ctx, String stateData)
     {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
-        ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
-        //Handle the Zero Auth request
-        Map<String, Object> paymentResult = AdyenController.handlePaymentsCall(cart, stateData, true);
-        //TODOBAS handle payments response
+        try {
+            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
+            //Handle the Zero Auth request
+            Map<String, Object> paymentResult = AdyenController.handlePaymentsCall(cart, stateData, true);
+            if (!(Boolean)paymentResult.get('isFinal')) {
+                res.data = paymentResult;
+                return res;
+            }
+
+            if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
+                res.success = true;
+                return res;
+            }
+
+            res.success = false;
+            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message('Payment failed, result is ' + paymentResult);
+            res.messages.add(m);
+        }
+        catch (Exception e) {
+            ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
+            //Exception handling here
+            System.Debug('#### exception ' + e.getMessage() + e.getStackTraceString());
+            res.success = false;
+            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage());
+            res.messages.add(m);
+        }
         return res;
     }
 }
