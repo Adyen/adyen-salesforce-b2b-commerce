@@ -48,7 +48,6 @@ global with sharing class PmtAdyenPayController {
                 res.success = true;
                 return res;
             }
-            res.orderSuccess = orderSuccess;
             res.success = false;
             ccrz.cc_bean_Message m = new ccrz.cc_bean_Message('Payment failed, result is ' + paymentResult);
             res.messages.add(m);

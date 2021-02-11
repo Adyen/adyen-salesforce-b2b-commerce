@@ -4,9 +4,8 @@ public with sharing class AdyenPaymentMethods {
         paymentMethodsRequest.merchantAccount = merchant.Merchant_Account__c;
         if(isStoredPaymentMethod){
             //Only credit card for My Wallet
-            paymentMethodsRequest.amount = AdyenUtil.getAdyenAmount(UserInfo.getDefaultCurrency(), 10.00);
             paymentMethodsRequest.shopperReference = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
-            paymentMethodsRequest.allowedPaymentMethods = new List<String>{'card'};
+            paymentMethodsRequest.allowedPaymentMethods = new List<String>{'scheme'};
         }
         else {
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
