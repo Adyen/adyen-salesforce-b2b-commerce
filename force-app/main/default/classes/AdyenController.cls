@@ -30,31 +30,18 @@ global with sharing class AdyenController {
         };
     }
 
-            if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
-                //create order
-                Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cart.Id);
-                Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
-                //Return orderId for confirmation page
-                res.data = orderIds.get('orderIdEnc');
-                res.success = true;
-                return res;
-            }
+    public static void createStoredPaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
+        ccrz__E_StoredPayment__c storedPayment = new ccrz__E_StoredPayment__c();
+        storedPayment.ccrz__Enabled__c = true;
+        storedPayment.ccrz__Token__c = additionalData.get('recurring_recurringDetailReference');
+        storedPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
+        storedPayment.ccrz__Account__c = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
+        storedPayment.ccrz__AccountNumber__c = (String)additionalData.get('cardBin') + '******' + (String)additionalData.get('cardSummary');
+        storedPayment.ccrz__User__c = UserInfo.getUserId();
+        storedPayment.ccrz__Storefront__c = res.inputContext.storeFront;
+        storedPayment.ccrz__AccountType__c = 'adyencc';
 
-            res.success = false;
-            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message('Payment failed, result is ' + paymentResult);
-            res.messages.add(m);
-
-        } catch (Exception e) {
-            ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
-            //Exception handling here
-            System.Debug('#### exception ' + e.getMessage() + e.getStackTraceString());
-            res.success = false;
-            ccrz.cc_bean_Message m = new ccrz.cc_bean_Message(e.getMessage());
-            res.messages.add(m);
-        } finally {
-            ccrz.ccLog.close(res);
-        }
-        return res;
+        insert storedPayment;
     }
 
     public static Map<String, Object> placeOrder(Map<String, Object> processResult, String cartId) {
