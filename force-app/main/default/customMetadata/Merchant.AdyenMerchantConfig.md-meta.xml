@@ -34,8 +34,4 @@
         <field>Merchant_Account__c</field>
         <value xsi:type="xsd:string">MerchantAccount</value>
     </values>
-    <values>
-        <field>Name__c</field>
-        <value xsi:type="xsd:string">Name</value>
-    </values>
 </CustomMetadata>
