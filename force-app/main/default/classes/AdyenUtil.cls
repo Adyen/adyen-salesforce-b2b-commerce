@@ -24,7 +24,10 @@ public with sharing class AdyenUtil {
         return (String) cart.ccrz__EncryptedId__c;
     }
 
-
+    public static User getAccountIdFromUser(Id userId) {
+        return [SELECT AccountId
+                FROM User WHERE Id = :userId];
+    }
 
     public static Amount getAdyenAmount(String currencyCode, Decimal amount) {
         Integer multiplier = getMultiplierMinorUnits(currencyCode);

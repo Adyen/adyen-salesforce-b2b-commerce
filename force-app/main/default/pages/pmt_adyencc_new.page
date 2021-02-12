@@ -12,8 +12,15 @@
                 <h3 class="panel-title cc_title">{{pageLabelMap 'MyWallet_AddPymtMtd'}}</h3>
             </div>
             <div class="cc_myaccount_content panel-body cc_body">
-                <div id="action-container"></div>
                 <div id="paymentMethodsList"></div>
+            </div>
+        </div>
+        <input type="hidden" id="adyenStateData"/>
+        <input type="button" class='btn btn-default btn-sm button cancelPO cc_cancel_po' id="cancelAdyencc" value="{{pageLabelMap 'MyWallet_Cancel'}}" />
+        <input type="button" class='btn btn-default btn-sm button saveAdyencc cc_save_po' id="saveAdyencc" value="{{pageLabelMap 'MyWallet_SaveToWall'}}" />
+        <div class="modal fade" id="action-modal" role="dialog">
+            <div class="modal-dialog">
+                <div id="action-container"></div>
             </div>
         </div>
     </script>
@@ -71,10 +78,21 @@
                         CCRZ.pagevars.remoteContext,
                         document.getElementById("adyenStateData").value,
                         function(result, event){
-                            if(result.data.cartId){
-                                window.cartId = result.data.cartId;
+                            if (!result.data.isFinal && result.data.action) {
+                                //handle payment action
+                                handleAction(result.data.action);
                             }
-                            handlePaymentResult(result.data);
+                            else if(result.success){
+                                loadingToggle();
+                                $("#action-modal").modal('hide');
+                                myWallet();
+                            }
+                            else {
+                                loadingToggle();
+                                $("#action-modal").modal('hide');
+                                document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
+                                return false;
+                            }
                         },
                         { escape: true }
                     );

@@ -4,17 +4,14 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
         if (paymentProcessorInput.get(ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX) == ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX_CHECKOUT) {
             ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams) paymentProcessorInput.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA);
             ccrz__E_Cart__c cart = (ccrz__E_Cart__c) paymentProcessorInput.get('cart');
-            Merchant__mdt merchant = AdyenUtil.getConfiguredMerchantAccount(cart);
             paymentParams.transactionType = AdyenUtil.getConfiguredCaptureDelay(cart);
             String stateData = String.valueOf(paymentParams.token);
 
-            PaymentsRequest paymentRequest = AdyenPayments.createPaymentsRequest(stateData, cart, merchant);
-            PaymentsResponse paymentsResponse = AdyenPayments.authorisePayment(merchant, paymentRequest);
-
-            Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsResponse);
+            Map<String, Object> handleResponse = AdyenController.handlePaymentsCall(cart.ccrz__EncryptedId__c, stateData, false);
+            Map<String, Object> paymentResult = (Map<String, Object>)handleResponse.get('paymentResult');
             paymentProcessorInput.put('paymentResult', paymentResult);
 
-            paymentParams.transactionCode = paymentsResponse.pspReference;
+            paymentParams.transactionCode = (String)paymentResult.get('pspReference');
             //Remove the stateData from payment
             paymentParams.token = '';
 

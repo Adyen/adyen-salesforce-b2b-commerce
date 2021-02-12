@@ -6,7 +6,8 @@ public with sharing class AdyenResponseHandler {
                 return new Map<String, Object>{
                         'isFinal' => true,
                         'resultCode' => resultCode,
-                        'merchantReference' => paymentsResponse.merchantReference
+                        'merchantReference' => paymentsResponse.merchantReference,
+                        'pspReference' => paymentsResponse.pspReference
                 };
             }
             when REDIRECTSHOPPER, IDENTIFYSHOPPER, CHALLENGESHOPPER, PRESENTTOSHOPPER, PENDING {
@@ -32,12 +33,5 @@ public with sharing class AdyenResponseHandler {
                 };
             }
         }
-    }
-
-    public static Boolean isResponseSuccessful(PaymentsResponse.ResultCodeEnum resultCode){
-        if(resultCode == PaymentsResponse.ResultCodeEnum.AUTHORISED){
-            return true;
-        }
-        return false;
     }
 }

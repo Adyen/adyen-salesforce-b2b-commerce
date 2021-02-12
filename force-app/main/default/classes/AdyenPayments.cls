@@ -1,16 +1,29 @@
 public with sharing class AdyenPayments {
-    public static PaymentsRequest createPaymentsRequest(String stateData, ccrz__E_Cart__c cart, Merchant__mdt merchant) {
-        PaymentsRequest paymentRequest = createPaymentsRequestFromStateData(stateData);
-        paymentRequest.merchantAccount = merchant.Merchant_Account__c;
-        paymentRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
-        paymentRequest.applicationInfo = AdyenUtil.getApplicationInfo();
-        paymentRequest.reference = cart.Id;
+    public static PaymentsRequest createPaymentsRequest(String stateData, String cartId, Merchant__mdt merchant, Boolean isZeroAuth) {
+        PaymentsRequest paymentsRequest = createPaymentsRequestFromStateData(stateData);
+        paymentsRequest.merchantAccount = merchant.Merchant_Account__c;
+        paymentsRequest.applicationInfo = AdyenUtil.getApplicationInfo();
+        paymentsRequest.additionalData = getAdditionalData();
+        paymentsRequest.channel = 'web';
+
+        String returnPage = '/apex/AdyenReturn?merchantReference=';
+        if(isZeroAuth){
+            paymentsRequest.amount = AdyenUtil.getAdyenAmount(UserInfo.getDefaultCurrency(), 0.00);
+            paymentsRequest.shopperReference = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
+            paymentsRequest.reference = 'addStoredMethod-' + cartId;
+            returnPage = '/ccrz__MyAccount?viewState=viewAccount&cartId=';
+        }
+        else {
+            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
+            paymentsRequest.reference = cartId;
+            paymentsRequest.shopperReference = cart.ccrz__Account__c;
+            paymentsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
+        }
+
         //TODOBAS dynamic get host
-        paymentRequest.returnUrl = 'https://b2b-scoping-0920-dev-ed--c.visualforce.com/apex/AdyenReturn?merchantReference=' + cart.Id;
-        paymentRequest.shopperReference = cart.ccrz__Account__c;
-        paymentRequest.additionalData = getAdditionalData();
-        paymentRequest.channel = 'web';
-        return paymentRequest;
+        paymentsRequest.returnUrl = 'https://componentsdev0221-developer-edition.na150.force.com' + returnPage + cartId;
+
+        return paymentsRequest;
     }
 
     private static PaymentsRequest createPaymentsRequestFromStateData(String stateData) {
