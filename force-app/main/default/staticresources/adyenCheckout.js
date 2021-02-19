@@ -170,6 +170,8 @@ handleAction = action => {
 }
 
 handlePaymentResult = result => {
+    console.log('handlePaymentResult');
+    console.log(result);
     if (!result.isFinal && result.action) {
         //handle payment action
         handleAction(result.action);

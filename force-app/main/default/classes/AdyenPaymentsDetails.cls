@@ -5,11 +5,13 @@ public with sharing class AdyenPaymentsDetails {
     }
 
     public static PaymentsResponse requestAfterRedirect(Map<String, String> details, String cartEncryptedId){
+        System.debug('### requestAfterRedirect');
         ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartEncryptedId);
         PaymentsDetailsRequest paymentsDetailsRequest = new PaymentsDetailsRequest();
         paymentsDetailsRequest.details = details;
         //Get saved payment data from cart
         paymentsDetailsRequest.paymentData = cart.AdyenPaymentData__c;
+
         return callPaymentsDetails(paymentsDetailsRequest);
     }
 

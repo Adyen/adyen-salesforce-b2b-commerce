@@ -33,4 +33,11 @@ global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
 //
 //        return returnData;
 //    }
+
+    global override Map<String,Object> processPayment(Map<String,Object> inputData){
+        System.debug('### ProcessPayment inputData = ' + inputData);
+        Map<String,Object> test = super.processPayment(inputData);
+        System.debug('### ProcessPayment test = ' + test);
+        return test;
+    }
 }

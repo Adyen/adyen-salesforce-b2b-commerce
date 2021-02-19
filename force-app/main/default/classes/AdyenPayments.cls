@@ -20,9 +20,7 @@ public with sharing class AdyenPayments {
             paymentsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
         }
 
-        //TODOBAS dynamic get host
-        paymentsRequest.returnUrl = 'https://componentsdev0221-developer-edition.na150.force.com' + returnPage + cartId;
-
+        paymentsRequest.returnUrl = Site.getBaseSecureUrl() + returnPage + cartId;
         return paymentsRequest;
     }
 

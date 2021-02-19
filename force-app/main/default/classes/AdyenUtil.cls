@@ -14,8 +14,26 @@ public with sharing class AdyenUtil {
     }
 
     public static ccrz__E_Cart__c getCartByEncryptedId(String cartId) {
-        String query = 'SELECT ' + Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c')) + ', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
-        return (ccrz__E_Cart__c) Database.query(query);
+        try {
+                String query = 'SELECT ' + Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c')) + ', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
+                return (ccrz__E_Cart__c) Database.query(query);
+        } catch (Exception e) {
+            System.Debug('#### exception ' + e.getMessage() + e.getStackTraceString());
+            return new ccrz__E_Cart__c();
+        }
+
+    }
+
+     public static ccrz__E_Cart__c getCartByEncryptedId2(String cartId) {
+        try {
+            System.debug('### UserInfo.getName() = ' + UserInfo.getName());
+                String query = 'SELECT ccrz__CartId__c, ccrz__EncryptedId__c, ccrz__TotalAmount__c, ccrz__Storefront__c, AdyenPaymentData__c FROM ccrz__E_Cart__c LIMIT 1';
+                return (ccrz__E_Cart__c) Database.query(query);
+        } catch (Exception e) {
+            System.Debug('#### exception ' + e.getMessage() + e.getStackTraceString());
+            return new ccrz__E_Cart__c();
+        }
+
     }
 
     public static String getCartEncryptedId(String cartId) {

@@ -3,12 +3,14 @@ public with sharing class AdyenReturn {
         String redirectResult = ApexPages.currentPage().getParameters().get('redirectResult');
         String payload = ApexPages.currentPage().getParameters().get('payload');
         String merchantReference = ApexPages.currentPage().getParameters().get('merchantReference');
-
+        System.debug('### handleRedirectResponse');
         //Get details from the querystring
         Map<String, String> details = getDetails(redirectResult, payload);
-        String cartEncryptedId = AdyenUtil.getCartEncryptedId(merchantReference);
-        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, cartEncryptedId);
+//        String cartEncryptedId = AdyenUtil.getCartEncryptedId(merchantReference);
+        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, merchantReference);
+        System.debug('### paymentsDetailsResponse = ' + paymentsDetailsResponse);
         Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
+
 
         if((String)paymentResult.get('merchantReference') == merchantReference){
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED){
@@ -17,14 +19,14 @@ public with sharing class AdyenReturn {
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 String orderId = orderIds.get('orderIdEnc');
                 //TODOBAS retrieve community URL
-                PageReference pageRef = new PageReference('https://b2b-scoping-0920-developer-edition.na139.force.com/ccrz__OrderConfirmation?o=' + orderId);
+                PageReference pageRef = new PageReference(Site.getBaseSecureUrl() + '/ccrz__OrderConfirmation?o=' + orderId);
                 pageRef.setRedirect(true);
                 return pageRef;
             }
         }
 
         //TODOBAS add Payment Failed error message
-        PageReference pageReference = new PageReference('https://b2b-scoping-0920-developer-edition.na139.force.com/ccrz__CheckoutNew?cartID=' + cartEncryptedId);
+        PageReference pageReference = new PageReference(Site.getBaseSecureUrl() + '/ccrz__CheckoutNew?cartID=' + merchantReference);
         pageReference.setRedirect(true);
         return pageReference;
     }

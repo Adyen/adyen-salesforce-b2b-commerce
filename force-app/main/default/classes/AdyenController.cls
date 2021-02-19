@@ -30,6 +30,22 @@ global with sharing class AdyenController {
         };
     }
 
+    public static Map<String, Object> handlePaymentsDetailsCall(String stateData){
+        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestFromStateData(stateData);
+        Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
+        return new Map<String, Object> {
+            'paymentResult' => AdyenResponseHandler.handleResponse(paymentsDetailsResponse),
+            'additionalData' => paymentsDetailsResponse.additionalData
+        };
+    }
+
+    public static Map<String, Object> handleCalloutAdyen(ccrz__E_Cart__c cart, String stateData, String adyenCall) {
+       if(adyenCall == 'payments'){
+            return handlePaymentsCall(cart.ccrz__EncryptedId__c, stateData, false);
+       }
+       return handlePaymentsDetailsCall(stateData);
+    }
+
     public static void createStoredPaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
         ccrz__E_StoredPayment__c storedPayment = new ccrz__E_StoredPayment__c();
         storedPayment.ccrz__Enabled__c = true;
@@ -44,7 +60,27 @@ global with sharing class AdyenController {
         insert storedPayment;
     }
 
+    public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall){
+            System.debug('### createProcessorInput cartId = ' + cartId);
+            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
+            System.debug('### createProcessorInput cart = ' + cart);
+            Map<String, Object> inputParams = new Map<String, Object>();
+            inputParams.put('accountType', 'adyencc');
+            //Use token for stateData
+            inputParams.put('token', stateData);
+
+            Map<String, Object> paymentProcessorInput = new Map<String, Object>{
+                    ccrz.cc_hk_Payment.PARAM_TRANSACTION_DATA => JSON.serialize(inputParams), //stateData,
+                    ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX => ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT,
+                    ccrz.cc_hk_Payment.PARAM_CART => cart,
+                    ccrz.cc_hk_Payment.PARAM_ACCOUNT_TYPE => 'adyencc',
+                    'adyenCall' => adyenCall
+            };
+        return paymentProcessorInput;
+    }
+
     public static Map<String, Object> placeOrder(Map<String, Object> processResult, String cartId) {
+            System.debug('### placeOrder cartId = ' + cartId);
             Map<String, Object> createOrderParams = new Map<String, Object>{
                     ccrz.ccApi.API_VERSION => ccrz.ccAPI.CURRENT_VERSION,
                     ccrz.ccApiCart.TRANSPAYMENTDATA =>
@@ -55,8 +91,10 @@ global with sharing class AdyenController {
             if (Test.isRunningTest()) {
                 createOrderParams.put(ccrz.ccApiCart.SKIP_VALID_CHECK, true);
             }
+            System.debug('## createOrderParams = ' + createOrderParams);
             //Converts a cart to a corresponding order.
             Map<String, Object> placeResult = ccrz.ccApiCart.place(createOrderParams);
+            System.debug('## placeResult = ' + placeResult);
             return placeResult;
     }
 
