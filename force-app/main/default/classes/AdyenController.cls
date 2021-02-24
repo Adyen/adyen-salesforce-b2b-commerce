@@ -40,8 +40,20 @@ global with sharing class AdyenController {
         storedPayment.ccrz__User__c = UserInfo.getUserId();
         storedPayment.ccrz__Storefront__c = res.inputContext.storeFront;
         storedPayment.ccrz__AccountType__c = 'adyencc';
-
+        List<String> expiryDate = additionalData.get('expiryDate').split('/');
+        storedPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
+        storedPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
         insert storedPayment;
+    }
+
+    public static void updateStoredPaymentMethod(List<ccrz__E_StoredPayment__c> existingStoredPayments, Map<String, String> additionalData){
+        //There can only be one stored payment with recurringDetailReference as token
+        ccrz__E_StoredPayment__c existingStoredPayment = existingStoredPayments.get(0);
+        existingStoredPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
+        List<String> expiryDate = additionalData.get('expiryDate').split('/');
+        existingStoredPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
+        existingStoredPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
+        update existingStoredPayment;
     }
 
     public static Map<String, Object> placeOrder(Map<String, Object> processResult, String cartId) {

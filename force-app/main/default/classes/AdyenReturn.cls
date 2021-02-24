@@ -25,7 +25,7 @@ public with sharing class AdyenReturn {
         }
 
         //TODOBAS add Payment Failed error message
-        PageReference pageReference = new PageReference('https://componentsdev0221-developer-edition.na150.force.com/ccrz__CheckoutNew?cartID=' + cartEncryptedId);
+        PageReference pageReference = new PageReference('https://componentsdev0221-developer-edition.na150.force.com/ccrz__CheckoutNew?cartID=' + merchantReference);
         pageReference.setRedirect(true);
         return pageReference;
     }
