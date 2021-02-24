@@ -55,10 +55,6 @@ public with sharing class AdyenUtil {
                 FROM ccrz__E_StoredPayment__c WHERE ccrz__Token__c = :token AND ccrz__User__c = :UserInfo.getUserId()];
     }
 
-    public static List<String> getExpiryMonthYear(String expiryDate){
-        return expiryDate.split('/');
-    }
-
     public static Amount getAdyenAmount(String currencyCode, Decimal amount) {
         Integer multiplier = getMultiplierMinorUnits(currencyCode);
         Amount adyenAmount = new Amount();
