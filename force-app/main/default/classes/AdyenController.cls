@@ -1,4 +1,4 @@
-global with sharing class AdyenController {
+global without sharing class AdyenController {
     public static ccrz.cc_RemoteActionResult obtainPaymentMethods(ccrz.cc_RemoteActionContext ctx, Boolean isStoredPaymentMethod){
             ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
             try {

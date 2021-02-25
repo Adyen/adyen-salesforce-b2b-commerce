@@ -1,5 +1,5 @@
 @RestResource(urlMapping='/AdyenService/*')
-global with sharing class AdyenService {
+global without sharing class AdyenService {
     @HttpPost
     global static String adyenPaymentsDetails(){
         String stateData = RestContext.request.requestBody.toString();
