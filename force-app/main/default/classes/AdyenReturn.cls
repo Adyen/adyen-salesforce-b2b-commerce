@@ -4,10 +4,8 @@ public with sharing class AdyenReturn {
         String payload = ApexPages.currentPage().getParameters().get('payload');
         String merchantReference = ApexPages.currentPage().getParameters().get('merchantReference');
 
-        System.debug('### handleRedirectResponse');
         //Get details from the querystring
         Map<String, String> details = getDetails(redirectResult, payload);
-//        String cartEncryptedId = AdyenUtil.getCartEncryptedId(merchantReference);
         PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, merchantReference);
         Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
 
