@@ -45,6 +45,10 @@ public with sharing class AdyenPayments {
             paymentRequest.origin = (String)stateDataObjects.get('origin');
         }
 
+        if (stateDataObjects.containsKey('storePaymentMethod')) {
+            paymentRequest.storePaymentMethod = (Boolean)stateDataObjects.get('storePaymentMethod');
+        }
+
         if (stateDataObjects.containsKey('paymentMethod')) {
             Map<String, Object> paymentMethod = (Map<String, Object>) stateDataObjects.get('paymentMethod');
             paymentRequest.paymentMethod = getPaymentMethodDetails(paymentMethod);

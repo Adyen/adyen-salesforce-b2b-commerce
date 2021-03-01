@@ -29,6 +29,34 @@ public with sharing class AdyenUtil {
                 FROM User WHERE Id = :userId];
     }
 
+    public static ccrz__E_StoredPayment__c getStoredPayment(String storedPaymentId) {
+        return [SELECT Id,
+                ccrz__Account__c,
+                ccrz__Token__c,
+                ccrz__AccountType__c,
+                ccrz__ExpYear__c,
+                ccrz__ExpMonth__c,
+                ccrz__StoreFront__c,
+                ccrz__DisplayName__c,
+                ccrz__Enabled__c,
+                ccrz__User__c
+                FROM ccrz__E_StoredPayment__c WHERE Id = :storedPaymentId AND ccrz__User__c = :UserInfo.getUserId()];
+    }
+
+    public static List<ccrz__E_StoredPayment__c> getStoredPaymentByToken(String token) {
+        return [SELECT Id,
+                ccrz__Account__c,
+                ccrz__Token__c,
+                ccrz__AccountType__c,
+                ccrz__ExpYear__c,
+                ccrz__ExpMonth__c,
+                ccrz__StoreFront__c,
+                ccrz__DisplayName__c,
+                ccrz__Enabled__c,
+                ccrz__User__c
+                FROM ccrz__E_StoredPayment__c WHERE ccrz__Token__c = :token AND ccrz__User__c = :UserInfo.getUserId()];
+    }
+
     public static Amount getAdyenAmount(String currencyCode, Decimal amount) {
         Integer multiplier = getMultiplierMinorUnits(currencyCode);
         Amount adyenAmount = new Amount();

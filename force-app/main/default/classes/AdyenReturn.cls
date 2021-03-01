@@ -6,8 +6,7 @@ public with sharing class AdyenReturn {
 
         //Get details from the querystring
         Map<String, String> details = getDetails(redirectResult, payload);
-        String cartEncryptedId = AdyenUtil.getCartEncryptedId(merchantReference);
-        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, cartEncryptedId);
+        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, merchantReference);
         Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
 
         if((String)paymentResult.get('merchantReference') == merchantReference){
@@ -17,14 +16,14 @@ public with sharing class AdyenReturn {
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 String orderId = orderIds.get('orderIdEnc');
                 //TODOBAS retrieve community URL
-                PageReference pageRef = new PageReference('https://b2b-scoping-0920-developer-edition.na139.force.com/ccrz__OrderConfirmation?o=' + orderId);
+                PageReference pageRef = new PageReference('https://componentsdev0221-developer-edition.na150.force.com/ccrz__OrderConfirmation?o=' + orderId);
                 pageRef.setRedirect(true);
                 return pageRef;
             }
         }
 
         //TODOBAS add Payment Failed error message
-        PageReference pageReference = new PageReference('https://b2b-scoping-0920-developer-edition.na139.force.com/ccrz__CheckoutNew?cartID=' + cartEncryptedId);
+        PageReference pageReference = new PageReference('https://componentsdev0221-developer-edition.na150.force.com/ccrz__CheckoutNew?cartID=' + merchantReference);
         pageReference.setRedirect(true);
         return pageReference;
     }

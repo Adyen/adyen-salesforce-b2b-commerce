@@ -19,7 +19,20 @@ global with sharing class PmtAdyenNewController {
 
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 Map<String, String> additionalData = (Map<String, String>)handleResponse.get('additionalData');
-                AdyenController.createStoredPaymentMethod(additionalData, res);
+                String token = additionalData.get('recurring_recurringDetailReference');
+                if(!String.isBlank(token)){
+                    List<ccrz__E_StoredPayment__c> existingStoredPayments = AdyenUtil.getStoredPaymentByToken(token);
+                    if(existingStoredPayments.isEmpty()){
+                        AdyenController.createStoredPaymentMethod(additionalData, res);
+                    }
+                    else {
+                        AdyenController.updateStoredPaymentMethod(existingStoredPayments, additionalData);
+                    }
+                }
+                else {
+                    System.Debug('#### No recurringDetailReference in Adyen response ');
+                }
+
                 res.success = true;
                 return res;
             }
