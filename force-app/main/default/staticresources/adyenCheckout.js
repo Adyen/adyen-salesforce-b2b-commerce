@@ -174,7 +174,7 @@ handlePaymentResult = result => {
         //handle payment action
         handleAction(result.action);
     }
-    else if(result.isFinal && result.orderSuccess) {
+    else if(result.isFinal && result.orderIdEnc) {
         var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
         orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
         window.location.href = orderSuccessUrl;

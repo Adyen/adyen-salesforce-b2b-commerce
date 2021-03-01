@@ -1,4 +1,4 @@
-global with sharing class AdyenController {
+global inherited sharing class AdyenController {
     public static ccrz.cc_RemoteActionResult obtainPaymentMethods(ccrz.cc_RemoteActionContext ctx, Boolean isStoredPaymentMethod){
             ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
             try {
@@ -30,6 +30,22 @@ global with sharing class AdyenController {
         };
     }
 
+    public static Map<String, Object> handlePaymentsDetailsCall(String stateData){
+        PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestFromStateData(stateData);
+        Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
+        return new Map<String, Object> {
+            'paymentResult' => AdyenResponseHandler.handleResponse(paymentsDetailsResponse),
+            'additionalData' => paymentsDetailsResponse.additionalData
+        };
+    }
+
+    public static Map<String, Object> handleCalloutAdyen(ccrz__E_Cart__c cart, String stateData, String adyenCall) {
+       if(adyenCall == 'payments'){
+            return handlePaymentsCall(cart.ccrz__EncryptedId__c, stateData, false);
+       }
+       return handlePaymentsDetailsCall(stateData);
+    }
+
     public static void createStoredPaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
         ccrz__E_StoredPayment__c storedPayment = new ccrz__E_StoredPayment__c();
         storedPayment.ccrz__Enabled__c = true;
@@ -44,6 +60,23 @@ global with sharing class AdyenController {
         storedPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
         storedPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
         insert storedPayment;
+    }
+
+    public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall){
+            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
+            Map<String, Object> inputParams = new Map<String, Object>();
+            inputParams.put('accountType', 'adyencc');
+            //Use token for stateData
+            inputParams.put('token', stateData);
+
+            Map<String, Object> paymentProcessorInput = new Map<String, Object>{
+                    ccrz.cc_hk_Payment.PARAM_TRANSACTION_DATA => JSON.serialize(inputParams), //stateData,
+                    ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX => ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT,
+                    ccrz.cc_hk_Payment.PARAM_CART => cart,
+                    ccrz.cc_hk_Payment.PARAM_ACCOUNT_TYPE => 'adyencc',
+                    'adyenCall' => adyenCall
+            };
+        return paymentProcessorInput;
     }
 
     public static void updateStoredPaymentMethod(List<ccrz__E_StoredPayment__c> existingStoredPayments, Map<String, String> additionalData){

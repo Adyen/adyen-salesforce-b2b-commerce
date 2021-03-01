@@ -17,34 +17,23 @@ global with sharing class PmtAdyenPayController {
         try {
             ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
-
-            Map<String, Object> inputParams = new Map<String, Object>();
-            inputParams.put('accountType', 'adyencc');
-            //Use token for stateData
-            inputParams.put('token', stateData);
-
-            Map<String, Object> paymentProcessorInput = new Map<String, Object>{
-                    ccrz.cc_hk_Payment.PARAM_TRANSACTION_DATA => JSON.serialize(inputParams), //stateData,
-                    ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX => ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT,
-                    ccrz.cc_hk_Payment.PARAM_CART => cart,
-                    ccrz.cc_hk_Payment.PARAM_ACCOUNT_TYPE => 'adyencc'
-            };
-
+            Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(ctx.currentCartId, stateData, 'payments');
             Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
             Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
             if (!(Boolean)paymentResult.get('isFinal')) {
                 cart.AdyenPaymentData__c = (String)paymentResult.get('paymentData');
                 update cart;
-                paymentResult.put('cartId', cart.Id);
+                paymentResult.put('cartId', cart.ccrz__EncryptedId__c);
                 res.data = paymentResult;
                 return res;
             }
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 //create order
-                Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cart.Id);
+                Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cart.ccrz__EncryptedId__c);
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
-                res.data = orderIds.get('orderIdEnc');
+                paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));
+                res.data = paymentResult;
                 res.success = true;
                 return res;
             }
