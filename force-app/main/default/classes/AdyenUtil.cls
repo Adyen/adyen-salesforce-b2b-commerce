@@ -38,7 +38,8 @@ public with sharing class AdyenUtil {
                 ccrz__ExpMonth__c,
                 ccrz__StoreFront__c,
                 ccrz__DisplayName__c,
-                ccrz__Enabled__c
+                ccrz__Enabled__c,
+                ccrz__User__c
                 FROM ccrz__E_StoredPayment__c WHERE Id = :storedPaymentId AND ccrz__User__c = :UserInfo.getUserId()];
     }
 
@@ -51,7 +52,8 @@ public with sharing class AdyenUtil {
                 ccrz__ExpMonth__c,
                 ccrz__StoreFront__c,
                 ccrz__DisplayName__c,
-                ccrz__Enabled__c
+                ccrz__Enabled__c,
+                ccrz__User__c
                 FROM ccrz__E_StoredPayment__c WHERE ccrz__Token__c = :token AND ccrz__User__c = :UserInfo.getUserId()];
     }
 
