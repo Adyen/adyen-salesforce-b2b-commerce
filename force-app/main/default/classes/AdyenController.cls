@@ -32,7 +32,6 @@ global inherited sharing class AdyenController {
 
     public static Map<String, Object> handlePaymentsDetailsCall(String stateData){
         PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestFromStateData(stateData);
-        Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
         return new Map<String, Object> {
             'paymentResult' => AdyenResponseHandler.handleResponse(paymentsDetailsResponse),
             'additionalData' => paymentsDetailsResponse.additionalData
@@ -64,10 +63,10 @@ global inherited sharing class AdyenController {
 
     public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall){
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
-            Map<String, Object> inputParams = new Map<String, Object>();
-            inputParams.put('accountType', 'adyencc');
-            //Use token for stateData
-            inputParams.put('token', stateData);
+            Map<String, String> inputParams = new Map<String, String>{
+                'accountType' => 'adyencc',
+                'token' => stateData
+            };
 
             Map<String, Object> paymentProcessorInput = new Map<String, Object>{
                     ccrz.cc_hk_Payment.PARAM_TRANSACTION_DATA => JSON.serialize(inputParams), //stateData,
