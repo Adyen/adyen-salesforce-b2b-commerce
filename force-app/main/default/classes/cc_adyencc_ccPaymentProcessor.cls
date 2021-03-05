@@ -3,13 +3,19 @@ global inherited sharing class cc_adyencc_ccPaymentProcessor extends ccrz.ccPaym
         if (paymentProcessorInput.get(ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX) == ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX_CHECKOUT) {
             ccrz.cc_hk_Payment.TransactionPaymentParams paymentParams = (ccrz.cc_hk_Payment.TransactionPaymentParams) paymentProcessorInput.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA);
             ccrz__E_Cart__c cart = (ccrz__E_Cart__c) paymentProcessorInput.get('cart');
-            paymentParams.transactionType = AdyenUtil.getConfiguredCaptureDelay(cart);
+            //Zero Auth transaction does not have cart, also no capture delay needed
+            if(!String.isBlank(cart.ccrz__EncryptedId__c)){
+                paymentParams.transactionType = AdyenUtil.getConfiguredCaptureDelay(cart);
+            }
+            //Delete paymentData from cart
+            if(!String.isBlank(cart.AdyenPaymentData__c)){
+                cart.AdyenPaymentData__c = '';
+                update cart;
+            }
             String stateData = String.valueOf(paymentParams.token);
             String adyenCall = (String)paymentProcessorInput.get('adyenCall');
-            Map<String, Object> handleResponse = AdyenController.handleCalloutAdyen(cart, stateData, adyenCall);
-            Map<String, Object> paymentResult = (Map<String, Object>)handleResponse.get('paymentResult');
+            Map<String, Object> paymentResult = AdyenController.handleCalloutAdyen(cart, stateData, adyenCall);
             paymentProcessorInput.put('paymentResult', paymentResult);
-
             paymentParams.transactionCode = (String)paymentResult.get('pspReference');
             //Remove the stateData from payment
             paymentParams.token = '';

@@ -10,29 +10,15 @@ global with sharing class PmtAdyenNewController {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
             //Handle the Zero Auth request
-            Map<String, Object> handleResponse = AdyenController.handlePaymentsCall(ctx.currentCartId, stateData, true);
-            Map<String, Object> paymentResult = (Map<String, Object>)handleResponse.get('paymentResult');
+            Map<String, Object> paymentResult = AdyenController.handlePaymentsCall(ctx.currentCartId, stateData, true);
             if (!(Boolean)paymentResult.get('isFinal')) {
                 res.data = paymentResult;
                 return res;
             }
 
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
-                Map<String, String> additionalData = (Map<String, String>)handleResponse.get('additionalData');
-                String token = additionalData.get('recurring_recurringDetailReference');
-                if(!String.isBlank(token)){
-                    List<ccrz__E_StoredPayment__c> existingStoredPayments = AdyenUtil.getStoredPaymentByToken(token);
-                    if(existingStoredPayments.isEmpty()){
-                        AdyenController.createStoredPaymentMethod(additionalData, res);
-                    }
-                    else {
-                        AdyenController.updateStoredPaymentMethod(existingStoredPayments, additionalData);
-                    }
-                }
-                else {
-                    System.Debug('#### No recurringDetailReference in Adyen response ');
-                }
-
+                Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
+                AdyenController.checkToStorePaymentMethod(additionalData, res);
                 res.success = true;
                 return res;
             }
