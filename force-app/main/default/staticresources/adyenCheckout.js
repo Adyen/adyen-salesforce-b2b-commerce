@@ -170,14 +170,21 @@ handleAction = action => {
 }
 
 handlePaymentResult = result => {
-    if (!result.isFinal && result.action) {
+    if(result.isFinal){
+        if(result.orderIdEnc){
+            var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
+            orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
+            window.location.href = orderSuccessUrl;
+        }
+        else if(result.zeroAuthSuccess){
+            loadingToggle();
+            $("#action-modal").modal('hide');
+            myWallet();
+        }
+    }
+    else if(result.action){
         //handle payment action
         handleAction(result.action);
-    }
-    else if(result.isFinal && result.orderIdEnc) {
-        var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
-        orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
-        window.location.href = orderSuccessUrl;
     }
     else {
         loadingToggle();

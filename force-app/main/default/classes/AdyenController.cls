@@ -24,18 +24,12 @@ global inherited sharing class AdyenController {
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
         PaymentsRequest paymentsRequest = AdyenPayments.createPaymentsRequest(stateData, cartId, merchant, isZeroAuth);
         PaymentsResponse paymentsResponse = AdyenPayments.authorisePayment(merchant, paymentsRequest);
-        return new Map<String, Object> {
-            'paymentResult' => AdyenResponseHandler.handleResponse(paymentsResponse),
-            'additionalData' => paymentsResponse.additionalData
-        };
+        return AdyenResponseHandler.handleResponse(paymentsResponse);
     }
 
     public static Map<String, Object> handlePaymentsDetailsCall(String stateData){
         PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestFromStateData(stateData);
-        return new Map<String, Object> {
-            'paymentResult' => AdyenResponseHandler.handleResponse(paymentsDetailsResponse),
-            'additionalData' => paymentsDetailsResponse.additionalData
-        };
+        return AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
     }
 
     public static Map<String, Object> handleCalloutAdyen(ccrz__E_Cart__c cart, String stateData, String adyenCall) {
@@ -45,7 +39,23 @@ global inherited sharing class AdyenController {
        return handlePaymentsDetailsCall(stateData);
     }
 
-    public static void createStoredPaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
+    public static void checkToStorePaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
+        String token = additionalData.get('recurring_recurringDetailReference');
+        if(!String.isBlank(token)){
+            List<ccrz__E_StoredPayment__c> existingStoredPayments = AdyenUtil.getStoredPaymentByToken(token);
+            if(existingStoredPayments.isEmpty()){
+                createStoredPaymentMethod(additionalData, res);
+            }
+            else {
+                updateStoredPaymentMethod(existingStoredPayments, additionalData);
+            }
+        }
+        else {
+            System.Debug('#### No recurringDetailReference in Adyen response ');
+        }
+    }
+
+    private static void createStoredPaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
         ccrz__E_StoredPayment__c storedPayment = new ccrz__E_StoredPayment__c();
         storedPayment.ccrz__Enabled__c = true;
         storedPayment.ccrz__Token__c = additionalData.get('recurring_recurringDetailReference');
@@ -61,8 +71,19 @@ global inherited sharing class AdyenController {
         insert storedPayment;
     }
 
+     private static void updateStoredPaymentMethod(List<ccrz__E_StoredPayment__c> existingStoredPayments, Map<String, String> additionalData){
+        //There can only be one stored payment with recurringDetailReference as token
+        ccrz__E_StoredPayment__c existingStoredPayment = existingStoredPayments.get(0);
+        existingStoredPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
+        List<String> expiryDate = additionalData.get('expiryDate').split('/');
+        existingStoredPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
+        existingStoredPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
+        update existingStoredPayment;
+    }
+
     public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall){
-            ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
+            Boolean isZeroAuth = String.isBlank(cartId);
+            ccrz__E_Cart__c cart = !isZeroAuth ? AdyenUtil.getCartByEncryptedId(cartId) : new ccrz__E_Cart__c();
             Map<String, String> inputParams = new Map<String, String>{
                 'accountType' => 'adyencc',
                 'token' => stateData
@@ -76,16 +97,6 @@ global inherited sharing class AdyenController {
                     'adyenCall' => adyenCall
             };
         return paymentProcessorInput;
-    }
-
-    public static void updateStoredPaymentMethod(List<ccrz__E_StoredPayment__c> existingStoredPayments, Map<String, String> additionalData){
-        //There can only be one stored payment with recurringDetailReference as token
-        ccrz__E_StoredPayment__c existingStoredPayment = existingStoredPayments.get(0);
-        existingStoredPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
-        List<String> expiryDate = additionalData.get('expiryDate').split('/');
-        existingStoredPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
-        existingStoredPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
-        update existingStoredPayment;
     }
 
     public static Map<String, Object> placeOrder(Map<String, Object> processResult, String cartId) {

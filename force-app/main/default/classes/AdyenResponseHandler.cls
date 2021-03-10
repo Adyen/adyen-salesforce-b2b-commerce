@@ -7,7 +7,8 @@ public with sharing class AdyenResponseHandler {
                         'isFinal' => true,
                         'resultCode' => resultCode,
                         'merchantReference' => paymentsResponse.merchantReference,
-                        'pspReference' => paymentsResponse.pspReference
+                        'pspReference' => paymentsResponse.pspReference,
+                        'additionalData' => paymentsResponse.additionalData
                 };
             }
             when REDIRECTSHOPPER, IDENTIFYSHOPPER, CHALLENGESHOPPER, PRESENTTOSHOPPER, PENDING {

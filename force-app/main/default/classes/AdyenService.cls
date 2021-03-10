@@ -8,9 +8,8 @@ global without sharing class AdyenService {
         ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
         Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(cartId, stateData, 'paymentsDetails');
         Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
-        Boolean orderSuccess = false;
+        Boolean zeroAuthSuccess = false;
         Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
-
         if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
             String merchantReference = (String)paymentResult.get('merchantReference');
             if(merchantReference == cartId){
@@ -19,12 +18,16 @@ global without sharing class AdyenService {
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
                 paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));
-                orderSuccess = true;
             }
-            System.error('Invalid merchantReference: ' + merchantReference);
-        }
+            else if(merchantReference.contains('addStoredMethod')){
+                zeroAuthSuccess = true;
+            }
+            else {
+                System.debug('Invalid merchantReference: ' + merchantReference);
+            }
 
-        paymentResult.put('orderSuccess', orderSuccess);
+        }
+        paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
         return JSON.serialize(paymentResult, true);
     }
 }
