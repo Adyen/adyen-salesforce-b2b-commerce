@@ -6,7 +6,7 @@ global without sharing class AdyenService {
         Map<String, Object> requestData = (Map<String, Object>)JSON.deserializeUntyped(stateData);
         String cartId = (String)requestData.get('cartId');
         ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
-        Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(cartId, stateData, 'paymentsDetails');
+        Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(cartId, stateData, 'paymentsDetails', false);
         Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
         Boolean zeroAuthSuccess = false;
         Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
@@ -25,7 +25,6 @@ global without sharing class AdyenService {
             else {
                 System.debug('Invalid merchantReference: ' + merchantReference);
             }
-
         }
         paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
         return JSON.serialize(paymentResult, true);

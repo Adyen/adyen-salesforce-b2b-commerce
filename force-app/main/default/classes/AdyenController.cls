@@ -20,9 +20,9 @@ global inherited sharing class AdyenController {
             return res;
     }
 
-    public static Map<String, Object> handlePaymentsCall(String cartId, String stateData, Boolean isZeroAuth){
+    public static Map<String, Object> handlePaymentsCall(String cartId, String stateData, Boolean isZeroAuth, Boolean isStoredPayment){
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
-        PaymentsRequest paymentsRequest = AdyenPayments.createPaymentsRequest(stateData, cartId, merchant, isZeroAuth);
+        PaymentsRequest paymentsRequest = AdyenPayments.createPaymentsRequest(stateData, cartId, merchant, isZeroAuth, isStoredPayment);
         PaymentsResponse paymentsResponse = AdyenPayments.authorisePayment(merchant, paymentsRequest);
         return AdyenResponseHandler.handleResponse(paymentsResponse);
     }
@@ -32,9 +32,9 @@ global inherited sharing class AdyenController {
         return AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
     }
 
-    public static Map<String, Object> handleCalloutAdyen(ccrz__E_Cart__c cart, String stateData, String adyenCall) {
+    public static Map<String, Object> handleCalloutAdyen(ccrz__E_Cart__c cart, String stateData, String adyenCall, Boolean isStoredPayment) {
        if(adyenCall == 'payments'){
-            return handlePaymentsCall(cart.ccrz__EncryptedId__c, stateData, false);
+            return handlePaymentsCall(cart.ccrz__EncryptedId__c, stateData, false, isStoredPayment);
        }
        return handlePaymentsDetailsCall(stateData);
     }
@@ -81,7 +81,7 @@ global inherited sharing class AdyenController {
         update existingStoredPayment;
     }
 
-    public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall){
+    public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall, Boolean isStoredPayment){
             Boolean isZeroAuth = String.isBlank(cartId);
             ccrz__E_Cart__c cart = !isZeroAuth ? AdyenUtil.getCartByEncryptedId(cartId) : new ccrz__E_Cart__c();
             Map<String, String> inputParams = new Map<String, String>{
@@ -94,7 +94,8 @@ global inherited sharing class AdyenController {
                     ccrz.cc_hk_Payment.PARAM_PAYMENT_CTX => ccrz.cc_hk_Payment.PAYMENT_CTX_CHECKOUT,
                     ccrz.cc_hk_Payment.PARAM_CART => cart,
                     ccrz.cc_hk_Payment.PARAM_ACCOUNT_TYPE => 'adyencc',
-                    'adyenCall' => adyenCall
+                    'adyenCall' => adyenCall,
+                    'isStoredPayment' => isStoredPayment
             };
         return paymentProcessorInput;
     }

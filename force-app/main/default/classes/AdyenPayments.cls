@@ -1,11 +1,18 @@
 public with sharing class AdyenPayments {
-    public static PaymentsRequest createPaymentsRequest(String stateData, String cartId, Merchant__mdt merchant, Boolean isZeroAuth) {
+    public static PaymentsRequest createPaymentsRequest(String stateData, String cartId, Merchant__mdt merchant, Boolean isZeroAuth, Boolean isStoredPayment) {
+        PaymentsRequest.ShopperInteractionEnum shopperInteractionEcommerce = PaymentsRequest.ShopperInteractionEnum.Ecommerce;
+        PaymentsRequest.ShopperInteractionEnum shopperInteractionContAuth = PaymentsRequest.ShopperInteractionEnum.ContAuth;
+        PaymentsRequest.RecurringProcessingModelEnum cardOnFile = PaymentsRequest.RecurringProcessingModelEnum.CardOnFile;
         PaymentsRequest paymentsRequest = createPaymentsRequestFromStateData(stateData);
         paymentsRequest.merchantAccount = merchant.Merchant_Account__c;
         paymentsRequest.applicationInfo = AdyenUtil.getApplicationInfo();
         paymentsRequest.additionalData = getAdditionalData();
         paymentsRequest.channel = 'web';
-
+        paymentsRequest.shopperInteraction = shopperInteractionEcommerce;
+        if(isStoredPayment){
+            paymentsRequest.shopperInteraction = shopperInteractionContAuth;
+            paymentsRequest.recurringProcessingModel = cardOnFile;
+        }
         String returnPage = '/apex/AdyenReturn?merchantReference=';
         if(isZeroAuth){
             paymentsRequest.amount = AdyenUtil.getAdyenAmount(UserInfo.getDefaultCurrency(), 0.00);
@@ -59,11 +66,16 @@ public with sharing class AdyenPayments {
         String paymentType = (String) paymentMethod.get('type');
         if (paymentType == 'scheme') {
             CardDetails cardDetails = new CardDetails();
-            cardDetails.holderName = (String) paymentMethod.get('holderName');
-            cardDetails.encryptedCardNumber = (String) paymentMethod.get('encryptedCardNumber');
-            cardDetails.encryptedExpiryMonth = (String) paymentMethod.get('encryptedExpiryMonth');
-            cardDetails.encryptedExpiryYear = (String) paymentMethod.get('encryptedExpiryYear');
-            cardDetails.encryptedSecurityCode = (String) paymentMethod.get('encryptedSecurityCode');
+            if(!String.isBlank((String)paymentMethod.get('storedPaymentMethodId'))){
+                cardDetails.storedPaymentMethodId = (String) paymentMethod.get('storedPaymentMethodId');
+            }
+            else {
+                cardDetails.holderName = (String) paymentMethod.get('holderName');
+                cardDetails.encryptedCardNumber = (String) paymentMethod.get('encryptedCardNumber');
+                cardDetails.encryptedExpiryMonth = (String) paymentMethod.get('encryptedExpiryMonth');
+                cardDetails.encryptedExpiryYear = (String) paymentMethod.get('encryptedExpiryYear');
+                cardDetails.encryptedSecurityCode = (String) paymentMethod.get('encryptedSecurityCode');
+            }
             return cardDetails;
         } else if (paymentType == 'ach') {
             ACHDetails achDetails = new ACHDetails();
