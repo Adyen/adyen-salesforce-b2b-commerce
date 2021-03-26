@@ -1,5 +1,5 @@
 public with sharing class AdyenPayments {
-    public static PaymentsRequest createPaymentsRequest(String stateData, String cartId, Merchant__mdt merchant, Boolean isZeroAuth, Boolean isStoredPayment) {
+    public static PaymentsRequest createPaymentsRequest(String stateData, String cartId, Merchant__mdt merchant, Boolean isZeroAuth) {
         PaymentsRequest.ShopperInteractionEnum shopperInteractionEcommerce = PaymentsRequest.ShopperInteractionEnum.Ecommerce;
         PaymentsRequest.ShopperInteractionEnum shopperInteractionContAuth = PaymentsRequest.ShopperInteractionEnum.ContAuth;
         PaymentsRequest.RecurringProcessingModelEnum cardOnFile = PaymentsRequest.RecurringProcessingModelEnum.CardOnFile;
@@ -9,7 +9,7 @@ public with sharing class AdyenPayments {
         paymentsRequest.additionalData = getAdditionalData();
         paymentsRequest.channel = 'web';
         paymentsRequest.shopperInteraction = shopperInteractionEcommerce;
-        if(isStoredPayment){
+        if(paymentsRequest.paymentMethod.getType() == 'scheme' && !String.isBlank(((CardDetails)paymentsRequest.paymentMethod).getStoredPaymentMethodId())){
             paymentsRequest.shopperInteraction = shopperInteractionContAuth;
             paymentsRequest.recurringProcessingModel = cardOnFile;
         }

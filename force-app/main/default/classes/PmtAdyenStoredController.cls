@@ -5,7 +5,7 @@ global with sharing class PmtAdyenStoredController {
         try {
             ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
-            Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(ctx.currentCartId, stateData, 'payments', true);
+            Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(ctx.currentCartId, stateData, 'payments');
             Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
             Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
             if (!(Boolean)paymentResult.get('isFinal')) {

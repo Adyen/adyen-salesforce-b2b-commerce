@@ -10,7 +10,7 @@ global with sharing class PmtAdyenNewController {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
             //Handle the Zero Auth request
-            Map<String, Object> paymentResult = AdyenController.handlePaymentsCall(ctx.currentCartId, stateData, true, false);
+            Map<String, Object> paymentResult = AdyenController.handlePaymentsCall(ctx.currentCartId, stateData, true);
             if (!(Boolean)paymentResult.get('isFinal')) {
                 res.data = paymentResult;
                 return res;
