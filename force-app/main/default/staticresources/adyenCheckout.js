@@ -158,8 +158,8 @@ convertToJsonObject = jsonString => {
 }
 
 decodeJsonObject = jsonObject => {
-    var elem = document.createElement('textarea');
-    elem.innerHTML = JSON.stringify(jsonObject);;
+    let elem = document.createElement('textarea');
+    elem.innerHTML = JSON.stringify(jsonObject);
     return JSON.parse(elem.value);
 }
 
@@ -172,24 +172,55 @@ handleAction = action => {
 handlePaymentResult = result => {
     if(result.isFinal){
         if(result.orderIdEnc){
-            var orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
+            let orderSuccessUrl = new URL(CCRZ.pagevars.currSiteURL + 'ccrz__OrderConfirmation');
             orderSuccessUrl.searchParams.append('o', result.orderIdEnc);
             window.location.href = orderSuccessUrl;
+            return;
         }
         else if(result.zeroAuthSuccess){
             loadingToggle();
             $("#action-modal").modal('hide');
             myWallet();
+            return;
         }
+        return paymentNotSuccessful();
     }
     else if(result.action){
         //handle payment action
         handleAction(result.action);
+        return;
     }
-    else {
-        loadingToggle();
-        $("#action-modal").modal('hide');
-        document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
-        return false;
+    return paymentNotSuccessful();
+}
+
+paymentNotSuccessful = () => {
+    loadingToggle();
+    $("#action-modal").modal('hide');
+    document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
+    return false;
+}
+
+createStateDataStoredPayment = storedPayment => {
+    return {
+        paymentMethod: {
+            type: 'scheme',
+            storedPaymentMethodId: storedPayment.token
+        },
+        browserInfo: getBrowserInfo(),
+        origin: window.location.origin
+    }
+}
+
+getBrowserInfo = () => {
+    const d = new Date();
+    return {
+        acceptHeader: '*/*',
+        colorDepth: window.screen.colorDepth,
+        javaEnabled: window.navigator.javaEnabled(),
+        screenHeight: window.screen.height,
+        screenWidth: window.screen.width,
+        userAgent: window.navigator.userAgent,
+        language: window.navigator.language,
+        timeZoneOffset: d.getTimezoneOffset()
     }
 }

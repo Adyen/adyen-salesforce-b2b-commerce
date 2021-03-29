@@ -25,7 +25,6 @@ global without sharing class AdyenService {
             else {
                 System.debug('Invalid merchantReference: ' + merchantReference);
             }
-
         }
         paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
         return JSON.serialize(paymentResult, true);
