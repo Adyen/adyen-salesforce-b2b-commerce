@@ -2,7 +2,6 @@ public with sharing class AdyenPaymentMethods {
     private static PaymentMethodsRequest createPaymentMethodsRequest(String cartId, Merchant__mdt merchant, Boolean isStoredPaymentMethod) {
         PaymentMethodsRequest paymentMethodsRequest = new PaymentMethodsRequest();
         paymentMethodsRequest.merchantAccount = merchant.Merchant_Account__c;
-        String countryCode = 'US';
         if(isStoredPaymentMethod){
             //Only credit card for My Wallet
             paymentMethodsRequest.shopperReference = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
@@ -13,10 +12,8 @@ public with sharing class AdyenPaymentMethods {
             paymentMethodsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
             paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
             List<ccrz__E_ContactAddr__c> billingAddress = [Select ccrz__CountryISOCode__c from ccrz__E_ContactAddr__c Where Id = :cart.ccrz__BillTo__c];
-            countryCode = billingAddress[0].ccrz__CountryISOCode__c;
+            paymentMethodsRequest.countryCode = billingAddress[0].ccrz__CountryISOCode__c;
         }
-
-        paymentMethodsRequest.countryCode = countryCode;
         return paymentMethodsRequest;
     }
 
