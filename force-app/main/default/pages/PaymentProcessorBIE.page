@@ -13,7 +13,6 @@
                 {{#ifDisplay 'WLT.Enabled'}}
                 {{#if this.storedPayments}}
                 <div class="panel panel-default cc_panel cc_payment_processor_mywallet">
-                    {{ log this }}
                     <div class="panel-heading cc_heading">
                         <h3 class="panel-title cc_title">{{pageLabelMap 'PaymentProcessor_MyWallet'}}</h3>
                     </div>
@@ -46,6 +45,11 @@
             </div>
             <div class="paymentMidSection">{{pageLabelMap 'PaymentProcessor_MidSec'}}</div>
             {{#if this.paymentTypes}}
+                <!-- Response from Adyen /paymentMethods -->
+                {{#if this.paymentTypes.adyencc.adyenPaymentMethods }}
+                    <input type="hidden" value="{{this.paymentTypes.adyencc.adyenPaymentMethods}}" id="adyenPaymentMethods"/>
+                {{/if}}
+
             <div class="cc_payment_types_container">
                 <ul class="nav nav-tabs cc_nav-tabs cc_nav-tabs-payment" role="tablist">
                     {{#each this.paymentTypes}}

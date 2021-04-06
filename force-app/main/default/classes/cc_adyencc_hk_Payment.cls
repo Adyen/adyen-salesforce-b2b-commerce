@@ -20,4 +20,17 @@ global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
 
         return returnData;
     }
+
+    global override Map<String,Object> fetchPaymentTypes(Map<String,Object> inputData) {
+        PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(ccrz.cc_CallContext.currCartId, false);
+        //Remove suffix and convert to string
+        String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
+        String stringPaymentMethodsResponse = Util.makeAdyenCompatible(jsonPaymentMethodsResponse);
+        Map<String,Object> returnData =  super.fetchPaymentTypes(inputData);
+        Map<String,Object> paymentTypes = (Map<String,Object>)returnData.get('paymentTypes');
+        Map<String,Object> adyencc = (Map<String,Object>)paymentTypes.get('adyencc');
+        adyencc.put('adyenPaymentMethods', stringPaymentMethodsResponse);
+        return returnData;
+    }
+
 }
