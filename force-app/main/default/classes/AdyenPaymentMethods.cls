@@ -11,10 +11,9 @@ public with sharing class AdyenPaymentMethods {
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
             paymentMethodsRequest.amount = AdyenUtil.getAdyenAmount(cart.ccrz__CurrencyISOCode__c, cart.ccrz__TotalAmount__c);
             paymentMethodsRequest.shopperReference = cart.ccrz__Account__c;
+            List<ccrz__E_ContactAddr__c> billingAddress = [Select ccrz__CountryISOCode__c from ccrz__E_ContactAddr__c Where Id = :cart.ccrz__BillTo__c];
+            paymentMethodsRequest.countryCode = billingAddress[0].ccrz__CountryISOCode__c;
         }
-
-        //TODOBAS countryCode from address
-        paymentMethodsRequest.countryCode = 'US';
         return paymentMethodsRequest;
     }
 

@@ -41,19 +41,18 @@
 
     <script type="text/javascript">
     let isGuest = {!JSENCODE(IF(isGuest, "true", "false"))};
-    Visualforce.remoting.Manager.invokeAction(
-        '{!$RemoteAction.PmtAdyenPayController.getPaymentMethods}',
-        CCRZ.pagevars.remoteContext,
-        function(result, event){
+
+    function initiateAdyenComponent(){
+        if(document.getElementById("adyenPaymentMethods")){
+            const paymentMethodsResponse = document.getElementById("adyenPaymentMethods").value;
+            const paymentMethods = convertToJsonObject(paymentMethodsResponse);
+            renderAdyenComponent(paymentMethods);
             loadingToggle();
-            if(result.data){
-                const paymentMethods = convertToJsonObject(result.data);
-                renderAdyenComponent(paymentMethods);
-                loadingToggle();
-            }
-        },
-        { escape: true }
-    );
+        }
+        else {
+            console.error('Adyen payment methods not available');
+        }
+    }
 
     CCRZ.models.PaymentsAdyenCCModel = CCRZ.CloudCrazeModel.extend({
         errors: null
@@ -75,6 +74,8 @@
             this.model = options.model;
             this.render();
             CCRZ.pubSub.trigger('action:paymentViewInit',this);
+            loadingToggle();
+            initiateAdyenComponent();
         },
         renderDesktop: function(){
             this.setElement(this.selector);
