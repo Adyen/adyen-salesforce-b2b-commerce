@@ -79,14 +79,14 @@ public inherited sharing class AdyenUtil {
         }
     }
 
-    public static OASApplicationInfo getApplicationInfo() {
-        OASApplicationInfo applicationInfo = new OASApplicationInfo();
-        OASCommonField adyenPaymentSource = new OASCommonField();
+    public static ApplicationInfo getApplicationInfo() {
+        ApplicationInfo applicationInfo = new ApplicationInfo();
+        CommonField adyenPaymentSource = new CommonField();
         adyenPaymentSource.name = AdyenConstants.PACKAGE_NAME;
         adyenPaymentSource.version = AdyenConstants.PACKAGE_VERSION;
         applicationInfo.adyenPaymentSource = adyenPaymentSource;
 
-        OASExternalPlatform externalPlatform = new OASExternalPlatform();
+        ExternalPlatform externalPlatform = new ExternalPlatform();
         externalPlatform.name = AdyenConstants.PLATFORM_NAME;
         externalPlatform.version = '';
         applicationInfo.externalPlatform = externalPlatform;
