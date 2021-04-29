@@ -2,11 +2,10 @@ const checkout = {};
 const componentsObj = {};
 
 renderAdyenComponent = paymentMethodsResponse => {
-    //TODOBAS This will be configurable in later phase. Also client key instead of originKey
     const configuration = {
-        locale: "en_US",
-        environment: "test",
-        clientKey: "test_V34KOGIDVJHLTOSMCTHATSWM5AFOQB6M",
+        locale: CCRZ.pagevars.userLocale,
+        environment: document.getElementById("adyenEnvironment").value,
+        clientKey: document.getElementById("adyenClientKey").value,
         paymentMethodsResponse: paymentMethodsResponse,
         paymentMethodsConfiguration: getPaymentMethodsConfig(),
         onChange: handleOnChange,

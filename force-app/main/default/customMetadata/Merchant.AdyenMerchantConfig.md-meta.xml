@@ -4,7 +4,11 @@
     <protected>true</protected>
     <values>
         <field>API_Key__c</field>
-        <value xsi:type="xsd:string">abcd1234</value>
+        <value xsi:type="xsd:string">Adyen API key</value>
+    </values>
+    <values>
+        <field>Client_Key__c</field>
+        <value xsi:type="xsd:string">Adyen Client key</value>
     </values>
     <values>
         <field>Authorise_Endpoint__c</field>
