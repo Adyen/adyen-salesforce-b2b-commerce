@@ -45,9 +45,11 @@
             </div>
             <div class="paymentMidSection">{{pageLabelMap 'PaymentProcessor_MidSec'}}</div>
             {{#if this.paymentTypes}}
-                <!-- Response from Adyen /paymentMethods -->
-                {{#if this.paymentTypes.adyencc.adyenPaymentMethods }}
+                {{#if this.paymentTypes.adyencc }}
+                    <!-- Response from Adyen /paymentMethods -->
                     <input type="hidden" value="{{this.paymentTypes.adyencc.adyenPaymentMethods}}" id="adyenPaymentMethods"/>
+                    <input type="hidden" value="{{this.paymentTypes.adyencc.adyenClientKey}}" id="adyenClientKey"/>
+                    <input type="hidden" value="{{this.paymentTypes.adyencc.adyenEnvironment}}" id="adyenEnvironment"/>
                 {{/if}}
 
             <div class="cc_payment_types_container">

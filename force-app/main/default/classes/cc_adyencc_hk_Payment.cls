@@ -30,6 +30,8 @@ global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
         Map<String,Object> paymentTypes = (Map<String,Object>)returnData.get('paymentTypes');
         Map<String,Object> adyencc = (Map<String,Object>)paymentTypes.get('adyencc');
         adyencc.put('adyenPaymentMethods', stringPaymentMethodsResponse);
+        adyencc.put('adyenClientKey', AdyenUtil.getClientKey());
+        adyencc.put('adyenEnvironment', AdyenUtil.getAdyenEnvironment());
         return returnData;
     }
 
