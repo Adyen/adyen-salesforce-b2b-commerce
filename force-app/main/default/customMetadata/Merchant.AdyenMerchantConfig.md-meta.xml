@@ -38,4 +38,8 @@
         <field>Merchant_Account__c</field>
         <value xsi:type="xsd:string">MerchantAccount</value>
     </values>
+    <values>
+        <field>ApplicationInfo_SI__c</field>
+        <value xsi:type="xsd:string">Merchant's System Integrator</value>
+    </values>
 </CustomMetadata>

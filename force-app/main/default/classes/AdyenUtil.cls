@@ -97,8 +97,14 @@ public inherited sharing class AdyenUtil {
         ExternalPlatform externalPlatform = new ExternalPlatform();
         externalPlatform.name = AdyenConstants.PLATFORM_NAME;
         externalPlatform.version = '';
+        externalPlatform.integrator = getAppInfoSI();
         applicationInfo.externalPlatform = externalPlatform;
         return applicationInfo;
+    }
+
+    public static String getAppInfoSI(){
+        Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
+        return merchant.ApplicationInfo_SI__c;
     }
 
     public static Boolean isHttpResponseOK(Integer responseCode) {
