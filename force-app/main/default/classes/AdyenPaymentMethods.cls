@@ -2,10 +2,10 @@ public with sharing class AdyenPaymentMethods {
     private static PaymentMethodsRequest createPaymentMethodsRequest(String cartId, Merchant__mdt merchant, Boolean isStoredPaymentMethod) {
         PaymentMethodsRequest paymentMethodsRequest = new PaymentMethodsRequest();
         paymentMethodsRequest.merchantAccount = merchant.Merchant_Account__c;
+        paymentMethodsRequest.allowedPaymentMethods = new List<String>{'scheme'};
         if(isStoredPaymentMethod){
-            //Only credit card for My Wallet
+            //No cart through My Wallet
             paymentMethodsRequest.shopperReference = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
-            paymentMethodsRequest.allowedPaymentMethods = new List<String>{'scheme'};
         }
         else {
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);

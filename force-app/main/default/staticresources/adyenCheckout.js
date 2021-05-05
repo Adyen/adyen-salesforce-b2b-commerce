@@ -13,11 +13,16 @@ renderAdyenComponent = paymentMethodsResponse => {
     };
     checkout.adyenCheckout = new AdyenCheckout(configuration);
 
-    paymentMethodsResponse.paymentMethods.forEach((pm) =>
-        renderPaymentMethod(pm)
-    );
+    if(paymentMethodsResponse.paymentMethods.length > 0) {
+        paymentMethodsResponse.paymentMethods.forEach((pm) =>
+            renderPaymentMethod(pm)
+        );
+        selectFirstPaymentMethod();
+    }
+    else {
+        console.error('No payment methods available, please verify Adyen configuration');
+    }
 
-    selectFirstPaymentMethod();
 }
 
 getPaymentMethodsConfig = () => {
