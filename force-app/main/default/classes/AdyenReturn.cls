@@ -7,8 +7,9 @@ public with sharing class AdyenReturn {
         Map<String, String> details = getDetails(redirectResult, payload);
         PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, merchantReference);
         Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
-
-        if((String)paymentResult.get('merchantReference') == merchantReference){
+        Map<String, Object> additionalData = (Map<String, Object>)paymentResult.get('additionalData');
+        String responseMerchantReference = !String.isBlank((String)additionalData.get('merchantReference')) ? (String)additionalData.get('merchantReference') : (String)paymentResult.get('merchantReference');
+        if(merchantReference == responseMerchantReference){
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED){
                 //Place order
                 Map<String, Object> orderResult = AdyenController.placeOrder(paymentResult, merchantReference);
