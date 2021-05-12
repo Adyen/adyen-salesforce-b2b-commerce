@@ -28,6 +28,8 @@ global with sharing class PmtAdyenPayController {
                 return res;
             }
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
+                Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
+                AdyenController.checkToStorePaymentMethod(additionalData, res);
                 //create order
                 Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cart.ccrz__EncryptedId__c);
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
