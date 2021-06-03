@@ -27,12 +27,12 @@
     <script type="text/javascript">
         let isGuest = false;
         Visualforce.remoting.Manager.invokeAction(
-            '{!$RemoteAction.PmtAdyenNewController.getPaymentMethods}',
+            '{!$RemoteAction.PmtAdyenNewController.getMyWalletConfig}',
             CCRZ.pagevars.remoteContext,
             function(result, event){
                 if(result.data){
-                    const paymentMethods = convertToJsonObject(result.data);
-                    renderAdyenComponent(paymentMethods);
+                    const paymentMethods = convertToJsonObject(result.data.adyenPaymentMethods);
+                    renderAdyenComponent(paymentMethods, result.data.adyenEnvironment, result.data.adyenClientKey);
                 }
             },
             { escape: true }

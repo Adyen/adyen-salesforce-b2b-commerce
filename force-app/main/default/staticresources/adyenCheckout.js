@@ -1,11 +1,11 @@
 const checkout = {};
 const componentsObj = {};
 
-renderAdyenComponent = paymentMethodsResponse => {
+renderAdyenComponent = (paymentMethodsResponse, environment, clientKey) => {
     const configuration = {
         locale: CCRZ.pagevars.userLocale,
-        environment: document.getElementById("adyenEnvironment").value,
-        clientKey: document.getElementById("adyenClientKey").value,
+        environment: environment,
+        clientKey: clientKey,
         paymentMethodsResponse: paymentMethodsResponse,
         paymentMethodsConfiguration: getPaymentMethodsConfig(),
         onChange: handleOnChange,
