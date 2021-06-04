@@ -23,6 +23,7 @@ global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
 
     global override Map<String,Object> fetchPaymentTypes(Map<String,Object> inputData) {
         Map<String,Object> returnData =  super.fetchPaymentTypes(inputData);
+        //paymentTypesContext co = checkout and paymentTypesContext wlt = wallet
         if(inputData.get('paymentTypesContext') == 'co'){
             PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(ccrz.cc_CallContext.currCartId, false);
             //Remove suffix and convert to string
