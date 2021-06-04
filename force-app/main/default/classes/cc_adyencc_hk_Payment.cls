@@ -22,17 +22,19 @@ global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
     }
 
     global override Map<String,Object> fetchPaymentTypes(Map<String,Object> inputData) {
-        PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(ccrz.cc_CallContext.currCartId, false);
-        //Remove suffix and convert to string
-        String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
-        String stringPaymentMethodsResponse = Util.makeAdyenCompatible(jsonPaymentMethodsResponse);
         Map<String,Object> returnData =  super.fetchPaymentTypes(inputData);
-        Map<String,Object> paymentTypes = (Map<String,Object>)returnData.get('paymentTypes');
-        if(paymentTypes.size() > 0){
-            Map<String,Object> adyencc = (Map<String,Object>)paymentTypes.get('adyencc');
-            adyencc.put('adyenPaymentMethods', stringPaymentMethodsResponse);
-            adyencc.put('adyenClientKey', AdyenUtil.getClientKey());
-            adyencc.put('adyenEnvironment', AdyenUtil.getAdyenEnvironment());
+        if(inputData.get('paymentTypesContext') == 'co'){
+            PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(ccrz.cc_CallContext.currCartId, false);
+            //Remove suffix and convert to string
+            String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
+            String stringPaymentMethodsResponse = Util.makeAdyenCompatible(jsonPaymentMethodsResponse);
+            Map<String,Object> paymentTypes = (Map<String,Object>)returnData.get('paymentTypes');
+            if(paymentTypes.size() > 0){
+                Map<String,Object> adyencc = (Map<String,Object>)paymentTypes.get('adyencc');
+                adyencc.put('adyenPaymentMethods', stringPaymentMethodsResponse);
+                adyencc.put('adyenClientKey', AdyenUtil.getClientKey());
+                adyencc.put('adyenEnvironment', AdyenUtil.getAdyenEnvironment());
+            }
         }
         return returnData;
     }
