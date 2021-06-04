@@ -45,8 +45,10 @@
     function initiateAdyenComponent(){
         if(document.getElementById("adyenPaymentMethods")){
             const paymentMethodsResponse = document.getElementById("adyenPaymentMethods").value;
+            const environment = document.getElementById("adyenEnvironment").value;
+            const clientKey = document.getElementById("adyenClientKey").value;
             const paymentMethods = convertToJsonObject(paymentMethodsResponse);
-            renderAdyenComponent(paymentMethods);
+            renderAdyenComponent(paymentMethods, environment, clientKey);
             loadingToggle();
         }
         else {

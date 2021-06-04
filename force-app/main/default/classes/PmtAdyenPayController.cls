@@ -7,11 +7,6 @@ global with sharing class PmtAdyenPayController {
     }
 
     @RemoteAction
-    global static ccrz.cc_RemoteActionResult getPaymentMethods(ccrz.cc_RemoteActionContext ctx) {
-        return AdyenController.obtainPaymentMethods(ctx, false);
-    }
-
-    @RemoteAction
     global static ccrz.cc_RemoteActionResult placeOrderAdyen(ccrz.cc_RemoteActionContext ctx, String stateData) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {

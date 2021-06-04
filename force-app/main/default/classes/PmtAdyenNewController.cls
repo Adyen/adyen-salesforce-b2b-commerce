@@ -1,7 +1,28 @@
 global with sharing class PmtAdyenNewController {
     @RemoteAction
-    global static ccrz.cc_RemoteActionResult getPaymentMethods(ccrz.cc_RemoteActionContext ctx) {
-        return AdyenController.obtainPaymentMethods(ctx, true);
+    global static ccrz.cc_RemoteActionResult getMyWalletConfig(ccrz.cc_RemoteActionContext ctx) {
+        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+            try {
+                PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(ctx.currentCartId, true);
+
+                //Remove suffix and convert to string
+                String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
+                String stringPaymentMethodsResponse = Util.makeAdyenCompatible(jsonPaymentMethodsResponse);
+                Map<String, Object> myWalletConfig = new Map<String, Object> {
+                    'adyenPaymentMethods' => stringPaymentMethodsResponse,
+                    'adyenClientKey' => AdyenUtil.getClientKey(),
+                    'adyenEnvironment' => AdyenUtil.getAdyenEnvironment()
+                };
+                res.data = myWalletConfig;
+                res.success = true;
+            } catch (Exception e) {
+                ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
+                System.Debug('## ERROR CATCH ' + e);
+                res.success = false;
+            } finally {
+                ccrz.ccLog.close(res);
+            }
+            return res;
     }
 
     @RemoteAction

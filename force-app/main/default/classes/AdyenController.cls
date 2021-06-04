@@ -1,25 +1,4 @@
 global inherited sharing class AdyenController {
-    public static ccrz.cc_RemoteActionResult obtainPaymentMethods(ccrz.cc_RemoteActionContext ctx, Boolean isStoredPaymentMethod){
-            ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
-            try {
-                PaymentMethodsResponse paymentMethodsResponse = AdyenPaymentMethods.getPaymentMethods(ctx.currentCartId, isStoredPaymentMethod);
-
-                //Remove suffix and convert to string
-                String jsonPaymentMethodsResponse = JSON.serialize(paymentMethodsResponse, true);
-                String stringPaymentMethodsResponse = Util.makeAdyenCompatible(jsonPaymentMethodsResponse);
-
-                res.data = stringPaymentMethodsResponse;
-                res.success = true;
-            } catch (Exception e) {
-                ccrz.ccLog.log(LoggingLevel.ERROR, 'Err', e);
-                System.Debug('## ERROR CATCH ' + e);
-                res.success = false;
-            } finally {
-                ccrz.ccLog.close(res);
-            }
-            return res;
-    }
-
     public static Map<String, Object> handlePaymentsCall(String cartId, String stateData, Boolean isZeroAuth){
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
         PaymentsRequest paymentsRequest = AdyenPayments.createPaymentsRequest(stateData, cartId, merchant, isZeroAuth);
