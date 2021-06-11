@@ -48,21 +48,23 @@ handleOnChange = state => {
 handleOnAdditionalDetails = (state, component) => {
     const details = {
         ...state.data,
-        cartId: window.cartId
+        cartId: window.cartId,
     };
-    $.ajax({
-        type: 'POST',
-        data: JSON.stringify(details),
-        dataType: 'text',
-        contentType: "application/json; charset=utf-8",
-        cache: false,
-        url: '/services/apexrest/AdyenService/',
-        success: function(data)
-        {
-            const result = JSON.parse(JSON.parse(data));
-            return handlePaymentResult(result);
-        }
-    });
+
+    let controllerAction = 'PmtAdyenPayController.handleOnAdditionalDetails';
+    if(CCRZ.pagevars.currentPageName === "ccrz__StoredPaymentDetail"){
+        controllerAction = 'PmtAdyenNewController.handleOnAdditionalDetails';
+    }
+
+    Visualforce.remoting.Manager.invokeAction(
+        controllerAction,
+        CCRZ.pagevars.remoteContext,
+        JSON.stringify(details),
+        function(result, event){
+            const jsonResult = convertToJsonObject(result);
+            return handlePaymentResult(jsonResult);
+        },
+    );
 }
 
 renderPaymentMethod = paymentMethod => {

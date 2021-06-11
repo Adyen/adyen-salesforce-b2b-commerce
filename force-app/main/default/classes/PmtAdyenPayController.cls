@@ -24,7 +24,7 @@ global with sharing class PmtAdyenPayController {
             }
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
-                AdyenController.checkToStorePaymentMethod(additionalData, res);
+                AdyenController.checkToStorePaymentMethod(additionalData, res.inputContext.storeFront);
                 //create order
                 Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cart.ccrz__EncryptedId__c);
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
@@ -49,5 +49,12 @@ global with sharing class PmtAdyenPayController {
             ccrz.ccLog.close(res);
         }
         return res;
+    }
+
+    @RemoteAction
+    global static String handleOnAdditionalDetails(ccrz.cc_RemoteActionContext ctx, String details){
+        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+        String storefrontName = res.inputContext.storeFront;
+        return AdyenController.handleOnAdditionalDetails(details, storefrontName);
     }
 }

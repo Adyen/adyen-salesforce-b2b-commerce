@@ -18,12 +18,41 @@ global inherited sharing class AdyenController {
        return handlePaymentsDetailsCall(stateData);
     }
 
-    public static void checkToStorePaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
+    public static String handleOnAdditionalDetails(String stateData, String storefrontName){
+        Map<String, Object> requestData = (Map<String, Object>)JSON.deserializeUntyped(stateData);
+        String cartId = (String)requestData.get('cartId');
+        ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
+        Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(cartId, stateData, 'paymentsDetails');
+        Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
+        Boolean zeroAuthSuccess = false;
+        Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
+        if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
+            String merchantReference = (String)paymentResult.get('merchantReference');
+            if(merchantReference == cartId){
+                //create order
+                Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cartId);
+                Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
+                //Return orderId for confirmation page
+                paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));
+            }
+            else if(merchantReference.contains('addStoredMethod')){
+                Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
+                AdyenController.checkToStorePaymentMethod(additionalData, storefrontName);
+                zeroAuthSuccess = true;
+            }
+            else {
+                System.debug('Invalid merchantReference: ' + merchantReference);
+            }
+        }
+        paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
+        return JSON.serialize(paymentResult, true);
+    }
+    public static void checkToStorePaymentMethod(Map<String, String> additionalData, string storefrontName){
         String token = additionalData.get('recurring_recurringDetailReference');
         if(!String.isBlank(token)){
             List<ccrz__E_StoredPayment__c> existingStoredPayments = AdyenUtil.getStoredPaymentByToken(token);
             if(existingStoredPayments.isEmpty()){
-                createStoredPaymentMethod(additionalData, res);
+                createStoredPaymentMethod(additionalData, storefrontName);
             }
             else {
                 updateStoredPaymentMethod(existingStoredPayments, additionalData);
@@ -34,7 +63,7 @@ global inherited sharing class AdyenController {
         }
     }
 
-    private static void createStoredPaymentMethod(Map<String, String> additionalData, ccrz.cc_RemoteActionResult res){
+    private static void createStoredPaymentMethod(Map<String, String> additionalData, String storefrontName){
         ccrz__E_StoredPayment__c storedPayment = new ccrz__E_StoredPayment__c();
         storedPayment.ccrz__Enabled__c = true;
         storedPayment.ccrz__Token__c = additionalData.get('recurring_recurringDetailReference');
@@ -42,7 +71,7 @@ global inherited sharing class AdyenController {
         storedPayment.ccrz__Account__c = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
         storedPayment.ccrz__AccountNumber__c = (String)additionalData.get('cardBin') + '******' + (String)additionalData.get('cardSummary');
         storedPayment.ccrz__User__c = UserInfo.getUserId();
-        storedPayment.ccrz__Storefront__c = res.inputContext.storeFront;
+        storedPayment.ccrz__Storefront__c = storefrontName;
         storedPayment.ccrz__AccountType__c = 'adyencc';
         List<String> expiryDate = additionalData.get('expiryDate').split('/');
         storedPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
