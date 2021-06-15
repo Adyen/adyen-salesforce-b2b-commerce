@@ -26,23 +26,23 @@ global inherited sharing class AdyenController {
         Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
         Boolean zeroAuthSuccess = false;
         Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
-        if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
-            String merchantReference = (String)paymentResult.get('merchantReference');
-            if(merchantReference == cartId){
+        Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
+        String merchantReference = (String)paymentResult.get('merchantReference');
+        if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED && (merchantReference == cartId || merchantReference.contains('addStoredMethod'))) {
+            if(merchantReference.contains('addStoredMethod')){
+                zeroAuthSuccess = true;
+            }
+            else {
                 //create order
                 Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cartId);
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
                 paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));
             }
-            else if(merchantReference.contains('addStoredMethod')){
-                Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
-                AdyenController.checkToStorePaymentMethod(additionalData, storefrontName);
-                zeroAuthSuccess = true;
-            }
-            else {
-                System.debug('Invalid merchantReference: ' + merchantReference);
-            }
+            AdyenController.checkToStorePaymentMethod(additionalData, storefrontName);
+        }
+        else {
+                System.debug('Payment failed or invalid merchantReference: ' + merchantReference);
         }
         paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
         return JSON.serialize(paymentResult, true);
