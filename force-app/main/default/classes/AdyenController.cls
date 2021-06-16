@@ -21,11 +21,11 @@ global inherited sharing class AdyenController {
     public static String handleOnAdditionalDetails(String stateData, String storefrontName){
         Map<String, Object> requestData = (Map<String, Object>)JSON.deserializeUntyped(stateData);
         String cartId = (String)requestData.get('cartId');
-        ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
-        Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(cartId, stateData, 'paymentsDetails');
-        Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
+
+        Map<String, Object> adyenResult = callAdyenPaymentHook(cartId, stateData, 'paymentsDetails');
+
         Boolean zeroAuthSuccess = false;
-        Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
+        Map<String, Object> paymentResult = (Map<String, Object>) adyenResult.get('paymentResult');
         Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
         String merchantReference = (String)paymentResult.get('merchantReference');
         if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED && (merchantReference == cartId || merchantReference.contains('addStoredMethod'))) {
@@ -34,7 +34,7 @@ global inherited sharing class AdyenController {
             }
             else {
                 //create order
-                Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cartId);
+                Map<String, Object> orderResult = AdyenController.placeOrder(adyenResult, cartId);
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
                 paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));
@@ -47,6 +47,13 @@ global inherited sharing class AdyenController {
         paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
         return JSON.serialize(paymentResult, true);
     }
+
+    public static Map<String, Object> callAdyenPaymentHook(String cartId, String stateData, String adyenEndpoint){
+        ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
+        Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(cartId, stateData, adyenEndpoint);
+        return paymentHook.processPayment(paymentProcessorInput);
+    }
+
     public static void checkToStorePaymentMethod(Map<String, String> additionalData, string storefrontName){
         String token = additionalData.get('recurring_recurringDetailReference');
         if(!String.isBlank(token)){

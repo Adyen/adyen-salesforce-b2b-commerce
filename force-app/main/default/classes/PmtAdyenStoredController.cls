@@ -3,11 +3,9 @@ global with sharing class PmtAdyenStoredController {
     global static ccrz.cc_RemoteActionResult placeOrderByStoredPaymentAdyen(ccrz.cc_RemoteActionContext ctx, String stateData) {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
         try {
-            ccrz.cc_hk_Payment paymentHook = ccrz.cc_hk_Payment.getInstance(null);
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(ctx.currentCartId);
-            Map<String, Object> paymentProcessorInput = AdyenController.createProcessorInput(ctx.currentCartId, stateData, 'payments');
-            Map<String, Object> processResult = paymentHook.processPayment(paymentProcessorInput);
-            Map<String, Object> paymentResult = (Map<String, Object>) processResult.get('paymentResult');
+            Map<String, Object> adyenResult = AdyenController.callAdyenPaymentHook(ctx.currentCartId, stateData, 'payments');
+            Map<String, Object> paymentResult = (Map<String, Object>) adyenResult.get('paymentResult');
             if (!(Boolean)paymentResult.get('isFinal')) {
                 cart.AdyenPaymentData__c = (String)paymentResult.get('paymentData');
                 update cart;
@@ -17,7 +15,7 @@ global with sharing class PmtAdyenStoredController {
             }
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 //create order
-                Map<String, Object> orderResult = AdyenController.placeOrder(processResult, cart.ccrz__EncryptedId__c);
+                Map<String, Object> orderResult = AdyenController.placeOrder(adyenResult, cart.ccrz__EncryptedId__c);
                 Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
                 //Return orderId for confirmation page
                 paymentResult.put('orderIdEnc', orderIds.get('orderIdEnc'));

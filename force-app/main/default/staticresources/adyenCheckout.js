@@ -51,10 +51,7 @@ handleOnAdditionalDetails = (state, component) => {
         cartId: window.cartId,
     };
 
-    let controllerAction = 'PmtAdyenPayController.handleOnAdditionalDetails';
-    if(CCRZ.pagevars.currentPageName === "ccrz__StoredPaymentDetail"){
-        controllerAction = 'PmtAdyenNewController.handleOnAdditionalDetails';
-    }
+    let controllerAction = CCRZ.pagevars.currentPageName === 'ccrz__StoredPaymentDetail' ? 'PmtAdyenNewController.handleOnAdditionalDetails' : 'PmtAdyenPayController.handleOnAdditionalDetails';
 
     Visualforce.remoting.Manager.invokeAction(
         controllerAction,
