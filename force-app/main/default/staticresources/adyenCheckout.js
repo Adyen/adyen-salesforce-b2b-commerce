@@ -15,7 +15,7 @@ renderAdyenComponent = (paymentMethodsResponse, environment, clientKey) => {
 
     if(paymentMethodsResponse.paymentMethods.length > 0) {
         paymentMethodsResponse.paymentMethods.forEach((pm) =>
-            renderPaymentMethod(pm)
+            pm.type == 'scheme' && renderPaymentMethod(pm)
         );
         selectFirstPaymentMethod();
     }
