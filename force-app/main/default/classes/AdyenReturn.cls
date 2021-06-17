@@ -7,22 +7,28 @@ public with sharing class AdyenReturn {
         Map<String, String> details = getDetails(redirectResult, payload);
         PaymentsResponse paymentsDetailsResponse = AdyenPaymentsDetails.requestAfterRedirect(details, merchantReference);
         Map<String, Object> paymentResult = AdyenResponseHandler.handleResponse(paymentsDetailsResponse);
-        Map<String, Object> additionalData = (Map<String, Object>)paymentResult.get('additionalData');
+        Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
         String responseMerchantReference = !String.isBlank((String)additionalData.get('merchantReference')) ? (String)additionalData.get('merchantReference') : (String)paymentResult.get('merchantReference');
-        if(merchantReference == responseMerchantReference){
-            if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED){
-                //Place order
-                Map<String, Object> orderResult = AdyenController.placeOrder(paymentResult, merchantReference);
-                Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
-                String orderId = orderIds.get('orderIdEnc');
-                PageReference pageRef = new PageReference(Site.getBaseSecureUrl() + '/ccrz__OrderConfirmation?o=' + orderId);
-                pageRef.setRedirect(true);
-                return pageRef;
+        Boolean isMyWallet = responseMerchantReference.contains('addStoredMethod');
+        //TODOBAS add Payment Failed error message
+        PageReference pageReference = isMyWallet ? new PageReference(Site.getBaseSecureUrl() + '/ccrz__MyAccount?viewState=myWallet?paymentFailed=true') : new PageReference(Site.getBaseSecureUrl() + '/ccrz__CheckoutNew?paymentFailed=true?cartID=' + merchantReference);
+        if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
+            if(merchantReference == responseMerchantReference || isMyWallet){
+                pageReference = new PageReference(Site.getBaseSecureUrl() + '/ccrz__MyAccount?viewState=myWallet');
+                if(!isMyWallet){
+                    //create order
+                    Map<String, Object> orderResult = AdyenController.placeOrder(paymentResult, merchantReference);
+                    Map<String, String> orderIds = AdyenController.validateOrderResult(orderResult);
+                    String orderId = orderIds.get('orderIdEnc');
+                    pageReference = new PageReference(Site.getBaseSecureUrl() + '/ccrz__OrderConfirmation?o=' + orderId);
+                }
+                AdyenController.checkToStorePaymentMethod(additionalData, ccrz.cc_CallContext.storefront);
+            }
+            else {
+                System.debug('Invalid merchantReference: ' + merchantReference);
             }
         }
 
-        //TODOBAS add Payment Failed error message
-        PageReference pageReference = new PageReference(Site.getBaseSecureUrl() + '/ccrz__CheckoutNew?cartID=' + merchantReference);
         pageReference.setRedirect(true);
         return pageReference;
     }

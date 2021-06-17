@@ -26,6 +26,13 @@ global with sharing class PmtAdyenNewController {
     }
 
     @RemoteAction
+    global static String handleOnAdditionalDetails(ccrz.cc_RemoteActionContext ctx, String details){
+        ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
+        String storefrontName = res.inputContext.storeFront;
+        return AdyenController.handleOnAdditionalDetails(details, storefrontName);
+    }
+
+    @RemoteAction
     global static ccrz.cc_RemoteActionResult addAdyenccStoredPayment(ccrz.cc_RemoteActionContext ctx, String stateData)
     {
         ccrz.cc_RemoteActionResult res = ccrz.cc_CallContext.init(ctx);
@@ -39,7 +46,7 @@ global with sharing class PmtAdyenNewController {
 
             if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
                 Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
-                AdyenController.checkToStorePaymentMethod(additionalData, res);
+                AdyenController.checkToStorePaymentMethod(additionalData, res.inputContext.storeFront);
                 res.success = true;
                 return res;
             }
