@@ -29,26 +29,6 @@
                         <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Merchant_Account__c.label}"/>
                         <apex:inputText required="true" value="{!editingRow.Merchant_Account__c}" />
                     </apex:pageBlockSectionItem>
-                    <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Payment_Endpoint__c.label}"/>
-                        <apex:inputText required="true" value="{!editingRow.Payment_Endpoint__c}" style="width:95%" />
-                    </apex:pageBlockSectionItem>
-                    <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Capture_Endpoint__c.label}"/>
-                        <apex:inputText required="true" value="{!editingRow.Capture_Endpoint__c}" style="width:95%" />
-                    </apex:pageBlockSectionItem>
-                    <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Authorise_Endpoint__c.label}"/>
-                        <apex:inputText required="true" value="{!editingRow.Authorise_Endpoint__c}" style="width:95%" />
-                    </apex:pageBlockSectionItem>
-                    <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.Disable_Endpoint__c.label}"/>
-                        <apex:inputText required="true" value="{!editingRow.Disable_Endpoint__c}" style="width:95%" />
-                    </apex:pageBlockSectionItem>
-                    <apex:pageBlockSectionItem>
-                        <apex:outputLabel value="{!$ObjectType.Merchant__mdt.fields.API_Key__c.label}" />
-                        <apex:inputSecret required="true" value="{!editingRow.API_Key__c}" style="width:95%" />
-                    </apex:pageBlockSectionItem>
                 </apex:pageBlockSection>
             </apex:actionRegion>
         </apex:pageBlock>

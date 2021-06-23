@@ -10,7 +10,7 @@ public with sharing class AdyenCaptureRequest {
 
     public static CaptureResponse sendCaptureRequest(Merchant__mdt merchant, CaptureRequest request) {
         CaptureResponse captureResponse = new CaptureResponse();
-        AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Capture_Endpoint__c);
+        AdyenClient client = new AdyenClient('{!$Credential.Password}', 'callout:AdyenCaptureAPI');
         String jsonString = JSON.serialize(request, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);

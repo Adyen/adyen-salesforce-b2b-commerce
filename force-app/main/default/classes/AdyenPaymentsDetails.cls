@@ -16,8 +16,7 @@ public with sharing class AdyenPaymentsDetails {
     public static PaymentsResponse callPaymentsDetails(PaymentsDetailsRequest request){
         PaymentsResponse paymentsDetailsResponse = new PaymentsResponse();
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
-
-        AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payments_Details_Endpoint__c);
+        AdyenClient client = new AdyenClient('{!$Credential.Password}', 'callout:AdyenPaymentsDetailsAPI');
         String jsonString = JSON.serialize(request, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);

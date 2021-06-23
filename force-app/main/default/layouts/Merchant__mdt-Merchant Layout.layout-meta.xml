@@ -8,23 +8,7 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>API_Key__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Required</behavior>
-                <field>Authorise_Endpoint__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Required</behavior>
-                <field>Capture_Endpoint__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Required</behavior>
                 <field>Merchant_Account__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Required</behavior>
-                <field>Disable_Endpoint__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
@@ -74,11 +58,7 @@
         <style>CustomLinks</style>
     </layoutSections>
     <miniLayout>
-        <fields>API_Key__c</fields>
-        <fields>Authorise_Endpoint__c</fields>
-        <fields>Capture_Endpoint__c</fields>
         <fields>Merchant_Account__c</fields>
-        <fields>Disable_Endpoint__c</fields>
     </miniLayout>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
