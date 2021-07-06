@@ -1,5 +1,30 @@
 <apex:page controller="PmtAdyenStoredController" docType="html-5.0" applyHtmlTag="false" showHeader="false" sidebar="false"
            standardStylesheets="false">
+    <div class="paymentFailedTarget" style="display:none"/>
+    <script id="paymentFailedTemplate" type="text/template">
+        <div class="error_messages_section alert alert-danger">
+            <div>Payment failed, please try again</div>
+        </div>
+    </script>
+    <script>
+        jQuery(function($) {
+            CCRZ.util.createView({
+                desktop: {
+                    template: 'paymentFailedTemplate',
+                    target: 'paymentFailedTarget'
+                },
+                phone: {
+                    template: 'paymentFailedTemplate',
+                    target: 'phone-center-column'
+                },
+                postRender: function() {
+                    if(window.location.href.indexOf("AuthorisationFailed") > -1){
+                        document.querySelector('.paymentFailedTarget').style.display = "block";
+                    }
+                }
+            });
+        });
+    </script>
     <script id="PaymentProcessor-Adyen" type="text/template">
         <div class="panel cc_panel cc_payment_processor">
             <div class="panel-body cc_body">
@@ -74,8 +99,6 @@
             {{/if}}
         </div>
     </script>
-
-
     <script>
         jQuery(function($){
             CCRZ.pubSub.on('view:PaymentProcessorView:refresh',function(PaymentProcessorView){

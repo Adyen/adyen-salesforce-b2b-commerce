@@ -6,11 +6,7 @@ public inherited sharing class AdyenUtil {
 
     public static String getAdyenEnvironment(){
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
-        if(merchant.PaymentMethods_Endpoint__c.contains('checkout-live')
-        && merchant.Payment_Endpoint__c.contains('checkout-live')
-        && merchant.Payments_Details_Endpoint__c.contains('checkout-live')){
-            return 'live';
-        }
+        //TODO create configuration for Live/Test
         return 'test';
     }
 
