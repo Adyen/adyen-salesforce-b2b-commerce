@@ -108,7 +108,7 @@ public with sharing class AdyenPayments {
 
     public static PaymentsResponse authorisePayment(Merchant__mdt merchant, PaymentsRequest request) {
         PaymentsResponse paymentsResponse = new PaymentsResponse();
-        AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Payment_Endpoint__c);
+        AdyenClient client = new AdyenClient('{!$Credential.Password}', 'callout:AdyenPaymentsAPI');
         String jsonString = JSON.serialize(request, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);

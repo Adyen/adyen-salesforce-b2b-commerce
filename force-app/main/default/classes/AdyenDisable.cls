@@ -5,7 +5,7 @@ public with sharing class AdyenDisable {
         disableRequest.merchantAccount = merchant.Merchant_Account__c;
         disableRequest.shopperReference = storedPayment.ccrz__Account__c;
         disableRequest.recurringDetailReference = storedPayment.ccrz__Token__c;
-        AdyenClient client = new AdyenClient(merchant.API_Key__c, merchant.Disable_Endpoint__c);
+        AdyenClient client = new AdyenClient('{!$Credential.Password}', 'callout:AdyenDisableAPI');
         String jsonString = JSON.serialize(disableRequest, true);
         jsonString = Util.makeAdyenCompatible(jsonString);
         HttpResponse httpResponse = client.request(client.config, jsonString);

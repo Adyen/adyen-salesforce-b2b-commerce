@@ -16,7 +16,7 @@ public with sharing class SetupController {
     public List<Merchant__mdt> settings {
         get {
             if(settings==null) {
-                settings = [SELECT Id, Merchant_Account__c, API_Key__c, Authorise_Endpoint__c, Capture_Endpoint__c, Disable_Endpoint__c, Payment_Endpoint__c, DeveloperName, MasterLabel, QualifiedApiName  FROM Merchant__mdt WHERE DeveloperName<>'ApexTest'];
+                settings = [SELECT Id, Merchant_Account__c, DeveloperName, MasterLabel, QualifiedApiName  FROM Merchant__mdt WHERE DeveloperName<>'ApexTest'];
             }
             return settings;
         }
@@ -27,7 +27,7 @@ public with sharing class SetupController {
     }
     public PageReference editRow() {
         try {
-            this.editingRow = [SELECT Id,Merchant_Account__c,  API_Key__c, Authorise_Endpoint__c, Capture_Endpoint__c, Disable_Endpoint__c, Payment_Endpoint__c, DeveloperName, MasterLabel, QualifiedApiName FROM Merchant__mdt WHERE DeveloperName=:this.editId LIMIT 1];
+            this.editingRow = [SELECT Id,Merchant_Account__c, DeveloperName, MasterLabel, QualifiedApiName FROM Merchant__mdt WHERE DeveloperName=:this.editId LIMIT 1];
 
             return Page.EditSetupRecord;
         }
@@ -52,17 +52,12 @@ public with sharing class SetupController {
     public PageReference newRow() {
         try {
 
-            Merchant__mdt confReference = [SELECT Id, Merchant_Account__c, API_Key__c, Authorise_Endpoint__c, Capture_Endpoint__c, Disable_Endpoint__c, Payment_Endpoint__c, DeveloperName, MasterLabel, QualifiedApiName  FROM Merchant__mdt WHERE DeveloperName = 'ApexTest' LIMIT 1];
+            Merchant__mdt confReference = [SELECT Id, Merchant_Account__c, DeveloperName, MasterLabel, QualifiedApiName  FROM Merchant__mdt WHERE DeveloperName = 'ApexTest' LIMIT 1];
 
             Merchant__mdt newConf = (Merchant__mdt) Merchant__mdt.sObjectType.newSObject();
-            newConf.API_Key__c = '';
-            newConf.Authorise_Endpoint__c = confReference.Authorise_Endpoint__c;
-            newConf.Capture_Endpoint__c = confReference.Capture_Endpoint__c;
             newConf.Merchant_Account__c = '';
             newConf.QualifiedApiName = '';
             newConf.MasterLabel = '';
-            newConf.Disable_Endpoint__c = confReference.Disable_Endpoint__c;
-            newConf.Payment_Endpoint__c = confReference.Payment_Endpoint__c;
             //
             // Brings user to the edit component
             this.editingRow = newConf;
@@ -101,33 +96,9 @@ public with sharing class SetupController {
 
             // Add all the field values
             Metadata.CustomMetadataValue customField = new Metadata.CustomMetadataValue();
-            customField.field = adyenNamespace+'__API_Key__c';
-            customField.value = this.editingRow.API_Key__c;
-            customMetadata.values.add(customField);
-
             customField = new Metadata.CustomMetadataValue();
             customField.field = adyenNamespace+'__Merchant_Account__c';
             customField.value = this.editingRow.Merchant_Account__c;
-            customMetadata.values.add(customField);
-
-            customField = new Metadata.CustomMetadataValue();
-            customField.field = adyenNamespace+'__Authorise_Endpoint__c';
-            customField.value = this.editingRow.Authorise_Endpoint__c;
-            customMetadata.values.add(customField);
-
-            customField = new Metadata.CustomMetadataValue();
-            customField.field = adyenNamespace+'__Capture_Endpoint__c';
-            customField.value = this.editingRow.Capture_Endpoint__c;
-            customMetadata.values.add(customField);
-
-            customField = new Metadata.CustomMetadataValue();
-            customField.field = adyenNamespace+'__Disable_Endpoint__c';
-            customField.value = this.editingRow.Disable_Endpoint__c;
-            customMetadata.values.add(customField);
-
-            customField = new Metadata.CustomMetadataValue();
-            customField.field = adyenNamespace+'__Payment_Endpoint__c';
-            customField.value = this.editingRow.Payment_Endpoint__c;
             customMetadata.values.add(customField);
 
             Metadata.DeployContainer mdContainer = new Metadata.DeployContainer();
