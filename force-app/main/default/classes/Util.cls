@@ -4,7 +4,7 @@ public inherited sharing class Util {
 
     public static Merchant__mdt getConfigByName(String configName) {
         Merchant__mdt[] configs = [
-                SELECT Client_Key__c, Merchant_Account__c, ApplicationInfo_SI__c, QualifiedApiName
+                SELECT Client_Key__c, Merchant_Account__c, ApplicationInfo_SI__c, Live__c, QualifiedApiName
                 FROM Merchant__mdt
                 WHERE DeveloperName = :configName
                 LIMIT 1

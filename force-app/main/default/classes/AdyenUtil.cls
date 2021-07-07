@@ -6,7 +6,9 @@ public inherited sharing class AdyenUtil {
 
     public static String getAdyenEnvironment(){
         Merchant__mdt merchant = Util.getConfigByName('AdyenMerchantConfig');
-        //TODO create configuration for Live/Test
+        if(merchant.Live__c){
+            return 'live';
+        }
         return 'test';
     }
 
