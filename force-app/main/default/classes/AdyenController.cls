@@ -90,6 +90,7 @@ global inherited sharing class AdyenController {
         //There can only be one stored payment with recurringDetailReference as token
         ccrz__E_StoredPayment__c existingStoredPayment = existingStoredPayments.get(0);
         existingStoredPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
+        existingStoredPayment.ccrz__Enabled__c = true;
         List<String> expiryDate = additionalData.get('expiryDate').split('/');
         existingStoredPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
         existingStoredPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
