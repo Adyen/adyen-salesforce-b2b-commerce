@@ -3,15 +3,23 @@
     <label>AdyenMerchantConfiguration</label>
     <protected>true</protected>
     <values>
-        <field>Client_Key__c</field>
-        <value xsi:type="xsd:string">Adyen Client key</value>
-    </values>
-    <values>
-        <field>Merchant_Account__c</field>
-        <value xsi:type="xsd:string">MerchantAccount</value>
+        <field>AdyenMerchantConfig__c</field>
+        <value xsi:type="xsd:string">AdyenMerchantConfig</value>
     </values>
     <values>
         <field>ApplicationInfo_SI__c</field>
         <value xsi:type="xsd:string">Merchant's System Integrator</value>
+    </values>
+    <values>
+        <field>Client_Key__c</field>
+        <value xsi:type="xsd:string">Client Key</value>
+    </values>
+    <values>
+        <field>Live__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Merchant_Account__c</field>
+        <value xsi:type="xsd:string">Merchant Account</value>
     </values>
 </CustomMetadata>
