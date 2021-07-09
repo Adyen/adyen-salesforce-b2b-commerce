@@ -71,30 +71,29 @@ global inherited sharing class AdyenController {
     }
 
     private static void createStoredPaymentMethod(Map<String, String> additionalData, String storefrontName){
-        ccrz__E_StoredPayment__c storedPayment = new ccrz__E_StoredPayment__c();
-        storedPayment.ccrz__Enabled__c = true;
+        ccrz__E_StoredPayment__c storedPayment = setStoredPaymentMethodDetails(new ccrz__E_StoredPayment__c(), additionalData);
         storedPayment.ccrz__Token__c = additionalData.get('recurring_recurringDetailReference');
-        storedPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
         storedPayment.ccrz__Account__c = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
         storedPayment.ccrz__AccountNumber__c = (String)additionalData.get('cardBin') + '******' + (String)additionalData.get('cardSummary');
         storedPayment.ccrz__User__c = UserInfo.getUserId();
         storedPayment.ccrz__Storefront__c = storefrontName;
         storedPayment.ccrz__AccountType__c = 'adyencc';
-        List<String> expiryDate = additionalData.get('expiryDate').split('/');
-        storedPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
-        storedPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
         insert storedPayment;
     }
 
      private static void updateStoredPaymentMethod(List<ccrz__E_StoredPayment__c> existingStoredPayments, Map<String, String> additionalData){
         //There can only be one stored payment with recurringDetailReference as token
-        ccrz__E_StoredPayment__c existingStoredPayment = existingStoredPayments.get(0);
-        existingStoredPayment.ccrz__DisplayName__c = additionalData.get('cardHolderName');
-        existingStoredPayment.ccrz__Enabled__c = true;
-        List<String> expiryDate = additionalData.get('expiryDate').split('/');
-        existingStoredPayment.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
-        existingStoredPayment.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
+        ccrz__E_StoredPayment__c existingStoredPayment = setStoredPaymentMethodDetails(existingStoredPayments.get(0), additionalData);
         update existingStoredPayment;
+    }
+
+    public static ccrz__E_StoredPayment__c setStoredPaymentMethodDetails(ccrz__E_StoredPayment__c storedPaymentMethod, Map<String, String> additionalData){
+        storedPaymentMethod.ccrz__DisplayName__c = additionalData.get('cardHolderName');
+        storedPaymentMethod.ccrz__Enabled__c = true;
+        List<String> expiryDate = additionalData.get('expiryDate').split('/');
+        storedPaymentMethod.ccrz__ExpMonth__c = Decimal.valueOf(expiryDate.get(0));
+        storedPaymentMethod.ccrz__ExpYear__c = Decimal.valueOf(expiryDate.get(1));
+        return storedPaymentMethod;
     }
 
     public static Map<String, Object> createProcessorInput(String cartId, String stateData, String adyenCall){
