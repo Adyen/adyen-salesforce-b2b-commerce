@@ -3,8 +3,7 @@ public with sharing class TransactionPaymentHandler {
         Set<Id> setIds = new Set<Id>();
 
         for(ccrz__E_TransactionPayment__c tp : listNew){
-            System.debug('tp = ' + tp);
-            if(tp.Capture_Payment__c){ // && !mapOld.get(tp.Id).Capture_Payment__c
+            if(tp.Capture_Payment__c && !mapOld.get(tp.Id).Capture_Payment__c){
                 setIds.add(tp.Id);
             }
         }
