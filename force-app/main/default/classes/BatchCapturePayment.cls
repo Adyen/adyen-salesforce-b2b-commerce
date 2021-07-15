@@ -30,7 +30,6 @@ global with sharing class BatchCapturePayment implements Database.Batchable<sObj
                         merchant = mapStoreNameMerchant.get(tp.ccrz__Storefront__c);
 
                     } else {
-                        Boolean useCache = !Test.isRunningTest();
                         merchant = Util.getConfigByName('AdyenMerchantConfig');
                         mapStoreNameMerchant.put(tp.ccrz__Storefront__c, merchant);
                     }
@@ -53,7 +52,7 @@ global with sharing class BatchCapturePayment implements Database.Batchable<sObj
                         listToUpsert.add(tp);
                     }
                 } catch (Exception ex) {
-                    System.debug(ex.getMessage());
+                    System.debug('Error while payment capture ' + ex.getMessage());
                     tp.Capture_Payment__c = false;
                     tp.Integration_Messages__c = ex.getMessage();
                     listToUpsert.add(tp);
