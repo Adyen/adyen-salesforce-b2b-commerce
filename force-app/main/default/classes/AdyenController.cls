@@ -42,7 +42,7 @@ global inherited sharing class AdyenController {
             AdyenController.checkToStorePaymentMethod(additionalData, storefrontName);
         }
         else {
-                System.debug('Payment failed or invalid merchantReference: ' + merchantReference);
+            System.debug('Payment failed or invalid merchantReference: ' + merchantReference);
         }
         paymentResult.put('zeroAuthSuccess', zeroAuthSuccess);
         return JSON.serialize(paymentResult, true);
@@ -116,6 +116,7 @@ global inherited sharing class AdyenController {
 
     public static Map<String, Object> placeOrder(Map<String, Object> processResult, String cartId) {
             Map<String, Object> createOrderParams = new Map<String, Object>{
+                    ccrz.ccApiCart.PAYMENTDATA => JSON.serialize((Map<String, Object>) processResult.get('paymentResult')),
                     ccrz.ccApi.API_VERSION => ccrz.ccAPI.CURRENT_VERSION,
                     ccrz.ccApiCart.TRANSPAYMENTDATA =>
                             processResult.get(ccrz.cc_hk_Payment.PARAM_TRANSACTION_PROCESSED_DATA),
