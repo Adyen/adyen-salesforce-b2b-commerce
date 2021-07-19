@@ -24,12 +24,6 @@ public inherited sharing class AdyenUtil {
         return (ccrz__E_Cart__c) Database.query(query);
     }
 
-    public static String getCartEncryptedId(String cartId) {
-        String query = 'SELECT ccrz__EncryptedId__c FROM ccrz__E_Cart__c WHERE Id = :cartId LIMIT 1';
-        ccrz__E_Cart__c cart = (ccrz__E_Cart__c) Database.query(query);
-        return (String) cart.ccrz__EncryptedId__c;
-    }
-
     public static User getAccountIdFromUser(Id userId) {
         return [SELECT AccountId
                 FROM User WHERE Id = :userId];
@@ -112,39 +106,4 @@ public inherited sharing class AdyenUtil {
         return responseOK.contains(responseCode);
     }
 
-//
-//    public static DisableRequest disableStoredPayment(ccrz__E_StoredPayment__c storedPayment,  Merchant__mdt merchant)
-//    {
-//        DisableRequest dr = new DisableRequest();
-//
-//        dr.merchantAccount = merchant.Name__c;
-//        dr.shopperReference = storedPayment.ccrz__Account__c;
-//        dr.recurringDetailReference = storedPayment.ccrz__Token__c;
-//
-//        return dr;
-//    }
-//
-//    public static AuthoriseRequest updateSoretPayment(ccrz__E_StoredPayment__c storedPayment,  Merchant__mdt merchant)
-//    {
-//        AuthoriseRequest request = new AuthoriseRequest();
-//        request.amount = new Amount();
-//        request.card = new PaymentMethod();
-//        request.recurring = new Recurring();
-//
-//        request.amount.value = 0;
-//        request.amount.currency_x = UserInfo.getDefaultCurrency();
-//
-//        request.card.expiryMonth = String.valueOf(storedPayment.ccrz__ExpMonth__c);
-//        request.card.expiryYear = String.valueOf(storedPayment.ccrz__ExpYear__c);
-//
-//        request.reference = storedPayment.Id;
-//        request.shopperReference = storedPayment.ccrz__Account__c;
-//        request.shopperInteraction = 'ContAuth';
-//        request.selectedRecurringDetailReference = storedPayment.ccrz__Token__c;
-//        request.merchantAccount = merchant.Name__c;
-//
-//        request.recurring.contract = 'RECURRING';
-//
-//        return request;
-//    }
 }
