@@ -157,7 +157,7 @@ public class AdyenTestDataFactory {
         cart.ccrz__Storefront__c = 'DefaultStore';
         cart.ccrz__CartStatus__c = 'Open';
         cart.ccrz__CartType__c = 'Cart';
-        cart.ccrz__EncryptedId__c = '123123'; // String.valueOf(System.currentTimeMillis());
+        cart.ccrz__EncryptedId__c = String.valueOf(System.currentTimeMillis());
         cart.ccrz__Contact__c = con.Id;
         cart.ccrz__Account__c = acc.Id;
         return cart;
