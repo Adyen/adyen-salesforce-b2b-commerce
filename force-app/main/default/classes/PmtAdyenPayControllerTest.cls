@@ -108,6 +108,7 @@ private class PmtAdyenPayControllerTest {
         Test.startTest();
         ccrz.cc_RemoteActionResult res = PmtAdyenPayController.placeOrderAdyen(ctx, stateData);
         Test.stopTest();
+        System.assertEquals(res.success, true);
     }
 
     @isTest
@@ -123,5 +124,6 @@ private class PmtAdyenPayControllerTest {
         Test.startTest();
         ccrz.cc_RemoteActionResult res = PmtAdyenPayController.placeOrderAdyen(ctx, stateData);
         Test.stopTest();
+        System.assertEquals(res.success, false);
     }
 }
