@@ -96,7 +96,7 @@ private class PmtAdyenPayControllerTest {
     }
 
     @isTest
-    private static void testOrderSuccess(){
+    private static void creditCardSuccess(){
         ccrz__E_Cart__c cart = [SELECT Id, ccrz__EncryptedId__c FROM ccrz__E_Cart__c][0];
 
         ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
@@ -105,6 +105,21 @@ private class PmtAdyenPayControllerTest {
         string stateData = '{"riskData":{"clientData":"eyJ2ZXJzaW.."},"paymentMethod":{"type":"scheme","holderName":"Bas","encryptedCardNumber":"adyenjs_0_1_25$YtGy..","encryptedExpiryMonth":"adyenjs_0_1_25$gs6..","encryptedExpiryYear":"adyenjs_0_1_25$dLg..","encryptedSecurityCode":"adyenjs_0_1_25$Qo.."},"browserInfo":{}}';
 
         Test.setMock(HttpCalloutMock.class, new Mocks.AdyenPaymentsSuccessMock());
+        Test.startTest();
+        ccrz.cc_RemoteActionResult res = PmtAdyenPayController.placeOrderAdyen(ctx, stateData);
+        Test.stopTest();
+    }
+
+    @isTest
+    private static void creditCardFailed(){
+        ccrz__E_Cart__c cart = [SELECT Id, ccrz__EncryptedId__c FROM ccrz__E_Cart__c][0];
+
+        ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
+        ctx.storefront = 'DefaultStore';
+        ctx.currentCartId = cart.ccrz__EncryptedId__c;
+        string stateData = '{"riskData":{"clientData":"eyJ2ZXJzaW.."},"paymentMethod":{"type":"scheme","holderName":"Bas","encryptedCardNumber":"adyenjs_0_1_25$YtGy..","encryptedExpiryMonth":"adyenjs_0_1_25$gs6..","encryptedExpiryYear":"adyenjs_0_1_25$dLg..","encryptedSecurityCode":"adyenjs_0_1_25$Qo.."},"browserInfo":{}}';
+
+        Test.setMock(HttpCalloutMock.class, new Mocks.AdyenPaymentsFailedMock());
         Test.startTest();
         ccrz.cc_RemoteActionResult res = PmtAdyenPayController.placeOrderAdyen(ctx, stateData);
         Test.stopTest();
