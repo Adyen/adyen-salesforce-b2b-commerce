@@ -102,7 +102,7 @@ private class PmtAdyenPayControllerTest {
         ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
         ctx.storefront = 'DefaultStore';
         ctx.currentCartId = cart.ccrz__EncryptedId__c;
-        string stateData = '{"riskData":{"clientData":"eyJ2ZXJzaW.."},"paymentMethod":{"type":"scheme","holderName":"Bas","encryptedCardNumber":"adyenjs_0_1_25$YtGy..","encryptedExpiryMonth":"adyenjs_0_1_25$gs6..","encryptedExpiryYear":"adyenjs_0_1_25$dLg..","encryptedSecurityCode":"adyenjs_0_1_25$Qo.."},"browserInfo":{}}';
+        string stateData = '{"riskData":{"clientData":"eyJ2ZXJzaW.."},"paymentMethod":{"type":"scheme","holderName":"John Smith","encryptedCardNumber":"adyenjs_0_1_25$YtGy..","encryptedExpiryMonth":"adyenjs_0_1_25$gs6..","encryptedExpiryYear":"adyenjs_0_1_25$dLg..","encryptedSecurityCode":"adyenjs_0_1_25$Qo.."},"browserInfo":{}}';
 
         Test.setMock(HttpCalloutMock.class, new Mocks.AdyenPaymentsSuccessMock());
         Test.startTest();
@@ -117,7 +117,7 @@ private class PmtAdyenPayControllerTest {
         ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
         ctx.storefront = 'DefaultStore';
         ctx.currentCartId = cart.ccrz__EncryptedId__c;
-        string stateData = '{"riskData":{"clientData":"eyJ2ZXJzaW.."},"paymentMethod":{"type":"scheme","holderName":"Bas","encryptedCardNumber":"adyenjs_0_1_25$YtGy..","encryptedExpiryMonth":"adyenjs_0_1_25$gs6..","encryptedExpiryYear":"adyenjs_0_1_25$dLg..","encryptedSecurityCode":"adyenjs_0_1_25$Qo.."},"browserInfo":{}}';
+        string stateData = '{"riskData":{"clientData":"eyJ2ZXJzaW.."},"paymentMethod":{"type":"scheme","holderName":"John Smith","encryptedCardNumber":"adyenjs_0_1_25$YtGy..","encryptedExpiryMonth":"adyenjs_0_1_25$gs6..","encryptedExpiryYear":"adyenjs_0_1_25$dLg..","encryptedSecurityCode":"adyenjs_0_1_25$Qo.."},"browserInfo":{}}';
 
         Test.setMock(HttpCalloutMock.class, new Mocks.AdyenPaymentsFailedMock());
         Test.startTest();
