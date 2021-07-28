@@ -241,7 +241,7 @@ public class AdyenTestDataFactory {
                                                                     };
     }
 
-    public static void initiateTestData(){
+    public static Map<String,Object> initiateTestData(){
         String adyenNamespace = Util.getNamespacePrefix('cc_adyencc_ccPaymentProcessor');
         Map<String,Map<String,Object>> testSetupDataAdyen = AdyenTestDataFactory.createTestSetupDataAdyen(adyenNamespace);
 
@@ -295,5 +295,6 @@ public class AdyenTestDataFactory {
         ccrz__E_StoredPayment__c storedPayment = AdyenTestDataFactory.createCCStoredPayment(acc,u1);
         insert storedPayment;
 
+        return resData;
     }
 }
