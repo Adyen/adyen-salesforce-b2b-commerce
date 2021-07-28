@@ -50,6 +50,13 @@ public class AdyenTestDataFactory {
         );
         return acc;
     }
+
+    public static ccrz__E_ContactAddr__c createContactAddress(){
+        ccrz__E_ContactAddr__c contactAddress = new ccrz__E_ContactAddr__c(
+                ccrz__CountryISOCode__c = 'US'
+        );
+        return contactAddress;
+    }
     
     public static Contact createContact(Account acc, String Name){
         Contact con = new Contact(
@@ -71,7 +78,7 @@ public class AdyenTestDataFactory {
         return user;
     }
     
-    public static ccrz__E_StoredPayment__c createCCStoredPayment(Account acc){
+    public static ccrz__E_StoredPayment__c createCCStoredPayment(Account acc, User u){
         ccrz__E_StoredPayment__c sp = new ccrz__E_StoredPayment__c();
         sp.ccrz__Account__c = acc.Id;
         sp.ccrz__AccountType__c = 'adyencc';
@@ -81,9 +88,11 @@ public class AdyenTestDataFactory {
         sp.ccrz__Storefront__c = 'DefaultStore';
         sp.ccrz__AccountNumber__c = '1111';
         sp.ccrz__DisplayName__c = 'test';
+        sp.ccrz__Enabled__c = true;
+        sp.ccrz__User__c = u.Id;
         return sp;
     }
-    
+
     public static ccrz__E_Order__c createCCOrder(Account acc, User u, Contact con){
         ccrz__E_Order__c o = new ccrz__E_Order__c();
         o.ccrz__Account__c = acc.Id;
@@ -95,7 +104,7 @@ public class AdyenTestDataFactory {
         o.ccrz__User__c = u.Id;
         return o;
     }
-    
+
     public static ccrz__E_OrderItem__c createCCOrderItem(ccrz__E_Order__c order){
         ccrz__E_OrderItem__c oi = new ccrz__E_OrderItem__c();
         oi.ccrz__Order__c = order.Id;
@@ -108,7 +117,7 @@ public class AdyenTestDataFactory {
         oi.ccrz__Quantity__c = 1;
         return oi;
     }
-    
+
     public static ccrz__E_TransactionPayment__c createCCTransactionPayment(ccrz__E_Order__c order, String transactionType, String accountType){
         ccrz__E_TransactionPayment__c tp = new ccrz__E_TransactionPayment__c();
         tp.ccrz__Account__c = order.ccrz__Account__c;
@@ -126,7 +135,7 @@ public class AdyenTestDataFactory {
         tp.ccrz__Amount__c = order.ccrz__TotalAmount__c;
         return tp;
     }
-    
+
     public static ccrz__E_Product__c createCCProduct(String productName){
         ccrz__E_Product__c p = new ccrz__E_Product__c();
         p.ccrz__LongDescRT__c = p.ccrz__ShortDescRT__c = p.ccrz__SEODescription__c = 'desc';
@@ -146,13 +155,14 @@ public class AdyenTestDataFactory {
         p.ccrz__Quantityperunit__c = 1;
         return p;
     }
-    
-    public static ccrz__E_Cart__c createCCCart(User u, Contact con, Account acc){
+
+    public static ccrz__E_Cart__c createCCCart(User u, Contact con, Account acc, ccrz__E_ContactAddr__c ca){
         ccrz__E_Cart__c cart = new ccrz__E_Cart__c();
         cart.ccrz__CurrencyISOCode__c = 'USD';
         cart.ccrz__Name__c = 'New Cart';
         cart.ccrz__BuyerEmail__c = u.Email;
         cart.ccrz__BuyerFirstName__c = u.FirstName;
+        cart.ccrz__BillTo__c = ca.Id;
         cart.ccrz__ActiveCart__c = false;
         cart.ccrz__Storefront__c = 'DefaultStore';
         cart.ccrz__CartStatus__c = 'Open';
@@ -273,10 +283,17 @@ public class AdyenTestDataFactory {
         ccrz__E_Product__c prd = AdyenTestDataFactory.createCCProduct('product test');
         insert prd;
 
-        ccrz__E_Cart__c cart = AdyenTestDataFactory.createCCCart(u1, con, acc);
+        ccrz__E_ContactAddr__c ca = AdyenTestDataFactory.createContactAddress();
+        insert ca;
+
+        ccrz__E_Cart__c cart = AdyenTestDataFactory.createCCCart(u1, con, acc, ca);
         insert cart;
 
         ccrz__E_CartItem__c cartItem = AdyenTestDataFactory.createCCCartItem(cart, prd);
         insert cartItem;
+
+        ccrz__E_StoredPayment__c storedPayment = AdyenTestDataFactory.createCCStoredPayment(acc,u1);
+        insert storedPayment;
+
     }
 }

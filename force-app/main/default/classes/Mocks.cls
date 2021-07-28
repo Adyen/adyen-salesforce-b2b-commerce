@@ -14,8 +14,21 @@ public class Mocks {
         return '{"resultCode":"ChallengeShopper","action":{"paymentData":"Ab02b4","paymentMethodType":"scheme","token":"eyJhY3NS","type":"threeDS2Challenge"},"authentication":{"threeds2.challengeToken":"eyJhY3NS"},"details":[{"key":"threeds2.challengeResult","type":"text"}],"paymentData":"Ab02b4"}';
     }
 
-       public class AdyenPaymentsSuccessMock implements HttpCalloutMock {
+    public static String mockPaymentMethodsResponse() {
+        return '{"groups":[{"name":"Credit Card","types":["mc","visa"]}],"paymentMethods":[{"brands":["mc","visa"],"details":[{"key":"number","type":"text"},{"key":"expiryMonth","type":"text"},{"key":"expiryYear","type":"text"},{"key":"cvc","type":"text"},{"key":"holderName","optional":true,"type":"text"}],"name":"Credit Card","supportsRecurring":true,"type":"scheme"}]}';
+    }
 
+    public static String mockZeroAuthResponseSuccess() {
+        return '{ "additionalData": { "recurring.recurringDetailReference": "8xxxxxxxxx", "cardSummary": "1111", "expiryDate": "3/2030", "cardHolderName": "John Smith", "paymentMethod": "visa" }, "pspReference": "8xxxxxxxxx", "resultCode": "Authorised", "merchantReference": "addStoredMethod" }';
+    }
+
+    public static String mockDisableResponse() {
+        return '{ "response": "[detail-successfully-disabled]" }';
+    }
+
+
+
+    public class AdyenPaymentsSuccessMock implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) {
             HttpResponse res = new HttpResponse();
             res.setHeader('Content-Type', 'text/json');
@@ -26,11 +39,20 @@ public class Mocks {
     }
 
     public class AdyenPaymentsFailedMock implements HttpCalloutMock {
-
         public HTTPResponse respond(HTTPRequest req) {
             HttpResponse res = new HttpResponse();
             res.setHeader('Content-Type', 'text/json');
             res.setBody(mockPaymentsResponseFailed());
+            res.setStatusCode(200);
+            return res;
+        }
+    }
+
+    public class AdyenZeroAuthSuccessMock implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'text/json');
+            res.setBody(mockZeroAuthResponseSuccess());
             res.setStatusCode(200);
             return res;
         }
@@ -41,6 +63,26 @@ public class Mocks {
             HttpResponse res = new HttpResponse();
             res.setHeader('Content-Type', 'text/json');
             res.setBody(mockPaymentsResponseChallenge());
+            res.setStatusCode(200);
+            return res;
+        }
+    }
+
+    public class AdyenPaymentMethodsMock implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'text/json');
+            res.setBody(mockPaymentMethodsResponse());
+            res.setStatusCode(200);
+            return res;
+        }
+    }
+
+     public class AdyenDisableSuccessMock implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'text/json');
+            res.setBody(mockDisableResponse());
             res.setStatusCode(200);
             return res;
         }
