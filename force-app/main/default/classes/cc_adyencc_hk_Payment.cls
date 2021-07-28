@@ -2,22 +2,18 @@ global class cc_adyencc_hk_Payment extends ccrz.cc_hk_Payment {
     global override Map<String,Object> removeStoredPayment(Map<String,Object> inputData) {
         Map<String,Object> returnData = new Map<String,Object>();
         ccrz__E_StoredPayment__c storedPayment = AdyenUtil.getStoredPayment((String)inputData.get(ccrz.cc_hk_Payment.PARAM_STORED_PAYMENT_ID));
-        if(storedPayment.ccrz__AccountType__c == 'adyencc' && storedPayment.ccrz__User__c == UserInfo.getUserId())
-        {
+        if(storedPayment.ccrz__AccountType__c == 'adyencc' && storedPayment.ccrz__User__c == UserInfo.getUserId()) {
             DisableResponse disableResponse = AdyenDisable.disableStoredPayment(storedPayment);
-            if(disableResponse.response == '[detail-successfully-disabled]')
-            {
+            if(disableResponse.response == '[detail-successfully-disabled]') {
                 returnData = super.removeStoredPayment(inputData);
             }
-            else
-            {
+            else {
                 returnData.put('result', false);
             }
         }
         else {
             returnData = super.removeStoredPayment(inputData);
         }
-
         return returnData;
     }
 
