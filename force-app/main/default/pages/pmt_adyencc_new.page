@@ -3,8 +3,12 @@
 <apex:includeScript value="{! $Resource.adyenComponent }"/>
 <apex:includeScript value="{! $Resource.adyenCheckout }"/>
     <script id="MyAccount-MyWalletPO-Desktop" type="text/template">
-        <div class="error_messages_section alert alert-danger" style="display:none;">
-            <div>Payment failed, please try again</div>
+        <div class="paymentFailedTarget">
+            <div id="paymentFailedTemplate" type="text/template">
+                <div class="error_messages_section alert alert-danger" style="display:none;">
+                    <div>Payment failed, please try again</div>
+                </div>
+            </div>
         </div>
         <div id="overlayCustom" class="modal-backdrop fade in" style="display: none"></div>
         <div class="panel panel-default cc_panel cc_myaccount_mywallet">
@@ -38,13 +42,13 @@
             { escape: true }
         );
 
-    jQuery(function($) {
-        CCRZ.models.StoredPaymentsAdyenccModel = CCRZ.CloudCrazeModel.extend({
-            className : "PmtAdyenNewController",
-            saveAdyenccNumber: function(poData, callback) {
-            },
+        jQuery(function($) {
+            CCRZ.models.StoredPaymentsAdyenccModel = CCRZ.CloudCrazeModel.extend({
+                className : "PmtAdyenNewController",
+                saveAdyenccNumber: function(poData, callback) {
+                },
         });
-        
+
         CCRZ.views.StoredPaymentsAdyenccView = CCRZ.CloudCrazeView.extend({
             viewName : "StoredPaymentsAdyenccView",
             templateDesktop : CCRZ.util.template(CCRZ.uiProperties.StoredPaymentsPOView.desktop.tmpl),
@@ -99,11 +103,29 @@
                 }
             }
         });
-        
+
         CCRZ.paymentViews = CCRZ.paymentViews || {};
         CCRZ.paymentViews.po = new CCRZ.views.StoredPaymentsAdyenccView({
             model : new CCRZ.models.StoredPaymentsAdyenccModel
         });
+
+        CCRZ.util.createView({
+            desktop: {
+                template: 'paymentFailedTemplate',
+                target: 'paymentFailedTarget'
+            },
+            phone: {
+                template: 'paymentFailedTemplate',
+                target: 'phone-center-column'
+            },
+            postRender: function() {
+                if(window.location.href.indexOf("AuthorisationFailed") > -1){
+                    document.querySelector('.error_messages_section').style.display = "block";
+                }
+            }
+        });
+
     });
     </script>
+
 </apex:page>

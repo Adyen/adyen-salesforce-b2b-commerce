@@ -21,7 +21,11 @@ public inherited sharing class AdyenUtil {
 
     public static ccrz__E_Cart__c getCartByEncryptedId(String cartId) {
         String query = 'SELECT ' + Util.allFieldsCommaSeparated(Util.getFieldList('ccrz__E_Cart__c')) + ', Owner.Email FROM ccrz__E_Cart__c WHERE ccrz__EncryptedId__c = :cartId LIMIT 1';
-        return (ccrz__E_Cart__c) Database.query(query);
+        List<ccrz__E_Cart__c> cartList = Database.query(query);
+        if(cartList.size() > 0){
+            return cartList[0];
+        }
+        return null;
     }
 
     public static User getAccountIdFromUser(Id userId) {

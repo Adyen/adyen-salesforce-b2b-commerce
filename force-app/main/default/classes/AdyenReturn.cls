@@ -10,7 +10,7 @@ public with sharing class AdyenReturn {
         Map<String, String> additionalData = (Map<String, String>)paymentResult.get('additionalData');
         String responseMerchantReference = !String.isBlank((String)additionalData.get('merchantReference')) ? (String)additionalData.get('merchantReference') : (String)paymentResult.get('merchantReference');
         Boolean isMyWallet = responseMerchantReference.contains('addStoredMethod');
-        PageReference pageReference = isMyWallet ? new PageReference(Site.getBaseSecureUrl() + '/ccrz__MyAccount?viewState=myWallet?AuthorisationFailed=true') : new PageReference(Site.getBaseSecureUrl() + '/ccrz__CheckoutNew?AuthorisationFailed=true?cartID=' + merchantReference);
+        PageReference pageReference = isMyWallet ? new PageReference(Site.getBaseSecureUrl() + '/ccrz__StoredPaymentDetail?pt=adyencc&mode=new&AuthorisationFailed=true&cartId=') : new PageReference(Site.getBaseSecureUrl() + '/ccrz__CheckoutNew?AuthorisationFailed=true?cartID=' + merchantReference);
         if (paymentResult.get('resultCode') == PaymentsResponse.ResultCodeEnum.AUTHORISED) {
             if(merchantReference == responseMerchantReference || isMyWallet){
                 pageReference = new PageReference(Site.getBaseSecureUrl() + '/ccrz__MyAccount?viewState=myWallet');

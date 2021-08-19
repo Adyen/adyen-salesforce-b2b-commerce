@@ -9,6 +9,7 @@ public with sharing class AdyenPaymentsDetails {
         PaymentsDetailsRequest paymentsDetailsRequest = new PaymentsDetailsRequest();
         paymentsDetailsRequest.details = details;
         //Get saved payment data from cart
+        if(cart != null)
         paymentsDetailsRequest.paymentData = cart.AdyenPaymentData__c;
         return callPaymentsDetails(paymentsDetailsRequest);
     }

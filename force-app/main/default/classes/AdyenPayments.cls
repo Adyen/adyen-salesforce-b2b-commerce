@@ -18,7 +18,6 @@ public with sharing class AdyenPayments {
             paymentsRequest.amount = AdyenUtil.getAdyenAmount(UserInfo.getDefaultCurrency(), 0.00);
             paymentsRequest.shopperReference = AdyenUtil.getAccountIdFromUser(UserInfo.getUserId()).AccountId;
             paymentsRequest.reference = 'addStoredMethod-' + cartId;
-            returnPage = '/ccrz__MyAccount?viewState=viewAccount&cartId=';
         }
         else {
             ccrz__E_Cart__c cart = AdyenUtil.getCartByEncryptedId(cartId);
