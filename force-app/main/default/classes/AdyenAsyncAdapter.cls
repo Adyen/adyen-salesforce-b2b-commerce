@@ -1,6 +1,5 @@
 global with sharing class AdyenAsyncAdapter implements commercepayments.PaymentGatewayAsyncAdapter, commercepayments.PaymentGatewayAdapter {
     global AdyenAsyncAdapter() {}
-    
     global commercepayments.GatewayResponse processRequest(commercepayments.paymentGatewayContext gatewayContext) {
         return null;
     }
