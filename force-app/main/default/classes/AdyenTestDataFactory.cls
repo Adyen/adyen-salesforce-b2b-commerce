@@ -1,8 +1,19 @@
 @isTest
 public class AdyenTestDataFactory {
+
+    public static UserRole createUserRole(){
+        return new UserRole(DeveloperName = 'MyCustomRole', Name = 'My Role');
+    }
+
+    public static User updateCurrentUserRole(UserRole userrole){
+        User adminUser = [Select Id, UserRoleId From User Where Id=:UserInfo.getUserId()];
+        adminUser.UserRoleId = userRole.Id;
+        return adminUser;
+    }
+
     public static List<ccrz__E_PageLabel__c> createCCPageLabel(Integer qty){
         List<ccrz__E_PageLabel__c> listLabels = new List<ccrz__E_PageLabel__c>();
-        
+
         for(Integer i=1; i<=qty; i++){
             ccrz__E_PageLabel__c label = new ccrz__E_PageLabel__c();
             label.Name = 'label'+i;
@@ -11,18 +22,18 @@ public class AdyenTestDataFactory {
             label.ccrz__ValueRT__c = 'value'+i;
             listLabels.add(label);
         }
-        
+
         return listLabels;
     }
-    
+
     public static ccrz__E_ConfigurationModule__c createCCConfigModule(String apiName, String name){
         ccrz__E_ConfigurationModule__c cm = new ccrz__E_ConfigurationModule__c();
         cm.Name = name;
         cm.ccrz__APIName__c = apiName;
-        
+
         return cm;
     }
-    
+
     public static ccrz__E_ConfigurationMeta__c createCCConfigMeta(ccrz__E_ConfigurationModule__c cm, String apiName, String name, String description){
         ccrz__E_ConfigurationMeta__c cme = new ccrz__E_ConfigurationMeta__c();
         cme.ccrz__APIName__c = apiName;
@@ -30,20 +41,20 @@ public class AdyenTestDataFactory {
         cme.Name = name;
         cme.ccrz__ConfigurationModule__c = cm.Id;
         cme.ccrz__ExternallySafe__c = true;
-        
+
         return cme;
     }
-    
+
     public static ccrz__E_Configuration__c createCCConfig(ccrz__E_ConfigurationMeta__c cme, String pageName, String storeFront, String textValue){
         ccrz__E_Configuration__c config = new ccrz__E_Configuration__c();
         config.ccrz__ConfigurationMeta__c = cme.Id;
         config.ccrz__PageName__c = pageName;
         config.ccrz__Storefront__c = storeFront;
         config.ccrz__TextValue__c = textValue;
-        
+
         return config;
     }
-    
+
     public static Account createAccount(String name){
         Account acc = new Account(
                 Name = name
@@ -57,7 +68,7 @@ public class AdyenTestDataFactory {
         );
         return contactAddress;
     }
-    
+
     public static Contact createContact(Account acc, String Name){
         Contact con = new Contact(
                 AccountId = acc.Id,
@@ -65,7 +76,7 @@ public class AdyenTestDataFactory {
         );
         return con;
     }
-    
+
     public static User createCommunityUser(Contact con){
         Profile p = [select id from profile where UserType = 'PowerCustomerSuccess' OR UserType = 'PowerPartner'][0];
         Integer rand = Integer.valueof((Math.random() * 100));
@@ -74,10 +85,10 @@ public class AdyenTestDataFactory {
                 localesidkey='en_US', profileid = p.Id, country='United States',IsActive = true,
                 ContactId = con.Id,
                 timezonesidkey='America/Los_Angeles', username='tester@noemail.com' + rand);
-        
+
         return user;
     }
-    
+
     public static ccrz__E_StoredPayment__c createCCStoredPayment(Account acc, User u){
         ccrz__E_StoredPayment__c sp = new ccrz__E_StoredPayment__c();
         sp.ccrz__Account__c = acc.Id;
@@ -270,6 +281,12 @@ public class AdyenTestDataFactory {
         ccrz__E_Configuration__c config3 = AdyenTestDataFactory.createCCConfig(cme3, 'all', 'Global', 'false');
         config3.Name = 'Global.all.pmt_adyencc.immediate_capture';
         insert config3;
+
+        UserRole ur = AdyenTestDataFactory.createUserRole();
+        insert ur;
+
+        User cUser = AdyenTestDataFactory.updateCurrentUserRole(ur);
+        update cUser;
 
         Account acc = AdyenTestDataFactory.createAccount('account');
         insert acc;
