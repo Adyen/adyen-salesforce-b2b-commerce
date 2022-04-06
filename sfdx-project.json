@@ -2,10 +2,30 @@
   "packageDirectories": [
     {
       "path": "force-app",
-      "default": true
+      "default": true,
+      "package": "Adyen-Plugin-For-SFB2B-VF",
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "postInstallScript": "PostInstallScript",
+      "dependencies": [
+        {
+          "package": "API Library Apex Adyen@1.0.0-0"
+        },
+        {
+          "package": "B2B Commerce@3.149.2"
+        }
+      ]
     }
   ],
-  "namespace": "adyen_bundle",
+  "name": "adyen-b2b-vf",
+  "namespace": "adyen_payment",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "46.0"
+  "sourceApiVersion": "53.0",
+  "packageAliases": {
+    "Adyen-Plugin-For-SFB2B-VF": "0Ho4T000000004NSAQ",
+    "API Library Apex Adyen@0.1.0.1": "04t4T000001VvbqQAC",
+    "API Library Apex Adyen@1.0.0-0": "04t4T000001VvfJQAS",
+    "B2B Commerce@3.149.2": "04t3w0000019pkd",
+    "Adyen-Plugin-For-SFB2B-VF@2.0.0-0": "04t4T000001VvfOQAS"
+  }
 }

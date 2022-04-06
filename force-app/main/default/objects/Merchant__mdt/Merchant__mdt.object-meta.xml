@@ -4,7 +4,7 @@
     <fields>
         <fullName>AdyenMerchantConfig__c</fullName>
         <externalId>false</externalId>
-        <fieldManageability>DeveloperControlled</fieldManageability>
+        <fieldManageability>SubscriberControlled</fieldManageability>
         <label>AdyenMerchantConfig</label>
         <length>40</length>
         <required>false</required>
@@ -15,7 +15,7 @@
         <fullName>ApplicationInfo_SI__c</fullName>
         <description>Merchant&apos;s System Integrator</description>
         <externalId>false</externalId>
-        <fieldManageability>DeveloperControlled</fieldManageability>
+        <fieldManageability>SubscriberControlled</fieldManageability>
         <label>ApplicationInfo_SI</label>
         <length>255</length>
         <required>false</required>
@@ -25,7 +25,7 @@
     <fields>
         <fullName>Client_Key__c</fullName>
         <externalId>false</externalId>
-        <fieldManageability>DeveloperControlled</fieldManageability>
+        <fieldManageability>SubscriberControlled</fieldManageability>
         <label>Client_Key</label>
         <length>255</length>
         <required>true</required>
@@ -37,7 +37,7 @@
         <defaultValue>false</defaultValue>
         <description>Adyen mode Live or Test</description>
         <externalId>false</externalId>
-        <fieldManageability>DeveloperControlled</fieldManageability>
+        <fieldManageability>SubscriberControlled</fieldManageability>
         <label>Live</label>
         <type>Checkbox</type>
     </fields>
@@ -55,5 +55,5 @@
     </fields>
     <label>Merchant</label>
     <pluralLabel>Merchants</pluralLabel>
-    <visibility>Protected</visibility>
+    <visibility>Public</visibility>
 </CustomObject>
