@@ -9,7 +9,7 @@
       "postInstallScript": "PostInstallScript",
       "dependencies": [
         {
-          "package": "API Library Apex Adyen@0.1.0.1"
+          "package": "API Library Apex Adyen@1.0.0-0"
         },
         {
           "package": "B2B Commerce@3.149.2"
@@ -24,7 +24,8 @@
   "packageAliases": {
     "Adyen-Plugin-For-SFB2B-VF": "0Ho4T000000004NSAQ",
     "API Library Apex Adyen@0.1.0.1": "04t4T000001VvbqQAC",
-    "B2B Commerce@3.149.2": "04t3w0000019pkd"
-
+    "API Library Apex Adyen@1.0.0-0": "04t4T000001VvfJQAS",
+    "B2B Commerce@3.149.2": "04t3w0000019pkd",
+    "Adyen-Plugin-For-SFB2B-VF@2.0.0-0": "04t4T000001VvfOQAS"
   }
 }
