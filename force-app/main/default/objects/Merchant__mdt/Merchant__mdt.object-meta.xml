@@ -4,7 +4,7 @@
     <fields>
         <fullName>AdyenMerchantConfig__c</fullName>
         <externalId>false</externalId>
-        <fieldManageability>SubscriberControlled</fieldManageability>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>AdyenMerchantConfig</label>
         <length>40</length>
         <required>false</required>
