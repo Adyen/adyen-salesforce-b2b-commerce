@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AdyenMerchantConfiguration</label>
+    <protected>false</protected>
+    <values>
+        <field>AdyenMerchantConfig__c</field>
+        <value xsi:type="xsd:string">AdyenMerchantConfig</value>
+    </values>
+    <values>
+        <field>ApplicationInfo_SI__c</field>
+        <value xsi:type="xsd:string">Merchant's System Integrator</value>
+    </values>
+    <values>
+        <field>Client_Key__c</field>
+        <value xsi:type="xsd:string">Client Key</value>
+    </values>
+    <values>
+        <field>Live__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Merchant_Account__c</field>
+        <value xsi:type="xsd:string">Merchant Account</value>
+    </values>
+</CustomMetadata>

@@ -1,10 +1,23 @@
 {
-  "orgName": "harm Company",
+  "orgName": "adyen",
   "edition": "Developer",
-  "features": [],
+  "features": ["EnableSetPasswordInApi","Communities","B2BCommerce"],
   "settings": {
-    "orgPreferenceSettings": {
-      "s1DesktopEnabled": true
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStoragePref2": false
+    },
+    "communitiesSettings": {
+      "enableNetworksEnabled": true,
+      "enableOotbProfExtUserOpsEnable": true
+    },
+    "commerceSettings": {
+      "commerceEnabled": true
+    },
+    "orderSettings": {
+      "enableOrders": true
     }
   }
 }

@@ -1,135 +1,57 @@
-@IsTest
+@isTest
 private class PmtAdyenEditControllerTest {
-    
     @testSetup
     private static void testData(){
-         Map<String,Object> resData =
-            ccrz.ccApiTestData.setupData(new Map<String,Map<String,Object>>{
-                ccrz.ccApiTestData.APPLICATION_SETTINGS => new Map<String,Object>{
-                    'Anonymous_Account_Name__c' => 'CCAnonymous',
-                        'Default_Storefront__c' => 'DefaultStore'
-                        
-                        },
-                            ccrz.ccApiTestData.STOREFRONT_SETTINGS => new Map<String,Object>{
-                                'DefaultStore' => new Map<String,Object>()            
-                                    },
-                                        ccrz.ccApiTestData.CONFIG_SETTINGS => new Map<String,Object>{
-                                            'pmt_adyencc.config' => 'ApexTest'
-                                                },
-                                                    ccrz.ccApiTestData.ACCOUNT_DATA => new Map<String,Object>{
-                                                        ccrz.ccApiTestData.ACCOUNT_LIST => new List<Map<String,Object>>{
-                                                            new Map<String,Object>{
-                                                                'name' => 'testAccount1',
-                                                                    'ccrz__dataId__c' => 'testAccount1'
-                                                                    }
-                                                        }
-                                                    }
-            });
-        
-        ccrz__E_ConfigurationModule__c cm = AdyenTestDataFactory.createCCConfigModule('pmt_adyencc', 'name');
-        insert cm;
-        
-        ccrz__E_ConfigurationMeta__c cme = AdyenTestDataFactory.createCCConfigMeta(cm, 'config', 'name', 'desc');
-        insert cme;
-        
-        ccrz__E_Configuration__c config = AdyenTestDataFactory.createCCConfig(cme, 'all', 'Global', 'ApexTest');
-        config.Name = 'Global.all.pmt_adyencc.config';
-        insert config;
-        
-        Map<String,Object> accData = (Map<String,Object>)resData.get(ccrz.ccApiTestData.ACCOUNT_DATA);
-        List<Account> accList = (List<Account>)accData.get(ccrz.ccApiTestData.ACCOUNT_LIST);
-        
-        ccrz__E_StoredPayment__c sp = AdyenTestDataFactory.createCCStoredPayment(accList[0]);
-        insert sp;
+        AdyenTestDataFactory.initiateTestData();
     }
-    
-    static testMethod void testPmtAdyenEditController(){
-        ccrz__E_StoredPayment__c sp = [SELECT Id FROM ccrz__E_StoredPayment__c LIMIT 1];
-        apexpages.currentpage().getparameters().put('pid', sp.Id);
-        
-        Test.startTest();
-        PmtAdyenEditController editController = new PmtAdyenEditController();
-        Test.stopTest();
-        
-        System.assertEquals(sp.Id, editController.storedPayment.Id);
+
+    @isTest
+    private static void constructorTest(){
+        PageReference pageRef = new PageReference('www.adyentest.com');
+        Profile p = [select id, name from profile where UserType = 'PowerCustomerSuccess' OR UserType = 'PowerPartner'][0];
+        User user = [SELECT Id FROM User WHERE profileid = :p.id][0];
+        System.runAs(user){
+            Account testAccount = AdyenTestDataFactory.createAccount('StoreFrontUserAccount');
+            insert testAccount;
+            ccrz__E_StoredPayment__c storedPayment = AdyenTestDataFactory.createCCStoredPayment(testAccount,user);
+            insert storedPayment;
+            pageRef.getParameters().put('pid', storedPayment.id);
+			Test.setCurrentPage(pageRef);
+            Test.startTest();
+            PmtAdyenEditController editController = new PmtAdyenEditController();
+            Test.stopTest();
+        }
     }
-    
-    static testMethod void testUpdateAdyenccStoredPayment(){
-        ccrz__E_StoredPayment__c sp = Selector.getStoredPayment([SELECT Id FROM ccrz__E_StoredPayment__c LIMIT 1].Id);
-        
-        Map<String,Object> mapInputData = new Map<String,Object>();
-        mapInputData.put('storedPaymentId', (String)sp.Id);
-        mapInputData.put('displayName', (String)sp.ccrz__DisplayName__c);
-        mapInputData.put('isEnabled', String.valueOf(sp.ccrz__Enabled__c));
-        mapInputData.put('expirationMonth', String.valueOf(sp.ccrz__ExpMonth__c));
-        mapInputData.put('expirationYear', String.valueOf(sp.ccrz__ExpYear__c));
-        
+
+
+    @isTest
+    private static void updateStoredPaymentSuccess(){
+        Profile p = [select id, name from profile where UserType = 'PowerCustomerSuccess' OR UserType = 'PowerPartner'][0];
+        User user = [SELECT Id FROM User WHERE profileid = :p.id][0];
+        System.runAs(user){
+            Account testAccount = AdyenTestDataFactory.createAccount('StoreFrontUserAccount');
+            insert testAccount;
+            ccrz__E_StoredPayment__c storedPayment = AdyenTestDataFactory.createCCStoredPayment(testAccount,user);
+            insert storedPayment;
+            ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
+            ctx.storefront = 'DefaultStore';
+            String inputData = '{"displayName":"John Smith","accountNumber":"545454******5454","expirationMonth":"3","expirationYear":"2030","isEnabled":true,"storedPaymentId":"' + storedPayment.Id + '"}';
+
+            Test.startTest();
+            ccrz.cc_RemoteActionResult res = PmtAdyenEditController.updateAdyenStoredPayment(ctx, inputData);
+            Test.stopTest();
+            System.assertEquals(res.success, true);
+        }
+    }
+
+    @isTest
+    private static void updateStoredPaymentError(){
         ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
-        
+        ctx.storefront = 'DefaultStore';
+        String inputData = '{"displayName":"John Smith","accountNumber":"545454******5454","expirationMonth":"3","expirationYear":"2030","isEnabled":true,"storedPaymentId":"WrongStoredPaymentId"}';
         Test.startTest();
-        ccrz.cc_RemoteActionResult res = PmtAdyenEditController.updateAdyenccStoredPayment(ctx, JSON.serialize(mapInputData));
+        ccrz.cc_RemoteActionResult res = PmtAdyenEditController.updateAdyenStoredPayment(ctx, inputData);
         Test.stopTest();
-        
-        System.assertEquals(res.success, true);
-    }
-    
-    static testMethod void testUpdateAdyenccStoredPaymentCallout(){
-        ccrz__E_StoredPayment__c sp = Selector.getStoredPayment([SELECT Id FROM ccrz__E_StoredPayment__c LIMIT 1].Id);
-        
-        Map<String,Object> mapInputData = new Map<String,Object>();
-        mapInputData.put('storedPaymentId', (String)sp.Id);
-        mapInputData.put('displayName', (String)sp.ccrz__DisplayName__c);
-        mapInputData.put('isEnabled', String.valueOf(sp.ccrz__Enabled__c));
-        mapInputData.put('expirationMonth', String.valueOf(sp.ccrz__ExpMonth__c+1));
-        mapInputData.put('expirationYear', String.valueOf(sp.ccrz__ExpYear__c+1));
-        
-        ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
-        
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new Mocks.AdyenUpdateSuccessMock());
-        ccrz.cc_RemoteActionResult res = PmtAdyenEditController.updateAdyenccStoredPayment(ctx, JSON.serialize(mapInputData));
-        Test.stopTest();
-        
-        System.assertEquals(res.success, true);
-    }
-    
-    static testMethod void testUpdateAdyenccStoredPaymentCalloutError(){
-        ccrz__E_StoredPayment__c sp = Selector.getStoredPayment([SELECT Id FROM ccrz__E_StoredPayment__c LIMIT 1].Id);
-        
-        Map<String,Object> mapInputData = new Map<String,Object>();
-        mapInputData.put('storedPaymentId', (String)sp.Id);
-        mapInputData.put('displayName', (String)sp.ccrz__DisplayName__c);
-        mapInputData.put('isEnabled', String.valueOf(sp.ccrz__Enabled__c));
-        mapInputData.put('expirationMonth', String.valueOf(sp.ccrz__ExpMonth__c+1));
-        mapInputData.put('expirationYear', String.valueOf(sp.ccrz__ExpYear__c+1));
-        
-        ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
-        
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new Mocks.AdyenUpdateErrorMock());
-        ccrz.cc_RemoteActionResult res = PmtAdyenEditController.updateAdyenccStoredPayment(ctx, JSON.serialize(mapInputData));
-        Test.stopTest();
-        
-        System.assertEquals(res.success, false);
-    }
-    
-    static testMethod void testUpdateAdyenccStoredPaymentCalloutResufed(){
-        ccrz__E_StoredPayment__c sp = Selector.getStoredPayment([SELECT Id FROM ccrz__E_StoredPayment__c LIMIT 1].Id);
-        
-        Map<String,Object> mapInputData = new Map<String,Object>();
-        mapInputData.put('storedPaymentId', (String)sp.Id);
-        mapInputData.put('displayName', (String)sp.ccrz__DisplayName__c);
-        mapInputData.put('isEnabled', String.valueOf(sp.ccrz__Enabled__c));
-        mapInputData.put('expirationMonth', String.valueOf(sp.ccrz__ExpMonth__c+1));
-        mapInputData.put('expirationYear', String.valueOf(sp.ccrz__ExpYear__c+1));
-        
-        ccrz.cc_RemoteActionContext ctx = new ccrz.cc_RemoteActionContext();
-        
-        Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new Mocks.AdyenUpdateRefusedMock());
-        ccrz.cc_RemoteActionResult res = PmtAdyenEditController.updateAdyenccStoredPayment(ctx, JSON.serialize(mapInputData));
-        Test.stopTest();
-        
         System.assertEquals(res.success, false);
     }
 }

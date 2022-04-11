@@ -1,0 +1,248 @@
+<apex:page controller="PmtAdyenStoredController" docType="html-5.0" applyHtmlTag="false" showHeader="false" sidebar="false"
+           standardStylesheets="false">
+    <div class="paymentFailedTarget" style="display:none"/>
+    <script id="paymentFailedTemplate" type="text/template">
+        <div class="error_messages_section alert alert-danger">
+            <div>Payment failed, please try again</div>
+        </div>
+    </script>
+    <script>
+        jQuery(function($) {
+            CCRZ.util.createView({
+                desktop: {
+                    template: 'paymentFailedTemplate',
+                    target: 'paymentFailedTarget'
+                },
+                phone: {
+                    template: 'paymentFailedTemplate',
+                    target: 'phone-center-column'
+                },
+                postRender: function() {
+                    if(window.location.href.indexOf("AuthorisationFailed") > -1){
+                        document.querySelector('.paymentFailedTarget').style.display = "block";
+                    }
+                }
+            });
+        });
+    </script>
+    <script id="PaymentProcessor-Adyen" type="text/template">
+        <div class="panel cc_panel cc_payment_processor">
+            <div class="panel-body cc_body">
+                <div class="storedpayment-messagingSection-Error" role="alert" style="display: none"></div>
+                <div class="storedpayment-messagingSection-Warning" role="alert" style="display: none"></div>
+                <div class="storedpayment-messagingSection-Info" role="alert" style="display: none">
+                    <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                </div>
+
+                {{#if true }}
+                {{#ifDisplay 'WLT.Enabled'}}
+                {{#if this.storedPayments}}
+                <div class="panel panel-default cc_panel cc_payment_processor_mywallet">
+                    <div class="panel-heading cc_heading">
+                        <h3 class="panel-title cc_title">{{pageLabelMap 'PaymentProcessor_MyWallet'}}</h3>
+                    </div>
+                    <div class="panel-body cc_body">
+                        <div class="cc_stored_payments_container">
+                            <div class="cc_top_section">{{pageLabelMap 'PaymentProcessor_Top'}}</div>
+                            {{#each this.storedPayments}}
+                            <div class="cc_stored_payments_container {{this.accountType}}">
+                                <div class="radio">
+                                    <label for="storedPaymentSelection{{this.sfid}}" class="cc_stored_payments_selector {{this.sfid}}">
+                                        <input id="storedPaymentSelection{{this.sfid}}" type="radio" name="storedPaymentSelection" value="{{this.sfid}}" class="storedPaymentSelection {{this.sfid}}" data-id="{{this.sfid}}" {{#ifEquals @root.storedSelected this.sfid}}checked{{/ifEquals}}/></span>
+                                    </label>
+                                    <span class="cc_stored_payment_display">
+              {{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear) this.displayName}}
+             </span>
+                                </div>
+                            </div>
+                            {{/each}}
+                            <div class="cc_payment_action_container">
+                                <p class="panel-body pull-right cc_action_buttons">
+                                    <button type="button" id="storePaymentBtn" class="btn btn-default btn-sm useStoredPayment cc_use_stored_payment">{{pageLabelMap 'PaymentProcessor_UseStoredPayment'}}</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/if}}
+                {{/ifDisplay}}
+                {{/if}}
+            </div>
+            <div class="paymentMidSection">{{pageLabelMap 'PaymentProcessor_MidSec'}}</div>
+            {{#if this.paymentTypes}}
+                {{#if this.paymentTypes.adyencc }}
+                    <!-- Response from Adyen /paymentMethods -->
+                    <input type="hidden" value="{{this.paymentTypes.adyencc.adyenPaymentMethods}}" id="adyenPaymentMethods"/>
+                    <input type="hidden" value="{{this.paymentTypes.adyencc.adyenClientKey}}" id="adyenClientKey"/>
+                    <input type="hidden" value="{{this.paymentTypes.adyencc.adyenEnvironment}}" id="adyenEnvironment"/>
+                {{/if}}
+
+            <div class="cc_payment_types_container">
+                <ul class="nav nav-tabs cc_nav-tabs cc_nav-tabs-payment" role="tablist">
+                    {{#each this.paymentTypes}}
+                    <li role="presentation" {{#ifEquals @index 0 }} class="active cc_nav-tabs_li" {{/ifEquals}}>
+                    <a href="#{{@key}}" aria-controls="{{@key}}" role="tab" class="cc_nav-tabs_anchor" data-toggle="tab">{{pageLabelMapMultiString 'PaymentProcessorTab_' @key}}</a>
+                    </li>
+                    {{/each}}
+                </ul>
+                <!--***********-->
+                <div class="tab-content cc_tab-content">
+                    {{#each this.paymentTypes}}
+                    <div role="tabpanel" class="cc_tab-pane tab-pane {{#ifEquals @index 0 }} active {{/ifEquals}} " id="{{@key}}">
+                        <div class="paymentTypeContainer {{@key}} err cc_payment_type">
+                            {{pageLabelMap 'Payment_LoadingPaymentType'}}
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </script>
+    <script>
+        jQuery(function($){
+            CCRZ.pubSub.on('view:PaymentProcessorView:refresh',function(PaymentProcessorView){
+                PaymentProcessorView.events['click .useStoredPayment'] = 'useStoredPaymentAdyen';
+                PaymentProcessorView.useStoredPaymentAdyen = function(event){
+                    if (!$("#storePaymentBtn").is(":disabled")) {
+                        if (this.model.get("storedSelected")) {
+                            var storedPayment = this.model.get("storedSelected");
+                            _.each(this.model.get('storedPayments'), function (sp) {
+                                if (sp.sfid == storedPayment) {
+                                    storedPayment = sp;
+                                }
+                            });
+                            if (storedPayment.accountType == "adyencc") {
+                                loadingToggle();
+                                let stateData = createStateDataStoredPayment(storedPayment);
+                                Visualforce.remoting.Manager.invokeAction(
+                                    '{!$RemoteAction.PmtAdyenStoredController.placeOrderByStoredPaymentAdyen}',
+                                    CCRZ.pagevars.remoteContext,
+                                    JSON.stringify(stateData),
+                                    function(result){
+                                        if(result.data.cartId) {
+                                            window.cartId = result.data.cartId;
+                                        }
+                                        handlePaymentResult(result.data);
+                                    },
+                                    { escape: true }
+                                );
+                            } else {
+                                CCRZ.pubSub.trigger("action:processPayment", {
+                                    "storedPaymentId": storedPayment.sfid,
+                                    "accountNumber": storedPayment.accountNumber,
+                                    "accountType": storedPayment.accountType
+                                });
+                                if (CCRZ.ga) {
+                                    CCRZ.ga.handleSubmitOrder({'cartId': CCRZ.pagevars.currentCartID});
+                                } else {
+                                    CCRZ.pubSub.trigger("pageMessage", CCRZ.createPageMessage('ERROR', "storedpayment-messagingSection-Error", 'PaymentProcessor_InvalidPaymentId'));
+                                }
+                            }
+                        }
+                    }
+                }
+                PaymentProcessorView.delegateEvents();
+            });
+        });
+
+        jQuery(function($) {
+            CCRZ.models.PaymentProcessorModel = CCRZ.CloudCrazeModel.extend({
+            });
+
+            CCRZ.views.PaymentProcessorView = CCRZ.CloudCrazeView.extend({
+                templatePhone : false,
+                templateDesktop : false,
+                viewName : "PaymentProcessorView",
+                managedSubView: true,
+                childPaymentViews : [],
+                events: {
+                    "click .useStoredPayment" : "useStoredPayment"
+                    ,"click input.storedPaymentSelection" : "handleStoredPaymentSelection"
+                },
+                init: function(options) {
+                    this.phoneTemplate     = CCRZ.util.template(options.uiProperties.phone.tmpl);
+                    this.desktopTemplate   = CCRZ.util.template(options.uiProperties.desktop.tmpl);
+                    this.desktopSelector   = options.uiProperties.desktop.selector;
+                    this.phoneSelector     = options.uiProperties.phone.selector;
+                    this.paymentData = options.paymentData;
+
+                },
+                oneTimeRender : _.once(function(){
+                    var me = this;
+                    CCRZ.pubSub.on('action:paymentViewInit',function(payView){
+                        me.childPaymentViews.push(payView);
+                    });
+                    CCRZ.pubSub.on('action:paymentViewReady',function(payType,callback){
+                        callback({selector:'.paymentTypeContainer.'+payType});
+                    });
+                    var modelData = this.model.toJSON();
+                    _.each(modelData.paymentTypes,function(pt,key){
+                        me.paymentData = _.extend(me.paymentData, CCRZ.pagevars.remoteContext, {
+                            pmt_page : pt[me.paymentData.payKey]
+                        });
+                        $.post("/ccrz__CCPaymentInfo", me.paymentData).done(function(data){
+                            $('.paymentFuncContainer').append(data);
+                        });
+                    },this);
+
+                }),
+                clearView: function(theSelector){
+                    this.setElement($(theSelector));
+                    this.$el.html('');
+                },
+                doRender : function (theTemplate,theSelector){
+                    this.setElement($(theSelector));
+                    var modelData = this.model.toJSON();
+                    this.$el.html(theTemplate(modelData));
+                    this.oneTimeRender();
+                    _.each(this.childPaymentViews,function(cv){
+                        cv.render();
+                    });
+                },
+                preRender : function(){
+                    _.each(this.childPaymentViews,function(cv){
+                        if(_.isFunction(cv.parentPreRender)){
+                            cv.parentPreRender();
+                        }
+                    });
+                },
+                renderDesktop: function() {
+                    this.clearView(this.phoneSelector);
+                    this.doRender(this.desktopTemplate,this.desktopSelector);
+                },
+                renderPhone : function(){
+                    this.clearView(this.desktopSelector);
+                    this.doRender(this.phoneTemplate,this.phoneSelector);
+                },
+                handleStoredPaymentSelection : function(event){
+                    var objLink = $(event.currentTarget);
+                    var id = objLink.data("id");
+                    this.model.set("storedSelected",id);
+                },
+                useStoredPayment : function(event){
+                    if(!$("#storePaymentBtn").is(":disabled")) {
+                        if(this.model.get("storedSelected")){
+                            $("#storePaymentBtn").attr("disabled", true);
+                            var storedPayment = this.model.get("storedSelected");
+                            _.each(this.model.get('storedPayments'),function(sp){
+                                if(sp.sfid == storedPayment){
+                                    storedPayment = sp;
+                                }
+                            });
+                            CCRZ.pubSub.trigger("action:processPayment", {"storedPaymentId":storedPayment.sfid, "accountNumber":storedPayment.accountNumber, "accountType":storedPayment.accountType});
+                            if(CCRZ.ga){
+                                CCRZ.ga.handleSubmitOrder({'cartId': CCRZ.pagevars.currentCartID});
+                            }
+                        }else{
+                            CCRZ.pubSub.trigger("pageMessage", CCRZ.createPageMessage('ERROR', "storedpayment-messagingSection-Error", 'PaymentProcessor_InvalidPaymentId'));
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        CCRZ.uiProperties.CheckoutPaymentView.PaymentProcessor.desktop.tmpl = 'PaymentProcessor-Adyen';
+    </script>
+</apex:page>

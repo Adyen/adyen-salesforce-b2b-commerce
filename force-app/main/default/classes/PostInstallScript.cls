@@ -1,7 +1,3 @@
-/**
- * Created by jaapbranderhorst on 2019-07-16.
- */
-
 public without sharing class PostInstallScript implements InstallHandler {
 
     // add actions that implement the InstallAction interface to this map to have them executed on post install

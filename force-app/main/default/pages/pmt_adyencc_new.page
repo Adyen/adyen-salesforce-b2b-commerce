@@ -1,95 +1,54 @@
-<!--
-- Created by harm on 2019-08-22.
--->
-
 <apex:page controller="PmtAdyenNewController" docType="html-5.0" applyHtmlTag="false" showHeader="false" sidebar="false" standardStylesheets="false">
-    <apex:includeScript value="{! $Resource.validations }"/>
+<apex:includeScript value="{! $Resource.validations }"/>
+<apex:includeScript value="{! $Resource.adyenComponent }"/>
+<apex:includeScript value="{! $Resource.adyenCheckout }"/>
     <script id="MyAccount-MyWalletPO-Desktop" type="text/template">
-    <div id="overlayCustom" class="modal-backdrop fade in" style="display: none" />
-    <div class="panel panel-default cc_panel cc_myaccount_mywallet">
-        <div class="panel-heading cc_heading">
-            <h3 class="panel-title cc_title">{{pageLabelMap 'MyWallet_AddPymtMtd'}}</h3>
+        <div class="paymentFailedTarget">
+            <div id="paymentFailedTemplate" type="text/template">
+                <div class="error_messages_section alert alert-danger" style="display:none;">
+                    <div>Payment failed, please try again</div>
+                </div>
+            </div>
+        </div>
+        <div id="overlayCustom" class="modal-backdrop fade in" style="display: none"></div>
+        <div class="panel panel-default cc_panel cc_myaccount_mywallet">
+            <div class="panel-heading cc_heading">
+                <h3 class="panel-title cc_title">{{pageLabelMap 'MyWallet_AddPymtMtd'}}</h3>
             </div>
             <div class="cc_myaccount_content panel-body cc_body">
-                {{#if errors}}
-                 <div class="poPayment-messagingSection-Error">
-                 {{#each errors}}
-                 <div class="alert alert-danger">{{this.message}}</div>
-                 {{/each}}
-                 </div>
-                 {{/if}}
-                <div class="error_messages_section" style="display:none;"></div>
-                <form id="newAdyenccForm" class="form-horizontal newAdyenccForm cc_new_po_form">
-                    <h4>{{pageLabelMap 'MyWallet_NewAdyencc'}}</h4>
-                            <div class="form-group accountNumber">
-                            <label for="accountNumber" class="col-sm-2 control-label poLabel Number fieldLabel">{{pageLabelMap 'MyWallet_AdyenccCreditCardNumber'}}</label>
-                            <div class="col-sm-10">
-                            <input id="accountNumber" type="text" class="form-control" name="accountNumber" value="{{this.accountNumber}}" maxlength="19" placeholder="4111111111111111" />
-                            </div>
-                            </div>
-                            
-                            <div class="form-group expirationMonth">
-                            <label for="expirationMonth" class="col-sm-2 control-label poLabel Number fieldLabel">{{pageLabelMap 'MyWallet_AdyenccExpirationMonth'}}</label>
-                            <div class="col-sm-10">
-                            <input id="expirationMonth" type="text" class="form-control" name="expirationMonth" value="{{this.expirationMonth}}" maxlength="2" placeholder="MM" />
-                            </div>
-                            </div>
-                            <div class="form-group expirationYear">
-                            <label for="expirationYear" class="col-sm-2 control-label poLabel Number fieldLabel">{{pageLabelMap 'MyWallet_AdyenccExpirationYear'}}</label>
-                            <div class="col-sm-10">
-                            <input id="expirationYear" type="text" class="form-control" name="expirationYear" value="{{this.expirationYear}}" maxlength="4" placeholder="YYYY" />
-                            </div>
-                            </div>
-                            <div class="form-group verificationCode">
-                            <label for="verificationCode" class="col-sm-2 control-label poLabel Number fieldLabel">{{pageLabelMap 'MyWallet_AdyenccVerificationNumber'}}</label>
-                            <div class="col-sm-10">
-                            <input id="verificationCode" type="text" class="form-control" name="verificationCode" value="{{this.verificationCode}}" maxlength="4" placeholder="000" />
-                            </div>
-                            </div>
-                            <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                            <label for="isEnabled" class="poLabel SavePayment fieldLabel">
-                            <input type="checkbox" name="isEnabled" id="isEnabled" {{#if this.isEnabled}}checked{{/if}} />{{pageLabelMap 'MyWallet_Enabled'}}
-                            </label>
-                            </div>
-                            </div>
-                            </div>
-                            <div class="form-group displayName">
-                            <label for="displayName" class="col-sm-2 control-label poLabel Name fieldLabel">{{pageLabelMap 'MyWallet_NameOpt'}}</label>
-                            <div class="col-sm-10">
-                            <input id="displayName" type="text" class="form-control" name="displayName" maxlength="50" />
-                            </div>
-                            </div>
-                            <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                            <input type="button" class='btn btn-default btn-sm button cancelPO cc_cancel_po' id="cancelAdyencc" value="{{pageLabelMap 'MyWallet_Cancel'}}" />
-                            <input type="button" class='btn btn-default btn-sm button saveAdyencc cc_save_po' id="saveAdyencc" value="{{pageLabelMap 'MyWallet_SaveToWall'}}" />
-                            </div>
-                            </div>
-                            
-                            </form>
-                            </div>
-                            </div>
-                            </script>
-    
-    
-    <script>
-    let displayName = "";
-    let accountNumber = "";
-    let expirationMonth = "";
-    let expirationYear = "";
-    let verificationCode = "";
-    let isEnabled = false;
-    let errorMsgs = null;
-    jQuery(function($) {
-        CCRZ.models.StoredPaymentsAdyenccModel = CCRZ.CloudCrazeModel.extend({
-            className : "PmtAdyenNewController",
-            saveAdyenccNumber: function(poData, callback) {
-                
+                <div id="paymentMethodsList"></div>
+            </div>
+        </div>
+        <input type="hidden" id="adyenStateData"/>
+        <input type="button" class='btn btn-default btn-sm button cancelPO cc_cancel_po' id="cancelAdyencc" value="{{pageLabelMap 'MyWallet_Cancel'}}" />
+        <input type="button" class='btn btn-default btn-sm button saveAdyencc cc_save_po' id="saveAdyencc" value="{{pageLabelMap 'MyWallet_SaveToWall'}}" />
+        <div class="modal fade" id="action-modal" role="dialog">
+            <div class="modal-dialog">
+                <div id="action-container"></div>
+            </div>
+        </div>
+    </script>
+    <script type="text/javascript">
+        let isGuest = false;
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.PmtAdyenNewController.getMyWalletConfig}',
+            CCRZ.pagevars.remoteContext,
+            function(result, event){
+                if(result.data){
+                    const paymentMethods = convertToJsonObject(result.data.adyenPaymentMethods);
+                    renderAdyenComponent(paymentMethods, result.data.adyenEnvironment, result.data.adyenClientKey);
+                }
             },
+            { escape: true }
+        );
+
+        jQuery(function($) {
+            CCRZ.models.StoredPaymentsAdyenccModel = CCRZ.CloudCrazeModel.extend({
+                className : "PmtAdyenNewController",
+                saveAdyenccNumber: function(poData, callback) {
+                },
         });
-        
+
         CCRZ.views.StoredPaymentsAdyenccView = CCRZ.CloudCrazeView.extend({
             viewName : "StoredPaymentsAdyenccView",
             templateDesktop : CCRZ.util.template(CCRZ.uiProperties.StoredPaymentsPOView.desktop.tmpl),
@@ -101,40 +60,6 @@
                 "click #saveAdyencc" : "saveNewAdyenccNumber",
                 "click #cancelAdyencc" : "cancelNewAdyenccNumber"
             },
-            initValidation : function() {
-                jQuery.validator.addMethod("ccNumber", function (value, element) {
-                    return luhnCheck(value);
-                }, CCRZ.pagevars.pageLabels['PMTAdyencc_accountNumberInvalid']);
-                $('#newAdyenccForm').validate({
-                    invalidHandler : function(event, validator) {
-                        CCRZ.handleValidationErrors(event, validator, 'error_messages_section', false);
-                    },
-                    rules : {
-                        accountNumber : { required : true, ccNumber : true },
-                        expirationMonth : { required : true, range : [1, 12] },
-                        expirationYear : { required : true },
-                        verificationCode : { required : true, minlength : 3, maxlength : 4 }
-                    },
-                    messages : {
-                        accountNumber : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_accountNumberReq']},
-                        expirationMonth : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_expirationMonthReq'], range : CCRZ.pagevars.pageLabels['PMTAdyencc_expirationMonthInvalid']},
-                        expirationYear : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_expirationYearReq']},
-                        verificationCode : { required : CCRZ.pagevars.pageLabels['PMTAdyencc_verificationCodeReq'], minlength : CCRZ.pagevars.pageLabels['PMTAdyencc_verificationCodeInvalid'], maxlength : CCRZ.pagevars.pageLabels['PMTAdyencc_verificationCodeInvalid']}
-                    },
-                    errorPlacement : function(error, element) { }
-                });
-            },
-            preRender : function() {
-                this.data={
-                    'displayName' : displayName,
-                    'accountNumber' : accountNumber,
-                    'isEnabled' : isEnabled,
-                    'expirationMonth' : expirationMonth,
-                    'expirationYear' : expirationYear,
-                    'verificationCode' : verificationCode,
-                   	errors : errorMsgs
-                };
-            },
             renderDesktop : function(){
                 $(CCRZ.uiProperties.StoredPaymentsPOView.phone.selector).empty();
                 this.setElement($(CCRZ.uiProperties.StoredPaymentsPOView.desktop.selector));
@@ -145,56 +70,62 @@
                 this.setElement($(CCRZ.uiProperties.StoredPaymentsPOView.phone.selector));
                 this.$el.html(this.templatePhone(this.data));
             },
-            postRender : function() {
-                this.initValidation();
-            },
             cancelNewAdyenccNumber : function(){
                 myWallet();
             },
             saveNewAdyenccNumber : function() {
-                if ($('#newAdyenccForm').valid()) {
-                    var formData = form2js("newAdyenccForm", '.', false, function(node) {}, false);
-                    formData.accountType = 'adyencc';
-                    formData.isEnabled = formData.isEnabled != null ? true : false;
-                    expirationMonth = formData.expirationMonth;
-                    expirationYear = formData.expirationYear;
-                    isEnabled = formData.isEnabled;
-                    displayName = formData.displayName;
-                    accountNumber = formData.accountNumber;
-                    verificationCode = formData.verificationCode;
-                    
+                if(validateComponent()){
                     let self = this;
                     loadingToggle();
                     Visualforce.remoting.Manager.invokeAction(
                         '{!$RemoteAction.PmtAdyenNewController.addAdyenccStoredPayment}',
                         CCRZ.pagevars.remoteContext,
-                        JSON.stringify(formData),
+                        document.getElementById("adyenStateData").value,
                         function(result, event){
-                            if (event.status && result.success) {
-                                myWallet();
-                                errorMsgs = null;
-                                self.data.errors = null;
-                            } else if (event.type === 'exception') {
-                                errorMsgs = result.messages;
-                                self.data.errors = result.messages;
-                                loadingToggle();
-                            } else {
-                                errorMsgs = result.messages;
-                                self.data.errors = result.messages;
-                                loadingToggle();
+                            if (!result.data.isFinal && result.data.action) {
+                                //handle payment action
+                                handleAction(result.data.action);
                             }
-                            self.render();
+                            else if(result.success){
+                                loadingToggle();
+                                $("#action-modal").modal('hide');
+                                myWallet();
+                            }
+                            else {
+                                loadingToggle();
+                                $("#action-modal").modal('hide');
+                                document.querySelector('.error_messages_section').setAttribute('style', 'display:block');
+                                return false;
+                            }
                         },
-                        {escape: true}
+                        { escape: true }
                     );
                 }
             }
         });
-        
+
         CCRZ.paymentViews = CCRZ.paymentViews || {};
         CCRZ.paymentViews.po = new CCRZ.views.StoredPaymentsAdyenccView({
             model : new CCRZ.models.StoredPaymentsAdyenccModel
         });
+
+        CCRZ.util.createView({
+            desktop: {
+                template: 'paymentFailedTemplate',
+                target: 'paymentFailedTarget'
+            },
+            phone: {
+                template: 'paymentFailedTemplate',
+                target: 'phone-center-column'
+            },
+            postRender: function() {
+                if(window.location.href.indexOf("AuthorisationFailed") > -1){
+                    document.querySelector('.error_messages_section').style.display = "block";
+                }
+            }
+        });
+
     });
     </script>
+
 </apex:page>

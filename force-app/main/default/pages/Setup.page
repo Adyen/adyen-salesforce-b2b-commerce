@@ -18,8 +18,7 @@
                             </apex:commandLink>
                         </apex:column>
                         <apex:column value="{!configRecord.DeveloperName}" width="25%" />
-                        <apex:column value="{!configRecord.Name__c}" width="25%" />
-                        <apex:column value="{!configRecord.Authorise_Endpoint__c}" width="25%" />
+                        <apex:column value="{!configRecord.Merchant_Account__c}" width="25%" />
                     </apex:pageBlockTable>
 
                 </apex:actionRegion>

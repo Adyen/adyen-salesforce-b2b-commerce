@@ -1,7 +1,8 @@
 @IsTest
 private class PostInstallScriptTest {
-    
-    private static testMethod void testInstallInitialData() {
+
+    @isTest
+    private static void testInstallInitialData() {
         Test.startTest();
         Test.testInstall(new PostInstallScript(), null);
         Test.stopTest();

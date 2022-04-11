@@ -1,7 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Represents a Merchant used in the Adyen interface. The Merchant record contains all connection params</description>
+    <fields>
+        <fullName>AdyenMerchantConfig__c</fullName>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>AdyenMerchantConfig</label>
+        <length>40</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ApplicationInfo_SI__c</fullName>
+        <description>Merchant&apos;s System Integrator</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>ApplicationInfo_SI</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Client_Key__c</fullName>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Client_Key</label>
+        <length>255</length>
+        <required>true</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Live__c</fullName>
+        <defaultValue>false</defaultValue>
+        <description>Adyen mode Live or Test</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>Live</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Merchant_Account__c</fullName>
+        <description>Name of the Merchant, passed to the Adyen API as such</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <inlineHelpText>Name of the Merchant, passed to the Adyen API as such</inlineHelpText>
+        <label>Merchant Name</label>
+        <length>255</length>
+        <required>true</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
     <label>Merchant</label>
     <pluralLabel>Merchants</pluralLabel>
-    <visibility>Protected</visibility>
+    <visibility>Public</visibility>
 </CustomObject>
